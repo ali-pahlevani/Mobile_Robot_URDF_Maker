@@ -33,12 +33,12 @@
         </geometry>
       </collision>
     </link>
-  </xacro:macro>
 
-  <!-- Fixed Joint between base_link and chassis -->
-  <joint name="base_to_chassis" type="fixed">
-    <parent link="base_link" />
-    <child link="chassis" />
-    <origin xyz="0 0 0" rpy="0 0 0" />
-  </joint>
+    <!-- Fixed Joint between base_link and chassis -->
+    <joint name="base_to_chassis" type="fixed">
+      <parent link="base_link" />
+      <child link="chassis" />
+      <origin xyz="0 0 ${h/2}" rpy="0 0 0" />
+    </joint>
+  </xacro:macro>
 </robot>

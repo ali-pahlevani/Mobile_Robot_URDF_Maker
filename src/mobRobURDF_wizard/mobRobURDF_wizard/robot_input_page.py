@@ -105,6 +105,14 @@ class RobotInputPage(QWizardPage):
         except Exception:
             L, W, H = 1.2, 0.8, 0.3
             chassis_size_str = "1.2 0.8 0.3"
+            
+        # Get and parse camera size (expected as "Lc Wc Hc")
+        camera_size_str = self.cameraSizeLineEdit.text()
+        try:
+            Lc, Wc, Hc = map(float, camera_size_str.split())
+        except Exception:
+            Lc, Wc, Hc = 0.08, 0.2, 0.08
+            camera_size_str = "0.08 0.2 0.08"
 
         # Prepare parameters for substitution (for URDF generation)
         params = {
@@ -119,25 +127,32 @@ class RobotInputPage(QWizardPage):
             "lidar_height": self.lidarHeightLineEdit.text() or "0.08",
             "lidar_mass": self.lidarMassLineEdit.text() or "0.2",
             "lidar_material": self.lidarMaterialLineEdit.text() or "Red",
-            "camera_size": self.cameraSizeLineEdit.text() or "0.08 0.2 0.08",
+            "camera_size": camera_size_str,
             "camera_mass": self.cameraMassLineEdit.text() or "0.1",
             "camera_material": self.cameraMaterialLineEdit.text() or "Blue",
         }
 
+        # Convert wheel width to float
+        wheel_width = float(params["wheel_width"])
+        
+        # Convert lidar height to float
+        lidar_height = float(params["lidar_height"])
+
         # Compute wheel positions and lidar placement for URDF
         params["fl_x"] = str(L / 2)
-        params["fl_y"] = str(W / 2)
+        params["fl_y"] = str(W / 2 + wheel_width / 2)
         params["fl_z"] = str(-H / 2)
         params["fr_x"] = str(L / 2)
-        params["fr_y"] = str(-W / 2)
+        params["fr_y"] = str(-W / 2 - wheel_width / 2)
         params["fr_z"] = str(-H / 2)
         params["rl_x"] = str(-L / 2)
-        params["rl_y"] = str(W / 2)
+        params["rl_y"] = str(W / 2 + wheel_width / 2)
         params["rl_z"] = str(-H / 2)
         params["rr_x"] = str(-L / 2)
-        params["rr_y"] = str(-W / 2)
+        params["rr_y"] = str(-W / 2 - wheel_width / 2)
         params["rr_z"] = str(-H / 2)
-        params["lidar_z"] = str(H / 2)
+        params["lidar_z"] = str(H / 2 + lidar_height / 2)
+        params["camera_x"] = str(L / 2 + Lc / 2)
 
         # Retrieve the top-level wizard
         wizard = self.window()

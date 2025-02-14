@@ -6,12 +6,6 @@
 <robot name="mobRob">
   <!-- Base Link -->
   <link name="base_link"/>
-  <!-- Fixed Joint between base_link and chassis -->
-  <joint name="base_to_chassis" type="fixed">
-    <parent link="base_link"/>
-    <child link="chassis"/>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-  </joint>
   <!-- <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_sensors.xacro" /> -->
   <material name="Gray">
     <color rgba="0.5 0.5 0.5 1.0"/>
@@ -51,6 +45,12 @@
       </geometry>
     </collision>
   </link>
+  <!-- Fixed Joint between base_link and chassis -->
+  <joint name="base_to_chassis" type="fixed">
+    <parent link="base_link"/>
+    <child link="chassis"/>
+    <origin rpy="0 0 0" xyz="0 0 0.15"/>
+  </joint>
   <link name="front_left_wheel">
     <inertial>
       <mass value="0.5"/>
@@ -74,7 +74,7 @@
   <joint name="front_left_joint" type="continuous">
     <parent link="chassis"/>
     <child link="front_left_wheel"/>
-    <origin rpy="0 0 0" xyz="0.6 0.4 -0.15"/>
+    <origin rpy="0 0 0" xyz="0.6 0.46 -0.15"/>
     <axis xyz="0 1 0"/>
   </joint>
   <link name="front_right_wheel">
@@ -100,7 +100,7 @@
   <joint name="front_right_joint" type="continuous">
     <parent link="chassis"/>
     <child link="front_right_wheel"/>
-    <origin rpy="0 0 0" xyz="0.6 -0.4 -0.15"/>
+    <origin rpy="0 0 0" xyz="0.6 -0.46 -0.15"/>
     <axis xyz="0 1 0"/>
   </joint>
   <link name="rear_left_wheel">
@@ -126,7 +126,7 @@
   <joint name="rear_left_joint" type="continuous">
     <parent link="chassis"/>
     <child link="rear_left_wheel"/>
-    <origin rpy="0 0 0" xyz="-0.6 0.4 -0.15"/>
+    <origin rpy="0 0 0" xyz="-0.6 0.46 -0.15"/>
     <axis xyz="0 1 0"/>
   </joint>
   <link name="rear_right_wheel">
@@ -152,7 +152,7 @@
   <joint name="rear_right_joint" type="continuous">
     <parent link="chassis"/>
     <child link="rear_right_wheel"/>
-    <origin rpy="0 0 0" xyz="-0.6 -0.4 -0.15"/>
+    <origin rpy="0 0 0" xyz="-0.6 -0.46 -0.15"/>
     <axis xyz="0 1 0"/>
   </joint>
   <link name="lidar">
@@ -178,7 +178,7 @@
   <joint name="lidar_joint" type="fixed">
     <parent link="chassis"/>
     <child link="lidar"/>
-    <origin rpy="0 0 0" xyz="0 0 0.15"/>
+    <origin rpy="0 0 0" xyz="0 0 0.19"/>
   </joint>
   <!-- Camera Frame -->
   <link name="camera">
@@ -204,7 +204,7 @@
   <joint name="camera_joint" type="fixed">
     <parent link="chassis"/>
     <child link="camera"/>
-    <origin rpy="0 0 0" xyz="0.04 0 0"/>
+    <origin rpy="0 0 0" xyz="0.64 0 0"/>
   </joint>
   <!-- Camera Optical Frame -->
   <link name="camera_optical"/>

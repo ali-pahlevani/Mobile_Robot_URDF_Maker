@@ -22,5 +22,5 @@
 
   <!-- Sensors -->
   <xacro:lidar radius="${lidar_radius}" height="${lidar_height}" mass="${lidar_mass}" material="${lidar_material}" z="${lidar_z}" />
-  <xacro:camera size="${camera_size}" mass="${camera_mass}" material="${camera_material}" />
+  <xacro:camera size="${camera_size}" mass="${camera_mass}" material="${camera_material}" x="${camera_x}" />
 </robot>

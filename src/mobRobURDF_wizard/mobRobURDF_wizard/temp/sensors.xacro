@@ -34,7 +34,7 @@
   </xacro:macro>
 
   <!-- Camera Macro -->
-  <xacro:macro name="camera" params="size mass material">
+  <xacro:macro name="camera" params="size mass material x">
     <!-- Split the size string into individual components and convert to floats -->
     <xacro:property name="size_list" value="${list(map(float, size.split()))}" />
     <xacro:property name="l" value="${size_list[0]}" />
@@ -66,7 +66,7 @@
     <joint name="camera_joint" type="fixed">
       <parent link="chassis" />
       <child link="camera" />
-      <origin xyz="${l / 2} 0 0" rpy="0 0 0" />
+      <origin xyz="${x} 0 0" rpy="0 0 0" />
     </joint>
 
     <!-- Camera Optical Frame -->
