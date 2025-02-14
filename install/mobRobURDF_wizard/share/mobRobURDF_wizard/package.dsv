@@ -1,9 +1,0 @@
-source;share/mobRobURDF_wizard/hook/pythonpath.ps1
-source;share/mobRobURDF_wizard/hook/pythonpath.dsv
-source;share/mobRobURDF_wizard/hook/pythonpath.sh
-source;share/mobRobURDF_wizard/hook/ament_prefix_path.ps1
-source;share/mobRobURDF_wizard/hook/ament_prefix_path.dsv
-source;share/mobRobURDF_wizard/hook/ament_prefix_path.sh
-source;../../build/mobRobURDF_wizard/share/mobRobURDF_wizard/hook/pythonpath_develop.ps1
-source;../../build/mobRobURDF_wizard/share/mobRobURDF_wizard/hook/pythonpath_develop.dsv
-source;../../build/mobRobURDF_wizard/share/mobRobURDF_wizard/hook/pythonpath_develop.sh
