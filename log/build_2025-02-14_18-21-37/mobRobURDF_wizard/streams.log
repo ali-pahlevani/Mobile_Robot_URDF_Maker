@@ -1,0 +1,17 @@
+[0.516s] Invoking command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard': PYTHONPATH=/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/build --no-deps symlink_data
+[0.650s] running develop
+[0.748s] running egg_info
+[0.750s] writing mobRobURDF_wizard.egg-info/PKG-INFO
+[0.750s] writing dependency_links to mobRobURDF_wizard.egg-info/dependency_links.txt
+[0.750s] writing entry points to mobRobURDF_wizard.egg-info/entry_points.txt
+[0.750s] writing requirements to mobRobURDF_wizard.egg-info/requires.txt
+[0.750s] writing top-level names to mobRobURDF_wizard.egg-info/top_level.txt
+[0.751s] reading manifest file 'mobRobURDF_wizard.egg-info/SOURCES.txt'
+[0.752s] writing manifest file 'mobRobURDF_wizard.egg-info/SOURCES.txt'
+[0.753s] running build_ext
+[0.753s] Creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/python3.10/site-packages/mobRobURDF-wizard.egg-link (link to .)
+[0.753s] Installing mobRobURDF_wizard script to /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/mobRobURDF_wizard
+[0.754s] 
+[0.754s] Installed /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard
+[0.754s] running symlink_data
+[0.774s] Invoked command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard' returned '0': PYTHONPATH=/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/build --no-deps symlink_data

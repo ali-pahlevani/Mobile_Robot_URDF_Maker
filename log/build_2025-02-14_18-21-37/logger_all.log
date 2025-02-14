@@ -1,0 +1,305 @@
+[0.151s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build', '--symlink-install']
+[0.151s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=True, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=16, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, mixin_files=None, mixin=None, verb_parser=<colcon_mixin.mixin.mixin_argument.MixinArgumentDecorator object at 0x7f3cd3da7af0>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7f3cd3da75e0>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7f3cd3da75e0>>, mixin_verb=('build',))
+[0.382s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.382s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.382s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.382s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.382s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.382s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.382s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/alip22/Mobile_Robot_URDF_Maker'
+[0.382s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.382s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.382s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.382s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.382s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.382s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.382s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.382s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.382s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.394s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[0.394s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[0.394s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[0.394s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[0.394s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[0.394s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extensions ['ignore', 'ignore_ament_install']
+[0.394s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extension 'ignore'
+[0.394s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extension 'ignore_ament_install'
+[0.394s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extensions ['colcon_pkg']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extension 'colcon_pkg'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extensions ['colcon_meta']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extension 'colcon_meta'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extensions ['ros']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extension 'ros'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extensions ['cmake', 'python']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extension 'cmake'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extension 'python'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extensions ['python_setup_py']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(autofork_launch) by extension 'python_setup_py'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extensions ['ignore', 'ignore_ament_install']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extension 'ignore'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extension 'ignore_ament_install'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extensions ['colcon_pkg']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extension 'colcon_pkg'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extensions ['colcon_meta']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extension 'colcon_meta'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extensions ['ros']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extension 'ros'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extensions ['cmake', 'python']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extension 'cmake'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extension 'python'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extensions ['python_setup_py']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc) by extension 'python_setup_py'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extensions ['ignore', 'ignore_ament_install']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extension 'ignore'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extension 'ignore_ament_install'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extensions ['colcon_pkg']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extension 'colcon_pkg'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extensions ['colcon_meta']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extension 'colcon_meta'
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extensions ['ros']
+[0.395s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extension 'ros'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extensions ['cmake', 'python']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extension 'cmake'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extension 'python'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extensions ['python_setup_py']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/other_versions) by extension 'python_setup_py'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extensions ['ignore', 'ignore_ament_install']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extension 'ignore'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extension 'ignore_ament_install'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extensions ['colcon_pkg']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extension 'colcon_pkg'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extensions ['colcon_meta']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extension 'colcon_meta'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extensions ['ros']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extension 'ros'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extensions ['cmake', 'python']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extension 'cmake'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extension 'python'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extensions ['python_setup_py']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(etc/temp) by extension 'python_setup_py'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ignore', 'ignore_ament_install']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ignore_ament_install'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_pkg']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_pkg'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['colcon_meta']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'colcon_meta'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['ros']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'ros'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['cmake', 'python']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'cmake'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extensions ['python_setup_py']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src) by extension 'python_setup_py'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_description) by extensions ['ignore', 'ignore_ament_install']
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_description) by extension 'ignore'
+[0.396s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_description) by extension 'ignore_ament_install'
+[0.397s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_description) by extensions ['colcon_pkg']
+[0.397s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_description) by extension 'colcon_pkg'
+[0.397s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_description) by extensions ['colcon_meta']
+[0.397s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_description) by extension 'colcon_meta'
+[0.397s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_description) by extensions ['ros']
+[0.397s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_description) by extension 'ros'
+[0.399s] DEBUG:colcon.colcon_core.package_identification:Package 'src/mobRobURDF_description' with type 'ros.ament_cmake' and name 'mobRobURDF_description'
+[0.399s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_launch) by extensions ['ignore', 'ignore_ament_install']
+[0.399s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_launch) by extension 'ignore'
+[0.399s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_launch) by extension 'ignore_ament_install'
+[0.399s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_launch) by extensions ['colcon_pkg']
+[0.399s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_launch) by extension 'colcon_pkg'
+[0.399s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_launch) by extensions ['colcon_meta']
+[0.399s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_launch) by extension 'colcon_meta'
+[0.399s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_launch) by extensions ['ros']
+[0.399s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_launch) by extension 'ros'
+[0.400s] DEBUG:colcon.colcon_core.package_identification:Package 'src/mobRobURDF_launch' with type 'ros.ament_python' and name 'mobRobURDF_launch'
+[0.400s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_wizard) by extensions ['ignore', 'ignore_ament_install']
+[0.400s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_wizard) by extension 'ignore'
+[0.400s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_wizard) by extension 'ignore_ament_install'
+[0.400s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_wizard) by extensions ['colcon_pkg']
+[0.400s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_wizard) by extension 'colcon_pkg'
+[0.400s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_wizard) by extensions ['colcon_meta']
+[0.400s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_wizard) by extension 'colcon_meta'
+[0.400s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_wizard) by extensions ['ros']
+[0.400s] Level 1:colcon.colcon_core.package_identification:_identify(src/mobRobURDF_wizard) by extension 'ros'
+[0.400s] DEBUG:colcon.colcon_core.package_identification:Package 'src/mobRobURDF_wizard' with type 'ros.ament_python' and name 'mobRobURDF_wizard'
+[0.400s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.400s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.400s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.400s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.401s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.420s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[0.420s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[0.422s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 3 installed packages in /home/alip22/Mobile_Robot_URDF_Maker/install
+[0.423s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 413 installed packages in /opt/ros/humble
+[0.424s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[0.494s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_description' build argument 'cmake_args' from command line to 'None'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_description' build argument 'cmake_target' from command line to 'None'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_description' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_description' build argument 'cmake_clean_cache' from command line to 'False'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_description' build argument 'cmake_clean_first' from command line to 'False'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_description' build argument 'cmake_force_configure' from command line to 'False'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_description' build argument 'ament_cmake_args' from command line to 'None'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_description' build argument 'catkin_cmake_args' from command line to 'None'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_description' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.495s] DEBUG:colcon.colcon_core.verb:Building package 'mobRobURDF_description' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description', 'merge_install': False, 'path': '/home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_description', 'symlink_install': True, 'test_result_base': None}
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_launch' build argument 'cmake_args' from command line to 'None'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_launch' build argument 'cmake_target' from command line to 'None'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_launch' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_launch' build argument 'cmake_clean_cache' from command line to 'False'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_launch' build argument 'cmake_clean_first' from command line to 'False'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_launch' build argument 'cmake_force_configure' from command line to 'False'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_launch' build argument 'ament_cmake_args' from command line to 'None'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_launch' build argument 'catkin_cmake_args' from command line to 'None'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_launch' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.495s] DEBUG:colcon.colcon_core.verb:Building package 'mobRobURDF_launch' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch', 'merge_install': False, 'path': '/home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_launch', 'symlink_install': True, 'test_result_base': None}
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_wizard' build argument 'cmake_args' from command line to 'None'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_wizard' build argument 'cmake_target' from command line to 'None'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_wizard' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_wizard' build argument 'cmake_clean_cache' from command line to 'False'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_wizard' build argument 'cmake_clean_first' from command line to 'False'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_wizard' build argument 'cmake_force_configure' from command line to 'False'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_wizard' build argument 'ament_cmake_args' from command line to 'None'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_wizard' build argument 'catkin_cmake_args' from command line to 'None'
+[0.495s] Level 5:colcon.colcon_core.verb:set package 'mobRobURDF_wizard' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.495s] DEBUG:colcon.colcon_core.verb:Building package 'mobRobURDF_wizard' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard', 'merge_install': False, 'path': '/home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_wizard', 'symlink_install': True, 'test_result_base': None}
+[0.495s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.496s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.496s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_description' with build type 'ament_cmake'
+[0.496s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_description'
+[0.499s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.499s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.499s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.501s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_launch' with build type 'ament_python'
+[0.501s] Level 1:colcon.colcon_core.shell:create_environment_hook('mobRobURDF_launch', 'ament_prefix_path')
+[0.501s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/hook/ament_prefix_path.ps1'
+[0.502s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/hook/ament_prefix_path.dsv'
+[0.502s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/hook/ament_prefix_path.sh'
+[0.503s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.503s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.505s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_wizard' with build type 'ament_python'
+[0.505s] Level 1:colcon.colcon_core.shell:create_environment_hook('mobRobURDF_wizard', 'ament_prefix_path')
+[0.505s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard/hook/ament_prefix_path.ps1'
+[0.505s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard/hook/ament_prefix_path.dsv'
+[0.506s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard/hook/ament_prefix_path.sh'
+[0.506s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.506s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.514s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard:/opt/ros/humble /usr/bin/cmake --build /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description -- -j16 -l16
+[0.653s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_launch'
+[0.653s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.653s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.789s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_wizard'
+[0.790s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.790s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.794s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard:/opt/ros/humble /usr/bin/cmake --build /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description -- -j16 -l16
+[0.798s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard:/opt/ros/humble /usr/bin/cmake --install /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description
+[0.840s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mobRobURDF_description)
+[0.840s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard:/opt/ros/humble /usr/bin/cmake --install /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description
+[0.844s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description' for CMake module files
+[0.844s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description' for CMake config files
+[0.844s] Level 1:colcon.colcon_core.shell:create_environment_hook('mobRobURDF_description', 'cmake_prefix_path')
+[0.845s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/hook/cmake_prefix_path.ps1'
+[0.845s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/hook/cmake_prefix_path.dsv'
+[0.845s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/hook/cmake_prefix_path.sh'
+[0.845s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/bin'
+[0.845s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/lib/pkgconfig/mobRobURDF_description.pc'
+[0.846s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/lib/python3.10/site-packages'
+[0.846s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/bin'
+[0.846s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/package.ps1'
+[0.847s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/package.dsv'
+[0.847s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/package.sh'
+[0.847s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/package.bash'
+[0.848s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/package.zsh'
+[0.848s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/colcon-core/packages/mobRobURDF_description)
+[0.849s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mobRobURDF_description)
+[0.849s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description' for CMake module files
+[0.849s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description' for CMake config files
+[0.849s] Level 1:colcon.colcon_core.shell:create_environment_hook('mobRobURDF_description', 'cmake_prefix_path')
+[0.849s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/hook/cmake_prefix_path.ps1'
+[0.849s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/hook/cmake_prefix_path.dsv'
+[0.850s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/hook/cmake_prefix_path.sh'
+[0.850s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/bin'
+[0.850s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/lib/pkgconfig/mobRobURDF_description.pc'
+[0.850s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/lib/python3.10/site-packages'
+[0.850s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/bin'
+[0.850s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/package.ps1'
+[0.851s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/package.dsv'
+[0.851s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/package.sh'
+[0.851s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/package.bash'
+[0.851s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/package.zsh'
+[0.851s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/colcon-core/packages/mobRobURDF_description)
+[1.018s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch': PYTHONPATH=/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/build --no-deps symlink_data
+[1.021s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard': PYTHONPATH=/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/build --no-deps symlink_data
+[1.272s] Level 1:colcon.colcon_core.shell:create_environment_hook('mobRobURDF_launch', 'pythonpath_develop')
+[1.273s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/share/mobRobURDF_launch/hook/pythonpath_develop.ps1'
+[1.273s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch' returned '0': PYTHONPATH=/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/build --no-deps symlink_data
+[1.273s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/share/mobRobURDF_launch/hook/pythonpath_develop.dsv'
+[1.273s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/share/mobRobURDF_launch/hook/pythonpath_develop.sh'
+[1.274s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch' for CMake module files
+[1.274s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch' for CMake config files
+[1.274s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/lib'
+[1.275s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/bin'
+[1.275s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/lib/pkgconfig/mobRobURDF_launch.pc'
+[1.275s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/lib/python3.10/site-packages'
+[1.275s] Level 1:colcon.colcon_core.shell:create_environment_hook('mobRobURDF_launch', 'pythonpath')
+[1.275s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/hook/pythonpath.ps1'
+[1.275s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/hook/pythonpath.dsv'
+[1.275s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/hook/pythonpath.sh'
+[1.276s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/bin'
+[1.276s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mobRobURDF_launch)
+[1.276s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/package.ps1'
+[1.277s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/package.dsv'
+[1.277s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/package.sh'
+[1.277s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/package.bash'
+[1.278s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/package.zsh'
+[1.278s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/colcon-core/packages/mobRobURDF_launch)
+[1.279s] Level 1:colcon.colcon_core.shell:create_environment_hook('mobRobURDF_wizard', 'pythonpath_develop')
+[1.279s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/share/mobRobURDF_wizard/hook/pythonpath_develop.ps1'
+[1.279s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard' returned '0': PYTHONPATH=/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/build --no-deps symlink_data
+[1.279s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/share/mobRobURDF_wizard/hook/pythonpath_develop.dsv'
+[1.279s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/share/mobRobURDF_wizard/hook/pythonpath_develop.sh'
+[1.280s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard' for CMake module files
+[1.280s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard' for CMake config files
+[1.280s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib'
+[1.281s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/bin'
+[1.281s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/pkgconfig/mobRobURDF_wizard.pc'
+[1.281s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/python3.10/site-packages'
+[1.281s] Level 1:colcon.colcon_core.shell:create_environment_hook('mobRobURDF_wizard', 'pythonpath')
+[1.281s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard/hook/pythonpath.ps1'
+[1.281s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard/hook/pythonpath.dsv'
+[1.281s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard/hook/pythonpath.sh'
+[1.281s] Level 1:colcon.colcon_core.environment:checking '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/bin'
+[1.282s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(mobRobURDF_wizard)
+[1.282s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard/package.ps1'
+[1.282s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard/package.dsv'
+[1.282s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard/package.sh'
+[1.282s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard/package.bash'
+[1.283s] INFO:colcon.colcon_core.shell:Creating package script '/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard/package.zsh'
+[1.283s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/colcon-core/packages/mobRobURDF_wizard)
+[1.283s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[1.283s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[1.283s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[1.283s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[1.305s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.notify_send': Could not find 'notify-send'
+[1.306s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[1.306s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[1.306s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[1.306s] DEBUG:colcon.colcon_notification.desktop_notification.notify2:Failed to initialize notify2: org.freedesktop.DBus.Error.FileNotFound: Failed to connect to socket /run/user/1000/bus: No such file or directory
+[1.306s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[1.306s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/alip22/Mobile_Robot_URDF_Maker/install/local_setup.ps1'
+[1.307s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/alip22/Mobile_Robot_URDF_Maker/install/_local_setup_util_ps1.py'
+[1.308s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/alip22/Mobile_Robot_URDF_Maker/install/setup.ps1'
+[1.308s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/alip22/Mobile_Robot_URDF_Maker/install/local_setup.sh'
+[1.309s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/alip22/Mobile_Robot_URDF_Maker/install/_local_setup_util_sh.py'
+[1.309s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/alip22/Mobile_Robot_URDF_Maker/install/setup.sh'
+[1.310s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/alip22/Mobile_Robot_URDF_Maker/install/local_setup.bash'
+[1.310s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/alip22/Mobile_Robot_URDF_Maker/install/setup.bash'
+[1.311s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/alip22/Mobile_Robot_URDF_Maker/install/local_setup.zsh'
+[1.312s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/alip22/Mobile_Robot_URDF_Maker/install/setup.zsh'

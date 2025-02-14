@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mobRob">
+  <!-- Include other xacro files -->
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/base.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/wheels.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/sensors.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/inertial_macros.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/material_macros.xacro" />
+  <!-- <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_sensors.xacro" /> -->
+
+  <!-- Call the macro to define materials -->
+  <xacro:define_materials/>
+
+  <!-- Define the robot -->
+  <xacro:chassis size="1.2 0.8 0.3" mass="1.0" material="Gray" />
+
+  <!-- Wheels -->
+  <xacro:wheel name="front_left" radius="0.22" width="0.12" mass="0.5" material="Black" x="0.6" y="0.4" z="-0.15" />
+  <xacro:wheel name="front_right" radius="0.22" width="0.12" mass="0.5" material="Black" x="0.6" y="-0.4" z="-0.15" />
+  <xacro:wheel name="rear_left" radius="0.22" width="0.12" mass="0.5" material="Black" x="-0.6" y="0.4" z="-0.15" />
+  <xacro:wheel name="rear_right" radius="0.22" width="0.12" mass="0.5" material="Black" x="-0.6" y="-0.4" z="-0.15" />
+
+  <!-- Sensors -->
+  <xacro:lidar radius="0.1" height="0.08" mass="0.2" material="Red" z="0.15" />
+  <xacro:camera size="0.08 0.2 0.08" mass="0.1" material="Blue" />
+</robot>

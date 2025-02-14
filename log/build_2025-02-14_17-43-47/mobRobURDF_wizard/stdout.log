@@ -1,0 +1,22 @@
+running develop
+running egg_info
+creating mobRobURDF_wizard.egg-info
+writing mobRobURDF_wizard.egg-info/PKG-INFO
+writing dependency_links to mobRobURDF_wizard.egg-info/dependency_links.txt
+writing entry points to mobRobURDF_wizard.egg-info/entry_points.txt
+writing requirements to mobRobURDF_wizard.egg-info/requires.txt
+writing top-level names to mobRobURDF_wizard.egg-info/top_level.txt
+writing manifest file 'mobRobURDF_wizard.egg-info/SOURCES.txt'
+reading manifest file 'mobRobURDF_wizard.egg-info/SOURCES.txt'
+writing manifest file 'mobRobURDF_wizard.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/python3.10/site-packages/mobRobURDF-wizard.egg-link (link to .)
+Installing mobRobURDF_wizard script to /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/mobRobURDF_wizard
+
+Installed /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard
+running symlink_data
+creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/ament_index
+creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/ament_index/resource_index
+creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/ament_index/resource_index/packages
+symbolically linking /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/resource/mobRobURDF_wizard -> /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/ament_index/resource_index/packages
+symbolically linking /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/package.xml -> /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard

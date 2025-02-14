@@ -1,0 +1,24 @@
+[0.379s] Invoking command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard': PYTHONPATH=/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/build --no-deps symlink_data
+[0.516s] running develop
+[0.612s] running egg_info
+[0.612s] creating mobRobURDF_wizard.egg-info
+[0.612s] writing mobRobURDF_wizard.egg-info/PKG-INFO
+[0.612s] writing dependency_links to mobRobURDF_wizard.egg-info/dependency_links.txt
+[0.612s] writing entry points to mobRobURDF_wizard.egg-info/entry_points.txt
+[0.612s] writing requirements to mobRobURDF_wizard.egg-info/requires.txt
+[0.613s] writing top-level names to mobRobURDF_wizard.egg-info/top_level.txt
+[0.613s] writing manifest file 'mobRobURDF_wizard.egg-info/SOURCES.txt'
+[0.613s] reading manifest file 'mobRobURDF_wizard.egg-info/SOURCES.txt'
+[0.614s] writing manifest file 'mobRobURDF_wizard.egg-info/SOURCES.txt'
+[0.615s] running build_ext
+[0.615s] Creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/python3.10/site-packages/mobRobURDF-wizard.egg-link (link to .)
+[0.615s] Installing mobRobURDF_wizard script to /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/mobRobURDF_wizard
+[0.616s] 
+[0.616s] Installed /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard
+[0.616s] running symlink_data
+[0.616s] creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/ament_index
+[0.616s] creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/ament_index/resource_index
+[0.616s] creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/ament_index/resource_index/packages
+[0.616s] symbolically linking /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/resource/mobRobURDF_wizard -> /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/ament_index/resource_index/packages
+[0.616s] symbolically linking /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/package.xml -> /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/share/mobRobURDF_wizard
+[0.631s] Invoked command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard' returned '0': PYTHONPATH=/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_wizard/build --no-deps symlink_data

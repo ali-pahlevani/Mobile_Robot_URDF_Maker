@@ -1,0 +1,4 @@
+[0.011s] Invoking command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch': /usr/bin/cmake /home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_launch -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCATKIN_SYMLINK_INSTALL=ON -DCMAKE_INSTALL_PREFIX=/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch
+[0.012s] [0mCMake Error: The source directory "/home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_launch" does not appear to contain CMakeLists.txt.
+[0.012s] Specify --help for usage, or press the help button on the CMake GUI.[0m
+[0.146s] Invoked command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch' returned '1': /usr/bin/cmake /home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_launch -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCATKIN_SYMLINK_INSTALL=ON -DCMAKE_INSTALL_PREFIX=/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch

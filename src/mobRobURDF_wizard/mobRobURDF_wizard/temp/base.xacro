@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Include the inertial_macros.xacro file -->
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/inertial_macros.xacro" />
+
+  <!-- Base Link -->
+  <link name="base_link"></link>
+
+  <!-- Chassis -->
+  <xacro:macro name="chassis" params="size mass material">
+    <xacro:property name="size_list" value="${list(map(float, size.split()))}" />
+    <xacro:property name="l" value="${size_list[0]}" />
+    <xacro:property name="w" value="${size_list[1]}" />
+    <xacro:property name="h" value="${size_list[2]}" />
+
+    <link name="chassis">
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <xacro:box_inertia mass="${mass}" l="${l}" w="${w}" h="${h}" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${l} ${w} ${h}" />
+        </geometry>
+        <material name="${material}" />
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${l} ${w} ${h}" />
+        </geometry>
+      </collision>
+    </link>
+  </xacro:macro>
+
+  <!-- Fixed Joint between base_link and chassis -->
+  <joint name="base_to_chassis" type="fixed">
+    <parent link="base_link" />
+    <child link="chassis" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+</robot>

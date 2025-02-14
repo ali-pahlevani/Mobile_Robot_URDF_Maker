@@ -1,0 +1,54 @@
+[0.011s] Invoking command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description
+[0.160s] -- The C compiler identification is GNU 11.4.0
+[0.923s] -- The CXX compiler identification is GNU 11.4.0
+[1.428s] -- Detecting C compiler ABI info
+[1.520s] -- Detecting C compiler ABI info - done
+[1.524s] -- Check for working C compiler: /usr/bin/cc - skipped
+[1.526s] -- Detecting C compile features
+[1.526s] -- Detecting C compile features - done
+[1.530s] -- Detecting CXX compiler ABI info
+[1.627s] -- Detecting CXX compiler ABI info - done
+[1.631s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[1.631s] -- Detecting CXX compile features
+[1.631s] -- Detecting CXX compile features - done
+[1.687s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[1.775s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[1.817s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[1.846s] -- Found xacro: 2.0.8 (/opt/ros/humble/share/xacro/cmake)
+[1.884s] WARNING: Package name "mobRobURDF_description" does not follow the naming conventions. It should start with a lower case letter and only contain lower case letters, digits, underscores, and dashes.
+[1.897s] -- Configuring done
+[1.900s] -- Generating done
+[1.902s] -- Build files have been written to: /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description
+[1.906s] Invoked command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/alip22/Mobile_Robot_URDF_Maker/src/mobRobURDF_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description
+[1.907s] Invoking command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description -- -j16 -l16
+[1.926s] Invoked command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description -- -j16 -l16
+[1.932s] Invoking command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description
+[1.936s] -- Install configuration: ""
+[1.936s] -- Execute custom install script
+[1.937s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/ament_index/resource_index/package_run_dependencies/mobRobURDF_description
+[1.941s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/ament_index/resource_index/parent_prefix_path/mobRobURDF_description
+[1.945s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/environment/ament_prefix_path.sh
+[1.950s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/environment/ament_prefix_path.dsv
+[1.954s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/environment/path.sh
+[1.958s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/environment/path.dsv
+[1.963s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/local_setup.bash
+[1.966s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/local_setup.sh
+[1.970s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/local_setup.zsh
+[1.973s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/local_setup.dsv
+[1.977s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/package.dsv
+[1.981s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/ament_index/resource_index/packages/mobRobURDF_description
+[1.985s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/cmake/mobRobURDF_descriptionConfig.cmake
+[1.989s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/cmake/mobRobURDF_descriptionConfig-version.cmake
+[1.992s] -- Symlinking: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/package.xml
+[1.997s] -- Installing: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/urdf
+[1.997s] -- Installing: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/urdf/mobRob.xacro
+[1.997s] -- Installing: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/urdf/gazebo_files
+[1.997s] -- Installing: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/urdf/gazebo_files/gazebo_sensors.xacro
+[1.997s] -- Installing: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/urdf/macros
+[1.997s] -- Installing: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/urdf/macros/material_macros.xacro
+[1.998s] -- Installing: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/urdf/macros/inertial_macros.xacro
+[1.998s] -- Installing: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/urdf/submodules
+[1.998s] -- Installing: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/urdf/submodules/base.xacro
+[1.998s] -- Installing: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/urdf/submodules/wheels.xacro
+[1.998s] -- Installing: /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_description/share/mobRobURDF_description/urdf/submodules/sensors.xacro
+[1.999s] Invoked command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description

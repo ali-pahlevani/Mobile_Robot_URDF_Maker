@@ -1,0 +1,16 @@
+[0.545s] Invoking command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch': PYTHONPATH=/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/build --no-deps symlink_data
+[0.690s] running develop
+[0.783s] running egg_info
+[0.783s] writing mobRobURDF_launch.egg-info/PKG-INFO
+[0.783s] writing dependency_links to mobRobURDF_launch.egg-info/dependency_links.txt
+[0.783s] writing entry points to mobRobURDF_launch.egg-info/entry_points.txt
+[0.783s] writing requirements to mobRobURDF_launch.egg-info/requires.txt
+[0.783s] writing top-level names to mobRobURDF_launch.egg-info/top_level.txt
+[0.784s] reading manifest file 'mobRobURDF_launch.egg-info/SOURCES.txt'
+[0.785s] writing manifest file 'mobRobURDF_launch.egg-info/SOURCES.txt'
+[0.786s] running build_ext
+[0.786s] Creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/lib/python3.10/site-packages/mobRobURDF-launch.egg-link (link to .)
+[0.786s] 
+[0.786s] Installed /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch
+[0.787s] running symlink_data
+[0.808s] Invoked command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch' returned '0': PYTHONPATH=/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/build --no-deps symlink_data

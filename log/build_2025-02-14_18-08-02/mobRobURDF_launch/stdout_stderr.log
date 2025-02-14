@@ -1,0 +1,21 @@
+running develop
+running egg_info
+creating mobRobURDF_launch.egg-info
+writing mobRobURDF_launch.egg-info/PKG-INFO
+writing dependency_links to mobRobURDF_launch.egg-info/dependency_links.txt
+writing entry points to mobRobURDF_launch.egg-info/entry_points.txt
+writing requirements to mobRobURDF_launch.egg-info/requires.txt
+writing top-level names to mobRobURDF_launch.egg-info/top_level.txt
+writing manifest file 'mobRobURDF_launch.egg-info/SOURCES.txt'
+reading manifest file 'mobRobURDF_launch.egg-info/SOURCES.txt'
+writing manifest file 'mobRobURDF_launch.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/lib/python3.10/site-packages/mobRobURDF-launch.egg-link (link to .)
+
+Installed /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch
+running symlink_data
+symbolically linking /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/package.xml -> /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch
+creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/launch
+symbolically linking /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/launch/urdf_test.launch.py -> /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/launch
+creating /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/rviz
+symbolically linking /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_launch/rviz/rviz_test.rviz -> /home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_launch/share/mobRobURDF_launch/rviz
