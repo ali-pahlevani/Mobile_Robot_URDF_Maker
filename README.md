@@ -25,5 +25,3 @@ This workspace has 3 packages (up to now. I have plan for adding other packages 
             - **rviz2**
         Using these nodes, everyone would be able to test the performance of the final URDF file (visual check + testing the joints)
         - **rviz:** contains only one rviz2 config file (rviz_test.rviz). This is the rviz2 config file that is loaded into the discussed launch file.
-
- 
