@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-from .robot_input_page import RobotInputPage
-from .urdf_preview_page import URDFPreviewPage
-from .opengl_widget import OpenGLWidget
+from mobRobURDF_wizard.classes.robot_input_page import RobotInputPage
+from mobRobURDF_wizard.classes.urdf_preview_page import URDFPreviewPage
+from mobRobURDF_wizard.classes.opengl_widget import OpenGLWidget
 
 import sys
 from PyQt5.QtWidgets import (QApplication, QWizard, QVBoxLayout, QSplitter, QWidget)

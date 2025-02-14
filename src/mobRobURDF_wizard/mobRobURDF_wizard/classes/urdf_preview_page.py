@@ -1,4 +1,4 @@
-from .utils import render_template, generate_urdf
+from mobRobURDF_wizard.utils.utils import render_template, generate_urdf
 import os
 from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QPushButton, QTextEdit, QFileDialog)
 from ament_index_python.packages import get_package_share_directory

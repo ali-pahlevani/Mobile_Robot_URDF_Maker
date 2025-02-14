@@ -1,4 +1,4 @@
-from .utils import get_color
+from mobRobURDF_wizard.utils.utils import get_color
 from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QLabel, QLineEdit, QPushButton)
 
 class RobotInputPage(QWizardPage):
