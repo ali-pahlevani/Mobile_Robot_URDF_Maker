@@ -1,1 +1,0 @@
-[0.011s] Invoking command in '/home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/alip22/Mobile_Robot_URDF_Maker/install/mobRobURDF_wizard:/opt/ros/humble /usr/bin/cmake --build /home/alip22/Mobile_Robot_URDF_Maker/build/mobRobURDF_description -- -j16 -l16
