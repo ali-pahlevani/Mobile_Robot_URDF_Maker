@@ -20,14 +20,14 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
 
 2. mobRobURDF_wizard:
     - This is the *main package* of the workspace. This package contains the **source codes** of the Wizard. The codebase is composed of different classes and some utility functions, all imported into the main file **robot_wizard.py**. This package used to be a standalone codebase; however, now its a **ROS2 node**.
+    - In the Wizard window, you can apply your changes step by step, with no pressure. You can even fill only *some of the fields* and only apply those changes. Finally, you can **save your created URDF file** to any directory you want.
+    - **Attention:** If you want to use the launch file (that is provided for **testing purposes** (check the next part)), you'll need to **save** the created **URDF** file in the following location: **/mobRobURDF_description/urdf/mobRob.urdf**
+
     - In order to run the **Wizard**, you can easily run the following line in your terminal:
 
 ```bash
-ros2 run mobRobURDF_wizard mobRobURDF_wizard
-
-
-    - In the Wizard window, you can apply your changes step by step, with no pressure. You can even fill only *some of the fields* and only apply those changes. Finally, you can **save your created URDF file** to any directory you want.
-    - **Attention:** If you want to use the launch file (that is provided for **testing purposes** (check the next part)), you'll need to **save** the created **URDF** file in the following location: **/mobRobURDF_description/urdf/mobRob.urdf**
+    ros2 run mobRobURDF_wizard mobRobURDF_wizard
+```
 
 ![Wizard_Gif](https://github.com/user-attachments/assets/42abf021-481b-4386-b3e0-9e0288233829)
 
