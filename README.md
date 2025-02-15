@@ -2,27 +2,57 @@
 
 Automate the process of making a URDF for your 4-wheeled mobile robot using this **Wizard**
 
+-- main image
+
 ---
 
-This workspace has 3 packages (up to now. I have plan for adding other packages as well for **Gazebo**, **Control**, **Navigation**, etc.):
+This workspace has 3 **ROS2** packages (up to now. I have plan for adding other packages as well for **Gazebo**, **Control**, **Navigation**, etc.):
 
 1. mobRobURDF_description:
-    - This package includes all the **template xacro** files necessary for creating the **final URDF file**. The *sub-directories* in this directory are:
-        - **submodules:** contains **base.xacro**, **wheels.xacro**, and **sensors.xacro** files,
-        - **macros:** contains **inertial_macros.xacro**, and **material.xacro** files,
-        - **gazebo_files:** contains **gazebo_sensors.xacro** file for now (in the future, when the Gazebo package is added, not only this file will be used in the final URDF file, also other xacro files for Gazebo will be added as well (e.g., **gazebo_properties.xacro** file)).
-    - Finally, all the xacro files are brought into the *main xacro file* (**mobRob.xacro**), so that it can be converted to **mobRob.xacro** file.
+    - This package includes all the **template Xacro** files necessary for creating the **final URDF** file. The *sub-directories* in this directory are:
+        - **submodules:** containing **base.xacro**, **wheels.xacro**, and **sensors.xacro** files,
+        - **macros:** containing **inertial_macros.xacro**, and **material.xacro** files,
+        - **gazebo_files:** containing **gazebo_sensors.xacro** file for now (in the future, when the Gazebo package is added, not only this file will be used in the final URDF file, also other Xacro files for Gazebo will be added as well (e.g., **gazebo_properties.xacro** file)).
+    - Finally, all the Xacro files are imported into the *main Xacro file* (**mobRob.xacro**), so that it can be converted to **mobRob.urdf** file.
+    - Good news is that not only you can use the Wizard to make the URDF file you need, but also you have **access** to all the Xacro files. If you ever wanted to **change** any of them and adapt them to your specific case, you're free to go.
+
+---
 
 2. mobRobURDF_wizard:
-    - This is the main package of the workspace. This package contains the source codes of the Wizard. 
+    - This is the *main package* of the workspace. This package contains the **source codes** of the Wizard. The codebase is composed of different classes and some utility functions, all imported into the main file **robot_wizard.py**. This package used to be a standalone codebase; however, now its a **ROS2 node**.
+    - In order to run the **Wizard**, you can easily run the following line in your terminal:
 
+    ```bash
+    ros2 run mobRobURDF_wizard mobRobURDF_wizard
+    ```
+
+    -- wizard gif
+
+    - In the Wizard window, you can apply your changes step by step, with no pressure. You can even fill only *some of the fields* and only apply those changes. Finally, you can **save your created URDF file** to any directory you want.
+        - **Attention:** If you want to use the launch file (that is provided for **testing purposes** (check the next part)), you'll need to **save** the created **URDF** file in the following location: **/mobRobURDF_description/urdf/mobRob.urdf**
+
+---
 
 3. mobRobURDF_launch:
     - This package includes 2 main directories:
-        - **launch:** contains only one launch file for now for testing purposes (**urdf_test.launch.py**). By launching this launch files, 3 nodes will be launched:
+        - **launch:** containing only one launch file (for now) for testing purposes (**urdf_test.launch.py**). By launching this launch file, 3 nodes will be launched:
             - **robot_state_publisher**
             - **joint_state_publisher_gui**
             - **rviz2**
-        Using these nodes, everyone would be able to test the performance of the final URDF file (visual check + testing the joints)
-        - **rviz:** contains only one rviz2 config file (rviz_test.rviz). This is the rviz2 config file that is loaded into the discussed launch file.
+        Using these nodes, everyone would be able to **test** the performance of the final URDF file (**visual check** + **testing the joints**)
+        - **rviz:** containing only one *rviz2 config file* (**rviz_test.rviz**). This is the rviz2 config file that is loaded into the discussed launch file.
+
+    - In order to run the launch file, you can run the following line in your terminal:
+
+    ```bash
+    ros2 launch mobRobURDF_launch urdf_test.launch.py
+    ```
+
+    -- launch file gif
+
+---
+
+If you have any question, please let me know: **a.pahlevani1998@gmail.com**
+
+## Please stay tuned for the next versions of the app.
  
