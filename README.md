@@ -24,7 +24,7 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
 
 ```bash
 ros2 run mobRobURDF_wizard mobRobURDF_wizard
-```
+
 
     - In the Wizard window, you can apply your changes step by step, with no pressure. You can even fill only *some of the fields* and only apply those changes. Finally, you can **save your created URDF file** to any directory you want.
     - **Attention:** If you want to use the launch file (that is provided for **testing purposes** (check the next part)), you'll need to **save** the created **URDF** file in the following location: **/mobRobURDF_description/urdf/mobRob.urdf**
