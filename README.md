@@ -8,7 +8,7 @@
 
 This workspace has 3 **ROS2** packages (up to now. I have plan for adding other packages as well for **Gazebo**, **Control**, **Navigation**, etc.):
 
-### mobRobURDF_description:
+### mobRobURDF_description: ###
     - This package includes all the **template Xacro** files necessary for creating the **final URDF** file. The *sub-directories* in this directory are:
         - **submodules:** containing **base.xacro** (*chassis*), **wheels.xacro** (*4 wheels*), and **sensors.xacro** (*2D-Lidar* + *RGB Camera*) files,
         - **macros:** containing **inertial_macros.xacro**, and **material.xacro** (*colors*) files,
