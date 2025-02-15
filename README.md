@@ -8,7 +8,7 @@
 
 This workspace has 3 **ROS2** packages (up to now. I have plan for adding other packages as well for **Gazebo**, **Control**, **Navigation**, etc.):
 
-### mobRobURDF_description: ###
+**1. mobRobURDF_description:**
     - This package includes all the **template Xacro** files necessary for creating the **final URDF** file. The *sub-directories* in this directory are:
         - **submodules:** containing **base.xacro** (*chassis*), **wheels.xacro** (*4 wheels*), and **sensors.xacro** (*2D-Lidar* + *RGB Camera*) files,
         - **macros:** containing **inertial_macros.xacro**, and **material.xacro** (*colors*) files,
@@ -18,7 +18,7 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
 
 ---
 
-### mobRobURDF_wizard:
+**2. mobRobURDF_wizard:**
     - This is the *main package* of the workspace. This package contains the **source codes** of the Wizard. The codebase is composed of different classes and some utility functions, all imported into the main file **robot_wizard.py**. This package used to be a standalone codebase; however, now its a **ROS2 node**.
     - In the Wizard window, you can apply your changes step by step, with no pressure. You can even fill only *some of the fields* and only apply those changes. Finally, you can **save your created URDF file** to any directory you want. Additionally, for your convenience, you'll have **3-DOF camera rotation**, plus **zooming capability** in the preview window. 
     - **Attention:** If you want to use the launch file (that is provided for **testing purposes** (check the next part)), you'll need to **save** the created **URDF** file in the following location: **/mobRobURDF_description/urdf/mobRob.urdf**
@@ -33,7 +33,7 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
 
 ---
 
-### 3. mobRobURDF_launch:
+**3. mobRobURDF_launch:**
     - This package includes 2 main directories:
         - **launch:** containing only one launch file (for now) for testing purposes (**urdf_test.launch.py**). By launching this launch file, 3 nodes will be launched:
             - **robot_state_publisher**
