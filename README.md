@@ -23,7 +23,7 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
     - In order to run the **Wizard**, you can easily run the following line in your terminal:
 
 ```bash
-    ros2 run mobRobURDF_wizard mobRobURDF_wizard
+ros2 run mobRobURDF_wizard mobRobURDF_wizard
 ```
 
     - In the Wizard window, you can apply your changes step by step, with no pressure. You can even fill only *some of the fields* and only apply those changes. Finally, you can **save your created URDF file** to any directory you want.
