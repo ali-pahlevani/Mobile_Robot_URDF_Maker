@@ -15,7 +15,7 @@ glutInit()
 class RobotWizard(QWizard):
     def __init__(self):
         super(RobotWizard, self).__init__()
-        self.setWindowTitle("Robot URDF Generator Wizard")
+        self.setWindowTitle("Mobile Robot URDF Generator Wizard (v1)")
         self.resize(1200, 600)
 
         # Create a splitter to divide the window into two parts
@@ -40,6 +40,9 @@ class RobotWizard(QWizard):
         # Right side: 3D preview
         self.glWidget = OpenGLWidget()
         self.splitter.addWidget(self.glWidget)
+        
+        # Set the sizes of the left and right side (percentages based on total space)
+        self.splitter.setSizes([int(0.25 * self.width()), int(0.75 * self.width())])
     
 def main(args=None):
     app = QApplication(sys.argv)

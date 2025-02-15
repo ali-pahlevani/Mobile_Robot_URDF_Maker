@@ -21,6 +21,6 @@
   <xacro:wheel name="rear_right" radius="0.22" width="0.12" mass="0.5" material="Black" x="-0.6" y="-0.46" z="-0.15" />
 
   <!-- Sensors -->
-  <xacro:lidar radius="0.1" height="0.08" mass="0.2" material="Red" z="0.19" />
+  <xacro:lidar radius="0.1" height="0.2" mass="0.2" material="Red" z="0.25" />
   <xacro:camera size="0.08 0.2 0.08" mass="0.1" material="Blue" x="0.64" />
 </robot>

@@ -21,7 +21,7 @@ class OpenGLWidget(QGLWidget):
         self.W = 0.8
         self.H = 0.3
 
-        # Default wheel and lidar sizes
+        # Default wheel and sensors sizes
         self.wheel_radius = 0.22
         self.wheel_width  = 0.12
         self.lidar_radius = 0.1
@@ -105,7 +105,7 @@ class OpenGLWidget(QGLWidget):
         # Draw the camera (cube)
         glColor3f(*self.camera_color)
         glPushMatrix()
-        glTranslatef(self.L / 2, 0.0, 0.0)
+        glTranslatef(self.L / 2 + self.camera_size[0] / 2, 0.0, 0.0)
         glScalef(*self.camera_size)
         glutSolidCube(1.0)
         glPopMatrix()
