@@ -23,7 +23,7 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
     - In the Wizard window, you can apply your changes step by step, with no pressure. You can even fill only *some of the fields* and only apply those changes. Finally, you can **save your created URDF file** to any directory you want. Additionally, for your convenience, you'll have **3-DOF camera rotation**, plus **zooming capability** in the preview window. 
     - **Attention:** If you want to use the launch file (that is provided for **testing purposes** (check the next part)), you'll need to **save** the created **URDF** file in the following location: **/mobRobURDF_description/urdf/mobRob.urdf**
 
-    - In order to run the **Wizard**, you can easily run the following line in your terminal:
+    - In order to run the **Wizard**, you can easily run the following line in your **terminal**:
 
 ```bash
     ros2 run mobRobURDF_wizard mobRobURDF_wizard
@@ -42,7 +42,7 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
         Using these nodes, everyone would be able to **test** the performance of the final URDF file (**visual check** + **testing the joints**)
         - **rviz:** containing only one *rviz2 config file* (**rviz_test.rviz**). This is the rviz2 config file that is loaded into the discussed launch file.
 
-    - In order to run the launch file, you can run the following line in your terminal:
+    - In order to run the launch file, you can run the following line in your **terminal**:
 
 ```bash
     ros2 launch mobRobURDF_launch urdf_test.launch.py
