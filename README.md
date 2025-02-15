@@ -27,17 +27,17 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
 
     - In order to run the **Wizard**, first you need to install the **dependencies**:
   
-```bash
+    ```bash
     sudo apt update
     rosdep install --from-paths src --ignore-src -r -y
     sudo apt install python3-pyqt5 python3-pyqt5.qtopengl
-```
+    ```
 
     - Then, you can easily run the following line in your **terminal**:
 
-```bash
+    ```bash
     ros2 run mobRobURDF_wizard mobRobURDF_wizard
-```
+    ```
 
 ![Wizard_Gif](https://github.com/user-attachments/assets/42abf021-481b-4386-b3e0-9e0288233829)
 
