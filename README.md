@@ -23,17 +23,24 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
     - In the Wizard window, you can apply your changes step by step, with no pressure. You can even fill only *some of the fields* and only apply those changes. Finally, you can **save your created URDF file** to any directory you want. Additionally, for your convenience, you'll have **3-DOF camera rotation**, plus **zooming capability** in the preview window. 
     - **Attention:** If you want to use the launch file (that is provided for **testing purposes** (check the next part)), you'll need to **save** the created **URDF** file in the following location: **/mobRobURDF_description/urdf/mobRob.urdf**
 
+    - In order to run the **Wizard**, first you need to **build the workspace** and **source** it:
 
+    ```bash
+    git clone https://github.com/ali-pahlevani/Mobile_Robot_URDF_Maker.git
+    cd Mobile_Robot_URDF_Maker
+    colcon build --symlink-install
+    source install/setup.bash
+    ```
+    
+    - For the next step, you'll need to install the **dependencies**:
 
-    - In order to run the **Wizard**, first you need to install the **dependencies**:
-  
     ```bash
     sudo apt update
     rosdep install --from-paths src --ignore-src -r -y
     sudo apt install python3-pyqt5 python3-pyqt5.qtopengl
     ```
 
-    - Then, you can easily run the following line in your **terminal**:
+    - Finally, you can easily run the following line in your **terminal**:
 
     ```bash
     ros2 run mobRobURDF_wizard mobRobURDF_wizard
