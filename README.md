@@ -2,7 +2,6 @@
 
 Automate the process of making a URDF for your 4-wheeled mobile robot using this **Wizard**
 
--- main image
 ![Wizard_Overview](https://github.com/user-attachments/assets/a8880c77-7261-4811-b6c2-6da5ce587a67)
 
 ---
