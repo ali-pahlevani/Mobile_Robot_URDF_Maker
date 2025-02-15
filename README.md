@@ -22,9 +22,9 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
     - This is the *main package* of the workspace. This package contains the **source codes** of the Wizard. The codebase is composed of different classes and some utility functions, all imported into the main file **robot_wizard.py**. This package used to be a standalone codebase; however, now its a **ROS2 node**.
     - In order to run the **Wizard**, you can easily run the following line in your terminal:
 
-    ```bash
+```bash
     ros2 run mobRobURDF_wizard mobRobURDF_wizard
-    ```
+```
 
 ![Wizard_Gif](https://github.com/user-attachments/assets/42abf021-481b-4386-b3e0-9e0288233829)
 
