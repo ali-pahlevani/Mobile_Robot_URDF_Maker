@@ -44,9 +44,9 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
 
     - In order to run the launch file, you can run the following line in your terminal:
 
-    ```bash
+```bash
     ros2 launch mobRobURDF_launch urdf_test.launch.py
-    ```
+```
 
 ![Launch_Gif](https://github.com/user-attachments/assets/17dcad6c-91f0-475f-9f9a-331f2c42962a)
 
