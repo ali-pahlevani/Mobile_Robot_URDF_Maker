@@ -6,10 +6,14 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from mobRobURDF_wizard.classes.OpenGLWidget import OpenGLWidget
 from mobRobURDF_wizard.utils.utils import get_color
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Configuration Page
 class ConfigurationPage(QWizardPage):
-    modelUpdated = pyqtSignal(float, float, float, str, str, str, str, str, tuple, tuple, tuple, tuple, str)
+    modelUpdated = pyqtSignal(float, float, float, str, str, str, str, str, tuple, tuple, tuple, tuple, str, str)  # Added caster_radius
 
     def __init__(self, urdf_manager, parent=None):
         super().__init__(parent)
@@ -33,6 +37,10 @@ class ConfigurationPage(QWizardPage):
 
     def initializePage(self):
         self.robot_type = self.field("robot_type")
+        logging.debug(f"ConfigurationPage initialized with robot_type: {self.robot_type}")
+        if self.robot_type is None:
+            logging.warning("robot_type is None, defaulting to 4_wheeled")
+            self.robot_type = "4_wheeled"  # Fallback to avoid crashes
         self.setTitle(f"Configure {self.robot_type.replace('_', ' ').title()} Parameters")
         self.setup_parameters()
 
@@ -51,6 +59,8 @@ class ConfigurationPage(QWizardPage):
             self.add_3w_parameters()
         elif self.robot_type == "2_wheeled_caster":
             self.add_2wc_parameters()
+        else:
+            logging.error(f"Unknown robot_type: {self.robot_type}, no parameters added")
 
         self.applyButton = QPushButton("Apply and Preview", styleSheet="font-size: 11pt; font-weight: bold; color: red;")
         self.applyButton.setMinimumHeight(30)
@@ -235,6 +245,21 @@ class ConfigurationPage(QWizardPage):
             params["caster_x"] = str(L / 2)
             params["caster_y"] = "0"
             params["caster_z"] = str(-H / 2)
+        else:
+            logging.error(f"Invalid robot_type: {self.robot_type}, using default 4-wheeled parameters")
+            # Default to 4-wheeled if robot_type is unrecognized
+            params["fl_x"] = str(L / 2)
+            params["fl_y"] = str(W / 2 + wheel_width / 2)
+            params["fl_z"] = str(-H / 2)
+            params["fr_x"] = str(L / 2)
+            params["fr_y"] = str(-W / 2 - wheel_width / 2)
+            params["fr_z"] = str(-H / 2)
+            params["rl_x"] = str(-L / 2)
+            params["rl_y"] = str(W / 2 + wheel_width / 2)
+            params["rl_z"] = str(-H / 2)
+            params["rr_x"] = str(-L / 2)
+            params["rr_y"] = str(-W / 2 - wheel_width / 2)
+            params["rr_z"] = str(-H / 2)
 
         params["lidar_z"] = str(H / 2 + lidar_height / 2)
         params["camera_x"] = str(L / 2 + Lc / 2)
@@ -242,6 +267,8 @@ class ConfigurationPage(QWizardPage):
         urdf_text = self.urdf_manager.generate_urdf(self.robot_type, params)
         self.previewTextEdit.setPlainText(urdf_text)
 
+        # Emit signal with caster_radius for 2_wheeled_caster
+        caster_radius = params.get("caster_radius", None)
         self.modelUpdated.emit(
             L, W, H,
             params["wheel_radius"],
@@ -253,7 +280,8 @@ class ConfigurationPage(QWizardPage):
             get_color(params["wheel_material"]),
             get_color(params["lidar_material"]),
             get_color(params["camera_material"]),
-            self.robot_type
+            self.robot_type,
+            caster_radius
         )
 
     def saveURDF(self):
