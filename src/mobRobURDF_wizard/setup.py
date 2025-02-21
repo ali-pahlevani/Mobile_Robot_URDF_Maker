@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'mobRobURDF_wizard = mobRobURDF_wizard.robot_wizard:main',
+            'mobRobURDF_wizard = mobRobURDF_wizard.RobotWizard:main',
         ],
     },
 )

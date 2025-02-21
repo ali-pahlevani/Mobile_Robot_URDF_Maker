@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Include the inertial_macros.xacro file for 3-wheeled robot -->
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/inertial_macros.xacro" />
+
+  <!-- Lidar Macro -->
+  <xacro:macro name="lidar" params="radius height mass material z">
+    <link name="lidar">
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <!-- Use the cylinder_inertia macro from inertial_macros.xacro -->
+        <xacro:cylinder_inertia mass="${mass}" r="${radius}" h="${height}" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder radius="${radius}" length="${height}" />
+        </geometry>
+        <material name="${material}" />
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder radius="${radius}" length="${height}" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="lidar_joint" type="fixed">
+      <parent link="chassis" />
+      <child link="lidar" />
+      <origin xyz="0 0 ${z}" rpy="0 0 0" />
+    </joint>
+  </xacro:macro>
+
+  <!-- Camera Macro -->
+  <xacro:macro name="camera" params="size mass material x">
+    <!-- Split the size string into individual components and convert to floats -->
+    <xacro:property name="size_list" value="${list(map(float, size.split()))}" />
+    <xacro:property name="l" value="${size_list[0]}" />
+    <xacro:property name="w" value="${size_list[1]}" />
+    <xacro:property name="h" value="${size_list[2]}" />
+
+    <!-- Camera Frame -->
+    <link name="camera">
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <!-- Use the box_inertia macro from inertial_macros.xacro -->
+        <xacro:box_inertia mass="${mass}" l="${l}" w="${w}" h="${h}" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${l} ${w} ${h}" />
+        </geometry>
+        <material name="${material}" />
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${l} ${w} ${h}" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="camera_joint" type="fixed">
+      <parent link="chassis" />
+      <child link="camera" />
+      <origin xyz="${x} 0 0" rpy="0 0 0" />
+    </joint>
+
+    <!-- Camera Optical Frame -->
+    <link name="camera_optical" />
+
+    <joint name="camera_optical_joint" type="fixed">
+      <parent link="camera" />
+      <child link="camera_optical" />
+      <!-- Rotate to align with ROS optical frame convention:
+           X: Right, Y: Down, Z: Forward -->
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    </joint>
+  </xacro:macro>
+</robot>

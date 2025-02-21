@@ -1,0 +1,262 @@
+from PyQt5.QtWidgets import (
+    QWizardPage, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTextEdit, QFileDialog, QSplitter, QWidget)
+from PyQt5.QtCore import Qt, pyqtSignal
+from OpenGL.GL import *
+from OpenGL.GLUT import *
+from OpenGL.GLU import *
+from mobRobURDF_wizard.classes.OpenGLWidget import OpenGLWidget
+from mobRobURDF_wizard.utils.utils import get_color
+
+# Configuration Page
+class ConfigurationPage(QWizardPage):
+    modelUpdated = pyqtSignal(float, float, float, str, str, str, str, str, tuple, tuple, tuple, tuple, str)
+
+    def __init__(self, urdf_manager, parent=None):
+        super().__init__(parent)
+        self.urdf_manager = urdf_manager
+        self.robot_type = None
+
+        layout = QVBoxLayout()
+        self.splitter = QSplitter(Qt.Horizontal)
+        self.left_widget = QWidget()
+        self.left_layout = QVBoxLayout()
+        self.left_widget.setLayout(self.left_layout)
+        self.splitter.addWidget(self.left_widget)
+
+        self.glWidget = OpenGLWidget()
+        self.splitter.addWidget(self.glWidget)
+
+        layout.addWidget(self.splitter)
+        self.setLayout(layout)
+        self.splitter.setSizes([int(0.25 * 1200), int(0.75 * 1200)])
+        self.modelUpdated.connect(self.glWidget.updateRobotModel)
+
+    def initializePage(self):
+        self.robot_type = self.field("robot_type")
+        self.setTitle(f"Configure {self.robot_type.replace('_', ' ').title()} Parameters")
+        self.setup_parameters()
+
+    def setup_parameters(self):
+        while self.left_layout.count():
+            item = self.left_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        # Common parameters
+        self.add_common_parameters()
+
+        if self.robot_type == "4_wheeled":
+            self.add_4w_parameters()
+        elif self.robot_type == "3_wheeled":
+            self.add_3w_parameters()
+        elif self.robot_type == "2_wheeled_caster":
+            self.add_2wc_parameters()
+
+        self.applyButton = QPushButton("Apply and Preview", styleSheet="font-size: 11pt; font-weight: bold; color: red;")
+        self.applyButton.setMinimumHeight(30)
+        self.left_layout.addWidget(self.applyButton)
+        self.applyButton.clicked.connect(self.applyChanges)
+
+        self.previewTextEdit = QTextEdit()
+        self.previewTextEdit.setFixedHeight(125)
+        self.previewTextEdit.setReadOnly(True)
+        self.left_layout.addWidget(self.previewTextEdit)
+
+        self.saveButton = QPushButton("Save URDF to Folder", styleSheet="font-size: 11pt; font-weight: bold; color: blue;")
+        self.saveButton.setMinimumHeight(30)
+        self.left_layout.addWidget(self.saveButton)
+        self.saveButton.clicked.connect(self.saveURDF)
+
+    def add_common_parameters(self):
+        self.chassisSizeLineEdit = QLineEdit(placeholderText="e.g., 1 1 0.5", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Chassis Size (L W H):", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.chassisSizeLineEdit)
+
+        self.chassisMassLineEdit = QLineEdit(placeholderText="e.g., 1.0", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Chassis Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.chassisMassLineEdit)
+
+        self.chassisMaterialLineEdit = QLineEdit(placeholderText="e.g., Gray", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Chassis Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.chassisMaterialLineEdit)
+
+        self.lidarRadiusLineEdit = QLineEdit(placeholderText="e.g., 0.2", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Lidar Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.lidarRadiusLineEdit)
+
+        self.lidarHeightLineEdit = QLineEdit(placeholderText="e.g., 0.1", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Lidar Height:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.lidarHeightLineEdit)
+
+        self.lidarMassLineEdit = QLineEdit(placeholderText="e.g., 0.2", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Lidar Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.lidarMassLineEdit)
+
+        self.lidarMaterialLineEdit = QLineEdit(placeholderText="e.g., Red", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Lidar Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.lidarMaterialLineEdit)
+
+        self.cameraSizeLineEdit = QLineEdit(placeholderText="e.g., 0.1 0.1 0.1", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Camera Size (L W H):", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.cameraSizeLineEdit)
+
+        self.cameraMassLineEdit = QLineEdit(placeholderText="e.g., 0.1", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Camera Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.cameraMassLineEdit)
+
+        self.cameraMaterialLineEdit = QLineEdit(placeholderText="e.g., Blue", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Camera Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.cameraMaterialLineEdit)
+
+    def add_4w_parameters(self):
+        self.wheelRadiusLineEdit = QLineEdit(placeholderText="e.g., 0.3", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Wheel Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.wheelRadiusLineEdit)
+
+        self.wheelWidthLineEdit = QLineEdit(placeholderText="e.g., 0.1", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Wheel Width:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.wheelWidthLineEdit)
+
+        self.wheelMassLineEdit = QLineEdit(placeholderText="e.g., 0.5", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Wheel Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.wheelMassLineEdit)
+
+        self.wheelMaterialLineEdit = QLineEdit(placeholderText="e.g., Black", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Wheel Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.wheelMaterialLineEdit)
+
+    def add_3w_parameters(self):
+        self.wheelRadiusLineEdit = QLineEdit(placeholderText="e.g., 0.3", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Wheel Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.wheelRadiusLineEdit)
+
+        self.wheelWidthLineEdit = QLineEdit(placeholderText="e.g., 0.1", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Wheel Width:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.wheelWidthLineEdit)
+
+        self.wheelMassLineEdit = QLineEdit(placeholderText="e.g., 0.5", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Wheel Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.wheelMassLineEdit)
+
+        self.wheelMaterialLineEdit = QLineEdit(placeholderText="e.g., Black", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Wheel Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.wheelMaterialLineEdit)
+
+    def add_2wc_parameters(self):
+        self.wheelRadiusLineEdit = QLineEdit(placeholderText="e.g., 0.3", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Wheel Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.wheelRadiusLineEdit)
+
+        self.wheelWidthLineEdit = QLineEdit(placeholderText="e.g., 0.1", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Wheel Width:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.wheelWidthLineEdit)
+
+        self.wheelMassLineEdit = QLineEdit(placeholderText="e.g., 0.5", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Wheel Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.wheelMassLineEdit)
+
+        self.wheelMaterialLineEdit = QLineEdit(placeholderText="e.g., Black", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Wheel Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.wheelMaterialLineEdit)
+
+        self.casterRadiusLineEdit = QLineEdit(placeholderText="e.g., 0.3", styleSheet="font-size: 10.5pt;")
+        self.left_layout.addWidget(QLabel("Caster Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(self.casterRadiusLineEdit)
+
+    def applyChanges(self):
+        chassis_size_str = self.chassisSizeLineEdit.text()
+        try:
+            L, W, H = map(float, chassis_size_str.split())
+        except ValueError:
+            L, W, H = 1.2, 0.8, 0.3
+            chassis_size_str = "1.2 0.8 0.3"
+
+        camera_size_str = self.cameraSizeLineEdit.text()
+        try:
+            Lc, Wc, Hc = map(float, camera_size_str.split())
+        except ValueError:
+            Lc, Wc, Hc = 0.08, 0.2, 0.08
+            camera_size_str = "0.08 0.2 0.08"
+
+        params = {
+            "chassis_size": chassis_size_str,
+            "chassis_mass": self.chassisMassLineEdit.text() or "1.0",
+            "chassis_material": self.chassisMaterialLineEdit.text() or "Gray",
+            "lidar_radius": self.lidarRadiusLineEdit.text() or "0.1",
+            "lidar_height": self.lidarHeightLineEdit.text() or "0.08",
+            "lidar_mass": self.lidarMassLineEdit.text() or "0.2",
+            "lidar_material": self.lidarMaterialLineEdit.text() or "Red",
+            "camera_size": camera_size_str,
+            "camera_mass": self.cameraMassLineEdit.text() or "0.1",
+            "camera_material": self.cameraMaterialLineEdit.text() or "Blue",
+        }
+
+        if self.robot_type in ["4_wheeled", "3_wheeled", "2_wheeled_caster"]:
+            params["wheel_radius"] = self.wheelRadiusLineEdit.text() or "0.22"
+            params["wheel_width"] = self.wheelWidthLineEdit.text() or "0.12"
+            params["wheel_mass"] = self.wheelMassLineEdit.text() or "0.5"
+            params["wheel_material"] = self.wheelMaterialLineEdit.text() or "Black"
+
+        if self.robot_type == "2_wheeled_caster":
+            params["caster_radius"] = self.casterRadiusLineEdit.text() or params["wheel_radius"]  # Default to wheel_radius
+
+        wheel_width = float(params["wheel_width"])
+        lidar_height = float(params["lidar_height"])
+        if self.robot_type == "4_wheeled":
+            params["fl_x"] = str(L / 2)
+            params["fl_y"] = str(W / 2 + wheel_width / 2)
+            params["fl_z"] = str(-H / 2)
+            params["fr_x"] = str(L / 2)
+            params["fr_y"] = str(-W / 2 - wheel_width / 2)
+            params["fr_z"] = str(-H / 2)
+            params["rl_x"] = str(-L / 2)
+            params["rl_y"] = str(W / 2 + wheel_width / 2)
+            params["rl_z"] = str(-H / 2)
+            params["rr_x"] = str(-L / 2)
+            params["rr_y"] = str(-W / 2 - wheel_width / 2)
+            params["rr_z"] = str(-H / 2)
+        elif self.robot_type == "3_wheeled":
+            params["front_x"] = str(L / 2)
+            params["front_y"] = "0"
+            params["front_z"] = str(-H / 2)
+            params["rl_x"] = str(-L / 2)
+            params["rl_y"] = str(W / 2 + wheel_width / 2)
+            params["rl_z"] = str(-H / 2)
+            params["rr_x"] = str(-L / 2)
+            params["rr_y"] = str(-W / 2 - wheel_width / 2)
+            params["rr_z"] = str(-H / 2)
+        elif self.robot_type == "2_wheeled_caster":
+            params["l_x"] = "0"
+            params["l_y"] = str(W / 2 + wheel_width / 2)
+            params["l_z"] = str(-H / 2)
+            params["r_x"] = "0"
+            params["r_y"] = str(-W / 2 - wheel_width / 2)
+            params["r_z"] = str(-H / 2)
+            params["caster_x"] = str(L / 2)
+            params["caster_y"] = "0"
+            params["caster_z"] = str(-H / 2)
+
+        params["lidar_z"] = str(H / 2 + lidar_height / 2)
+        params["camera_x"] = str(L / 2 + Lc / 2)
+
+        urdf_text = self.urdf_manager.generate_urdf(self.robot_type, params)
+        self.previewTextEdit.setPlainText(urdf_text)
+
+        self.modelUpdated.emit(
+            L, W, H,
+            params["wheel_radius"],
+            params["wheel_width"],
+            params["lidar_radius"],
+            params["lidar_height"],
+            params["camera_size"],
+            get_color(params["chassis_material"]),
+            get_color(params["wheel_material"]),
+            get_color(params["lidar_material"]),
+            get_color(params["camera_material"]),
+            self.robot_type
+        )
+
+    def saveURDF(self):
+        filename, _ = QFileDialog.getSaveFileName(self, "Save URDF", "", "URDF Files (*.urdf)")
+        if filename:
+            self.urdf_manager.save_urdf(filename)

@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Include the inertial_macros.xacro file -->
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/inertial_macros.xacro" />
+
+  <!-- Wheel Macro (Cylindrical Wheels) -->
+  <xacro:macro name="wheel" params="name radius width mass material x y z joint_type">
+    <link name="${name}_wheel">
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+        <!-- Use the cylinder_inertia macro from inertial_macros.xacro -->
+        <xacro:cylinder_inertia mass="${mass}" r="${radius}" h="${width}" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+        <geometry>
+          <cylinder radius="${radius}" length="${width}" />
+        </geometry>
+        <material name="${material}" />
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+        <geometry>
+          <cylinder radius="${radius}" length="${width}" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_joint" type="${joint_type}">
+      <parent link="chassis" />
+      <child link="${name}_wheel" />
+      <origin xyz="${x} ${y} ${z}" rpy="0 0 0" />
+      <axis xyz="0 1 0" />
+    </joint>
+  </xacro:macro>
+
+  <!-- Caster Macro (Spherical Wheel) -->
+  <xacro:macro name="caster" params="name radius mass material x y z">
+    <link name="${name}_wheel">
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <!-- Use the sphere_inertia macro from inertial_macros.xacro (assumed to exist) -->
+        <xacro:sphere_inertia mass="${mass}" r="${radius}" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <sphere radius="${radius}" />
+        </geometry>
+        <material name="${material}" />
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <sphere radius="${radius}" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${name}_joint" type="fixed">
+      <parent link="chassis" />
+      <child link="${name}_wheel" />
+      <origin xyz="${x} ${y} ${z}" rpy="0 0 0" />
+    </joint>
+  </xacro:macro>
+</robot>
