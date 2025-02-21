@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import (
-    QWizardPage, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTextEdit, QFileDialog, QSplitter, QWidget)
+from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QLabel, QLineEdit, QPushButton, 
+                             QTextEdit, QFileDialog, QSplitter, QWidget)
 from PyQt5.QtCore import Qt, pyqtSignal
 from OpenGL.GL import *
 from OpenGL.GLUT import *

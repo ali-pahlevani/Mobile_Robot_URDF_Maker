@@ -1,6 +1,8 @@
+import os
 from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QHBoxLayout, QLabel)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
+from ament_index_python.packages import get_package_share_directory
 
 # Future Features Page
 class FutureFeaturesPage(QWizardPage):
@@ -8,12 +10,14 @@ class FutureFeaturesPage(QWizardPage):
         super().__init__(parent)
         self.setTitle("Future Features")
 
+        self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images")
+
         features = [
-            ("Gazebo", "../../images/gazebo.png"),
-            ("Control", "../../images/control.png"),
-            ("SLAM", "../../images/slam.png"),
-            ("Navigation", "../../images/navigation.png"),
-            ("Object Tracking", "../../images/object_tracking.png"),
+            ("Gazebo", os.path.join(self.image_dir, "gazebo.png")),
+            ("Control", os.path.join(self.image_dir, "control.png")),
+            ("SLAM", os.path.join(self.image_dir, "slam.png")),
+            ("Navigation", os.path.join(self.image_dir, "navigation.png")),
+            ("Object Tracking", os.path.join(self.image_dir, "object_tracking.png")),
         ]
 
         layout = QVBoxLayout()

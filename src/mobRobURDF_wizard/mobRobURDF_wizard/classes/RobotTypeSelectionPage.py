@@ -1,6 +1,8 @@
+import os
 from PyQt5.QtWidgets import QWizardPage, QPushButton, QLabel, QHBoxLayout, QVBoxLayout
-from PyQt5.QtGui import QPixmap
+from ament_index_python.packages import get_package_share_directory
 from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QPixmap
 
 class RobotTypeSelectionPage(QWizardPage):
     robotTypeChanged = pyqtSignal()  # Define the custom signal
@@ -19,10 +21,12 @@ class RobotTypeSelectionPage(QWizardPage):
 
         self.preview_label = QLabel()
         self.preview_label.setFixedSize(300, 300)
+        
+        self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images")
 
-        self.btn_4w.enterEvent = lambda event: self.show_preview("../../images/4w_preview.png")
-        self.btn_3w.enterEvent = lambda event: self.show_preview("../../images/3w_preview.png")
-        self.btn_2wc.enterEvent = lambda event: self.show_preview("../../images/2wc_preview.png")
+        self.btn_4w.enterEvent = lambda event: self.show_preview(os.path.join(self.image_dir, "4w_preview.png"))
+        self.btn_3w.enterEvent = lambda event: self.show_preview(os.path.join(self.image_dir, "3w_preview.png"))
+        self.btn_2wc.enterEvent = lambda event: self.show_preview(os.path.join(self.image_dir, "2wc_preview.png"))
 
         self.btn_4w.clicked.connect(lambda: self.set_robot_type("4_wheeled"))
         self.btn_3w.clicked.connect(lambda: self.set_robot_type("3_wheeled"))

@@ -1,5 +1,7 @@
+import os
 from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QLabel)
-from PyQt5.QtGui import QMovie, QPixmap
+from ament_index_python.packages import get_package_share_directory
+from PyQt5.QtGui import QMovie
 
 # Welcome Page
 class WelcomePage(QWizardPage):
@@ -11,7 +13,10 @@ class WelcomePage(QWizardPage):
         title_label.setStyleSheet("font-size: 18pt; font-weight: bold;")
 
         gif_label = QLabel(self)
-        movie = QMovie("../../images/welcome.gif")
+        
+        self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images")
+        movie = QMovie(os.path.join(self.image_dir, "welcome.gif"))
+        
         gif_label.setMovie(movie)
         movie.start()
 

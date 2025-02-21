@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
+import sys
+import logging
 from mobRobURDF_wizard.classes.WelcomePage import WelcomePage
 from mobRobURDF_wizard.classes.URDFManager import URDFManager
 from mobRobURDF_wizard.classes.RobotTypeSelectionPage import RobotTypeSelectionPage
 from mobRobURDF_wizard.classes.FutureFeaturesPage import FutureFeaturesPage
 from mobRobURDF_wizard.classes.ConfigurationPage import ConfigurationPage
-
-import sys
-import logging
 from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QWidget, QApplication, QWizard, QListWidget)
 from OpenGL.GL import *
 from OpenGL.GLUT import *
