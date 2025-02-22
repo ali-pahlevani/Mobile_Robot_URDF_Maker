@@ -4,6 +4,7 @@ from OpenGL.GLU import *
 import numpy as np
 from PyQt5.QtOpenGL import QGLWidget
 from PyQt5.QtCore import Qt
+import logging
 
 # Class for 3D Preview
 class OpenGLWidget(QGLWidget):
@@ -16,7 +17,6 @@ class OpenGLWidget(QGLWidget):
         self.lastPos3D = None
         self.L, self.W, self.H = 1.2, 0.8, 0.3
         self.wheel_radius, self.wheel_width = 0.22, 0.12
-        self.caster_radius = 0.22  # Default to wheel_radius for 2_wheeled_caster
         self.lidar_radius, self.lidar_height = 0.1, 0.08
         self.camera_size = (0.08, 0.2, 0.08)
         self.chassis_color = (0.5, 0.5, 0.5)
@@ -24,10 +24,12 @@ class OpenGLWidget(QGLWidget):
         self.lidar_color = (1.0, 0.0, 0.0)
         self.camera_color = (0.0, 0.0, 1.0)
         self.robot_type = "4_wheeled"  # Default
+        logging.debug("OpenGLWidget initialized")
 
     def initializeGL(self):
         glEnable(GL_DEPTH_TEST)
         glClearColor(0.7, 0.7, 0.7, 1.0)
+        logging.debug("OpenGL initialized")
 
     def resizeGL(self, w, h):
         glViewport(0, 0, w, h)
@@ -90,10 +92,10 @@ class OpenGLWidget(QGLWidget):
                 glTranslatef(0, 0, -self.wheel_width / 2)
                 glutSolidCylinder(self.wheel_radius, self.wheel_width, 20, 20)
                 glPopMatrix()
-            # Caster wheel as a sphere
+            # Caster wheel as a sphere, using wheel_radius
             glPushMatrix()
             glTranslatef(self.L / 2, 0, -self.H / 2)
-            glutSolidSphere(self.caster_radius, 20, 20)
+            glutSolidSphere(self.wheel_radius, 20, 20)  # Changed to wheel_radius
             glPopMatrix()
 
         # Draw lidar
@@ -157,16 +159,21 @@ class OpenGLWidget(QGLWidget):
 
     def updateRobotModel(self, L, W, H, wheel_radius, wheel_width, lidar_radius, lidar_height, camera_size,
                          chassis_color, wheel_color, lidar_color, camera_color, robot_type="4_wheeled", caster_radius=None):
-        self.L, self.W, self.H = L, W, H
-        self.wheel_radius = float(wheel_radius)
-        self.wheel_width = float(wheel_width)
-        self.lidar_radius = float(lidar_radius)
-        self.lidar_height = float(lidar_height)
-        self.camera_size = tuple(map(float, camera_size.split()))
-        self.chassis_color = chassis_color
-        self.wheel_color = wheel_color
-        self.lidar_color = lidar_color
-        self.camera_color = camera_color
-        self.robot_type = robot_type
-        self.caster_radius = float(caster_radius) if caster_radius is not None else self.wheel_radius
-        self.update()
+        try:
+            self.L, self.W, self.H = L, W, H
+            self.wheel_radius = float(wheel_radius)
+            self.wheel_width = float(wheel_width)
+            self.lidar_radius = float(lidar_radius)
+            self.lidar_height = float(lidar_height)
+            self.camera_size = tuple(map(float, camera_size.split()))
+            self.chassis_color = chassis_color
+            self.wheel_color = wheel_color
+            self.lidar_color = lidar_color
+            self.camera_color = camera_color
+            self.robot_type = robot_type
+            # Caster radius defaults to wheel_radius for consistency
+            self.caster_radius = self.wheel_radius if robot_type == "2_wheeled_caster" else float(caster_radius) if caster_radius is not None else self.wheel_radius
+            logging.debug(f"Updated robot model: type={self.robot_type}, wheel_radius={self.wheel_radius}, caster_radius={self.caster_radius}")
+            self.update()
+        except ValueError as e:
+            logging.error(f"Error updating robot model parameters: {str(e)}")

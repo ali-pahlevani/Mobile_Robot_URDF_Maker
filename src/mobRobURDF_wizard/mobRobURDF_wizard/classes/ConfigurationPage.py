@@ -8,9 +8,6 @@ from mobRobURDF_wizard.classes.OpenGLWidget import OpenGLWidget
 from mobRobURDF_wizard.utils.utils import get_color
 import logging
 
-# Set up logging
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
-
 # Configuration Page
 class ConfigurationPage(QWizardPage):
     modelUpdated = pyqtSignal(float, float, float, str, str, str, str, str, tuple, tuple, tuple, tuple, str, str)  # Added caster_radius
@@ -34,6 +31,7 @@ class ConfigurationPage(QWizardPage):
         self.setLayout(layout)
         self.splitter.setSizes([int(0.25 * 1200), int(0.75 * 1200)])
         self.modelUpdated.connect(self.glWidget.updateRobotModel)
+        logging.debug("ConfigurationPage initialized")
 
     def initializePage(self):
         self.robot_type = self.field("robot_type")
@@ -50,7 +48,6 @@ class ConfigurationPage(QWizardPage):
             if item.widget():
                 item.widget().deleteLater()
 
-        # Common parameters
         self.add_common_parameters()
 
         if self.robot_type == "4_wheeled":
@@ -154,7 +151,7 @@ class ConfigurationPage(QWizardPage):
 
     def add_2wc_parameters(self):
         self.wheelRadiusLineEdit = QLineEdit(placeholderText="e.g., 0.3", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.left_layout.addWidget(QLabel("Wheel and Caster Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
         self.left_layout.addWidget(self.wheelRadiusLineEdit)
 
         self.wheelWidthLineEdit = QLineEdit(placeholderText="e.g., 0.1", styleSheet="font-size: 10.5pt;")
@@ -169,24 +166,24 @@ class ConfigurationPage(QWizardPage):
         self.left_layout.addWidget(QLabel("Wheel Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
         self.left_layout.addWidget(self.wheelMaterialLineEdit)
 
-        self.casterRadiusLineEdit = QLineEdit(placeholderText="e.g., 0.3", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Caster Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.casterRadiusLineEdit)
-
     def applyChanges(self):
         chassis_size_str = self.chassisSizeLineEdit.text()
         try:
             L, W, H = map(float, chassis_size_str.split())
+            logging.debug(f"Chassis size parsed: L={L}, W={W}, H={H}")
         except ValueError:
             L, W, H = 1.2, 0.8, 0.3
             chassis_size_str = "1.2 0.8 0.3"
+            logging.warning("Invalid chassis size input, using defaults: 1.2 0.8 0.3")
 
         camera_size_str = self.cameraSizeLineEdit.text()
         try:
             Lc, Wc, Hc = map(float, camera_size_str.split())
+            logging.debug(f"Camera size parsed: Lc={Lc}, Wc={Wc}, Hc={Hc}")
         except ValueError:
             Lc, Wc, Hc = 0.08, 0.2, 0.08
             camera_size_str = "0.08 0.2 0.08"
+            logging.warning("Invalid camera size input, using defaults: 0.08 0.2 0.08")
 
         params = {
             "chassis_size": chassis_size_str,
@@ -203,12 +200,13 @@ class ConfigurationPage(QWizardPage):
 
         if self.robot_type in ["4_wheeled", "3_wheeled", "2_wheeled_caster"]:
             params["wheel_radius"] = self.wheelRadiusLineEdit.text() or "0.22"
-            params["wheel_width"] = self.wheelWidthLineEdit.text() or "0.12"
+            params["wheel_width"] = self.wheelWidthLineEdit.text() or "0.12"  # Removed comma
             params["wheel_mass"] = self.wheelMassLineEdit.text() or "0.5"
             params["wheel_material"] = self.wheelMaterialLineEdit.text() or "Black"
 
+        # For 2_wheeled_caster, caster_radius matches wheel_radius
         if self.robot_type == "2_wheeled_caster":
-            params["caster_radius"] = self.casterRadiusLineEdit.text() or params["wheel_radius"]  # Default to wheel_radius
+            params["caster_radius"] = params["wheel_radius"]  # Enforce same value
 
         wheel_width = float(params["wheel_width"])
         lidar_height = float(params["lidar_height"])
@@ -247,7 +245,6 @@ class ConfigurationPage(QWizardPage):
             params["caster_z"] = str(-H / 2)
         else:
             logging.error(f"Invalid robot_type: {self.robot_type}, using default 4-wheeled parameters")
-            # Default to 4-wheeled if robot_type is unrecognized
             params["fl_x"] = str(L / 2)
             params["fl_y"] = str(W / 2 + wheel_width / 2)
             params["fl_z"] = str(-H / 2)
@@ -266,9 +263,9 @@ class ConfigurationPage(QWizardPage):
 
         urdf_text = self.urdf_manager.generate_urdf(self.robot_type, params)
         self.previewTextEdit.setPlainText(urdf_text)
+        logging.debug("URDF text updated in preview")
 
-        # Emit signal with caster_radius for 2_wheeled_caster
-        caster_radius = params.get("caster_radius", None)
+        caster_radius = params["wheel_radius"] if self.robot_type == "2_wheeled_caster" else None
         self.modelUpdated.emit(
             L, W, H,
             params["wheel_radius"],
@@ -283,8 +280,13 @@ class ConfigurationPage(QWizardPage):
             self.robot_type,
             caster_radius
         )
+        logging.debug(f"Emitted modelUpdated signal for {self.robot_type}")
 
     def saveURDF(self):
         filename, _ = QFileDialog.getSaveFileName(self, "Save URDF", "", "URDF Files (*.urdf)")
         if filename:
-            self.urdf_manager.save_urdf(filename)
+            try:
+                self.urdf_manager.save_urdf(filename)
+                logging.debug(f"URDF saved to: {filename}")
+            except Exception as e:
+                logging.error(f"Failed to save URDF to {filename}: {str(e)}")

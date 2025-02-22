@@ -1,4 +1,5 @@
 import os
+import logging
 from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QHBoxLayout, QLabel)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
@@ -11,6 +12,7 @@ class FutureFeaturesPage(QWizardPage):
         self.setTitle("Future Features")
 
         self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images")
+        logging.debug(f"Image directory set to: {self.image_dir}")
 
         features = [
             ("Gazebo", os.path.join(self.image_dir, "gazebo.png")),
@@ -29,8 +31,10 @@ class FutureFeaturesPage(QWizardPage):
             pixmap = QPixmap(image_path)
             if not pixmap.isNull():
                 image_label.setPixmap(pixmap.scaled(200, 200, Qt.KeepAspectRatio))
+                logging.debug(f"Loaded image for {feature_name}: {image_path}")
             else:
                 image_label.setText(f"{feature_name} Image Not Found")
+                logging.warning(f"Failed to load image for {feature_name}: {image_path}")
 
             feature_layout = QHBoxLayout()
             feature_layout.addWidget(feature_label)
@@ -39,3 +43,4 @@ class FutureFeaturesPage(QWizardPage):
 
         layout.addStretch()
         self.setLayout(layout)
+        logging.debug("FutureFeaturesPage initialized")
