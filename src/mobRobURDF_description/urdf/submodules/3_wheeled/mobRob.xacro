@@ -15,9 +15,9 @@
   <xacro:chassis size="${chassis_size}" mass="${chassis_mass}" material="${chassis_material}" />
 
   <!-- Wheels -->
-  <xacro:wheel name="front" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${front_x}" y="${front_y}" z="${front_z}" />
-  <xacro:wheel name="rear_left" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${rl_x}" y="${rl_y}" z="${rl_z}" />
-  <xacro:wheel name="rear_right" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${rr_x}" y="${rr_y}" z="${rr_z}" />
+  <xacro:wheel name="front" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="0" y="0" z="0" parent="front_steering_link" />
+  <xacro:wheel name="rear_left" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${rl_x}" y="${rl_y}" z="${rl_z}" parent="chassis" />
+  <xacro:wheel name="rear_right" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${rr_x}" y="${rr_y}" z="${rr_z}" parent="chassis" />
 
   <!-- Sensors -->
   <xacro:lidar radius="${lidar_radius}" height="${lidar_height}" mass="${lidar_mass}" material="${lidar_material}" z="${lidar_z}" />

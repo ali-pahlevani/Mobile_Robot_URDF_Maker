@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <!-- Include the inertial_macros.xacro file for 3-wheeled robot -->
+  <!-- Include the inertial_macros.xacro file -->
   <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/inertial_macros.xacro" />
 
   <!-- Lidar Macro -->

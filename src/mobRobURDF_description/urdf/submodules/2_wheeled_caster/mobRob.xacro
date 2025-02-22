@@ -15,9 +15,9 @@
   <xacro:chassis size="${chassis_size}" mass="${chassis_mass}" material="${chassis_material}" />
 
   <!-- Wheels -->
-  <xacro:wheel name="left" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${l_x}" y="${l_y}" z="${l_z}" joint_type="continuous" />
-  <xacro:wheel name="right" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${r_x}" y="${r_y}" z="${r_z}" joint_type="continuous" />
-  <xacro:caster name="front_caster" radius="${caster_radius}" mass="${wheel_mass}" material="${wheel_material}" x="${caster_x}" y="${caster_y}" z="${caster_z}" />
+  <xacro:wheel name="left" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${l_x}" y="${l_y}" z="${l_z}" />
+  <xacro:wheel name="right" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${r_x}" y="${r_y}" z="${r_z}" />
+  <xacro:caster name="front_caster" radius="${wheel_radius}" mass="${wheel_mass}" material="${wheel_material}" x="${caster_x}" y="${caster_y}" z="${caster_z}" />
 
   <!-- Sensors -->
   <xacro:lidar radius="${lidar_radius}" height="${lidar_height}" mass="${lidar_mass}" material="${lidar_material}" z="${lidar_z}" />

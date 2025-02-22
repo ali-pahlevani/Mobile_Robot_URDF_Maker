@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <!-- Include the inertial_macros.xacro file for 3-wheeled robot -->
+  <!-- Include the inertial_macros.xacro file -->
   <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/inertial_macros.xacro" />
 
   <!-- Base Link -->
@@ -13,6 +13,7 @@
     <xacro:property name="w" value="${size_list[1]}" />
     <xacro:property name="h" value="${size_list[2]}" />
 
+    <!-- Chassis Link -->
     <link name="chassis">
       <inertial>
         <mass value="${mass}" />
@@ -39,6 +40,26 @@
       <parent link="base_link" />
       <child link="chassis" />
       <origin xyz="0 0 ${h/2}" rpy="0 0 0" />
+    </joint>
+
+    <!-- Front Steering Link for 3-Wheeled Robot -->
+    <link name="front_steering_link">
+      <!-- No mass or geometry needed; this is a pivot point for steering -->
+      <inertial>
+        <mass value="0.001" /> <!-- Minimal mass to avoid simulation issues -->
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+      <!-- Optional: Add visual/collision if you want a visible steering component -->
+    </link>
+
+    <!-- Revolute Joint for Steering (z-axis rotation) -->
+    <joint name="chassis_to_front_steering" type="revolute">
+      <parent link="chassis" />
+      <child link="front_steering_link" />
+      <origin xyz="${l/2} 0 ${-h/2}" rpy="0 0 0" /> <!-- Position at front wheel base -->
+      <axis xyz="0 0 1" /> <!-- Rotation around z-axis for steering -->
+      <limit lower="${-pi/2}" upper="${pi/2}" effort="100" velocity="10" /> <!-- Steering range: ±90° -->
     </joint>
   </xacro:macro>
 </robot>

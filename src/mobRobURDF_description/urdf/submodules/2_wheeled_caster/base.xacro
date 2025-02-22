@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <!-- Include the inertial_macros.xacro file for 2-wheeled with caster robot -->
+  <!-- Include the inertial_macros.xacro file -->
   <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/inertial_macros.xacro" />
 
   <!-- Base Link -->
   <link name="base_link"></link>
 
-  <!-- Chassis -->
+  <!-- Chassis Macro -->
   <xacro:macro name="chassis" params="size mass material">
     <xacro:property name="size_list" value="${list(map(float, size.split()))}" />
     <xacro:property name="l" value="${size_list[0]}" />

@@ -6,7 +6,7 @@
   <!-- Base Link -->
   <link name="base_link"></link>
 
-  <!-- Chassis -->
+  <!-- Chassis Macro -->
   <xacro:macro name="chassis" params="size mass material">
     <xacro:property name="size_list" value="${list(map(float, size.split()))}" />
     <xacro:property name="l" value="${size_list[0]}" />

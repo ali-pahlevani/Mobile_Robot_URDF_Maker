@@ -4,7 +4,7 @@
   <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/inertial_macros.xacro" />
 
   <!-- Wheel Macro -->
-  <xacro:macro name="wheel" params="name radius width mass material x y z joint_type">
+  <xacro:macro name="wheel" params="name radius width mass material x y z parent">
     <link name="${name}_wheel">
       <inertial>
         <mass value="${mass}" />
@@ -26,8 +26,8 @@
         </geometry>
       </collision>
     </link>
-    <joint name="${name}_joint" type="${joint_type}">
-      <parent link="chassis" />
+    <joint name="${name}_joint" type="continuous">
+      <parent link="${parent}" />
       <child link="${name}_wheel" />
       <origin xyz="${x} ${y} ${z}" rpy="0 0 0" />
       <axis xyz="0 1 0" />
