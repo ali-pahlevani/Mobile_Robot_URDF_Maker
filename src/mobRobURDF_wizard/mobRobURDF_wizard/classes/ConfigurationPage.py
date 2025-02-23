@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QLabel, QLineEdit, QPushButton, 
-                             QTextEdit, QFileDialog, QSplitter, QWidget, QHBoxLayout)
-from PyQt5.QtCore import Qt, pyqtSignal
+                             QTextEdit, QFileDialog, QWidget, QHBoxLayout)
+from ament_index_python.packages import get_package_share_directory
+from PyQt5.QtCore import pyqtSignal
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
@@ -16,6 +17,8 @@ class ConfigurationPage(QWizardPage):
         super().__init__(parent)
         self.urdf_manager = urdf_manager
         self.robot_type = None
+        
+        self.default_save_path = os.path.join(get_package_share_directory("mobRobURDF_description"), "urdf", "mobRob.urdf")
 
         # Main layout for the entire page
         main_layout = QHBoxLayout()
@@ -345,7 +348,16 @@ class ConfigurationPage(QWizardPage):
         self.glWidget.update()  # Force immediate repaint of OpenGL widget
 
     def saveURDF(self):
-        filename, _ = QFileDialog.getSaveFileName(self, "Save URDF", "", "URDF Files (*.urdf)")
+        # First, save to the default location
+        try:
+            self.urdf_manager.save_urdf(self.default_save_path)
+            logging.debug(f"URDF saved to default location: {self.default_save_path}")
+        except Exception as e:
+            logging.error(f"Failed to save URDF to default location {self.default_save_path}: {str(e)}")
+            return  # Exit if default save fails
+
+        # Then, open file explorer for optional additional save
+        filename, _ = QFileDialog.getSaveFileName(self, "Save URDF", self.default_save_path, "URDF Files (*.urdf)")
         if filename:
             try:
                 self.urdf_manager.save_urdf(filename)

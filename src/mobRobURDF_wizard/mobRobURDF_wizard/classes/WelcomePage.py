@@ -16,7 +16,7 @@ class WelcomePage(QWizardPage):
         title_label.setStyleSheet("""
             font-size: 28pt;          /* Larger font size */
             font-weight: bold;        /* Bold text */
-            color: #2E2E2E;           /* Dark gray color */
+            color: #DC143C;           /* Dark gray color */
         """)
         title_label.setFont(QFont("Segoe UI", 28, QFont.Bold))  # Modern font
         title_label.setAlignment(Qt.AlignCenter)  # Center horizontally

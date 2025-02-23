@@ -27,7 +27,7 @@ class FutureFeaturesPage(QWizardPage):
         main_layout.setSpacing(20)  # Space between rows
 
         for feature_name, image_path in features:
-            # Feature name label (left-aligned)
+            # Feature name label (centered text)
             feature_label = QLabel(feature_name)
             feature_label.setStyleSheet("""
                 font-size: 18pt;
@@ -40,6 +40,7 @@ class FutureFeaturesPage(QWizardPage):
                 border-radius: 5px;
             """)
             feature_label.setFixedWidth(240)  # Fixed width for consistent spacing
+            feature_label.setAlignment(Qt.AlignCenter)  # Center text horizontally and vertically
 
             # Image label (centered exactly in the row)
             image_label = QLabel()

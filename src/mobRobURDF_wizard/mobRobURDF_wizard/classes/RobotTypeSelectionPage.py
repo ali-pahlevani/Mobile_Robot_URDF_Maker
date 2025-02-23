@@ -49,7 +49,7 @@ class RobotTypeSelectionPage(QWizardPage):
             QPushButton {
                 background-color: #28A745;  /* Green */
                 color: white;
-                font-size: 16pt;
+                font-size: 18pt;
                 font-weight: bold;
                 font-family: "Segoe UI";
                 padding: 10px;
@@ -71,15 +71,15 @@ class RobotTypeSelectionPage(QWizardPage):
 
         # Create framed labels for each robot type's image
         self.label_4w = QLabel()
-        self.label_4w.setFixedSize(400, 250)
+        self.label_4w.setFixedSize(400, 350)
         self.load_image(self.label_4w, os.path.join(self.image_dir, "4w_preview.png"))
 
         self.label_3w = QLabel()
-        self.label_3w.setFixedSize(400, 250)
+        self.label_3w.setFixedSize(400, 350)
         self.load_image(self.label_3w, os.path.join(self.image_dir, "3w_preview.png"))
 
         self.label_2wc = QLabel()
-        self.label_2wc.setFixedSize(400, 250)
+        self.label_2wc.setFixedSize(400, 350)
         self.load_image(self.label_2wc, os.path.join(self.image_dir, "2wc_preview.png"))
 
         # Style image labels with a subtle frame
@@ -106,9 +106,11 @@ class RobotTypeSelectionPage(QWizardPage):
 
         # Section 1: 4-Wheeled Robot
         section_4w = QVBoxLayout()
+        section_4w.addStretch(1)  # Stretch above to center content vertically
         section_4w.addWidget(self.btn_4w, alignment=Qt.AlignCenter)
+        section_4w.addSpacing(80)  # Adjustable distance between name and image (default 10px)
         section_4w.addWidget(self.label_4w, alignment=Qt.AlignCenter)
-        section_4w.addStretch()
+        section_4w.addStretch(1)  # Stretch below to center content vertically
         
         frame_4w = QFrame()
         frame_4w.setLayout(section_4w)
@@ -117,9 +119,11 @@ class RobotTypeSelectionPage(QWizardPage):
 
         # Section 2: 3-Wheeled Robot (Tricycle)
         section_3w = QVBoxLayout()
+        section_3w.addStretch(1)  # Stretch above to center content vertically
         section_3w.addWidget(self.btn_3w, alignment=Qt.AlignCenter)
+        section_3w.addSpacing(80)  # Adjustable distance between name and image (default 10px)
         section_3w.addWidget(self.label_3w, alignment=Qt.AlignCenter)
-        section_3w.addStretch()
+        section_3w.addStretch(1)  # Stretch below to center content vertically
         
         frame_3w = QFrame()
         frame_3w.setLayout(section_3w)
@@ -128,9 +132,11 @@ class RobotTypeSelectionPage(QWizardPage):
 
         # Section 3: 2-Wheeled Robot with Caster
         section_2wc = QVBoxLayout()
+        section_2wc.addStretch(1)  # Stretch above to center content vertically
         section_2wc.addWidget(self.btn_2wc, alignment=Qt.AlignCenter)
+        section_2wc.addSpacing(80)  # Adjustable distance between name and image (default 10px)
         section_2wc.addWidget(self.label_2wc, alignment=Qt.AlignCenter)
-        section_2wc.addStretch()
+        section_2wc.addStretch(1)  # Stretch below to center content vertically
         
         frame_2wc = QFrame()
         frame_2wc.setLayout(section_2wc)

@@ -182,26 +182,26 @@
     <inertial>
       <mass value="0.1"/>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="0.0003866666666666667" ixy="0" ixz="0" iyy="0.00010666666666666668" iyz="0" izz="0.0003866666666666667"/>
+      <inertia ixx="0.0014999999999999998" ixy="0" ixz="0" iyy="0.0014999999999999998" iyz="0" izz="0.0014999999999999998"/>
     </inertial>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.08 0.2 0.08"/>
+        <box size="0.3 0.3 0.3"/>
       </geometry>
       <material name="Blue"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.08 0.2 0.08"/>
+        <box size="0.3 0.3 0.3"/>
       </geometry>
     </collision>
   </link>
   <joint name="camera_joint" type="fixed">
     <parent link="chassis"/>
     <child link="camera"/>
-    <origin rpy="0 0 0" xyz="0.64 0 0"/>
+    <origin rpy="0 0 0" xyz="0.75 0 0"/>
   </joint>
   <!-- Camera Optical Frame -->
   <link name="camera_optical"/>
