@@ -4,12 +4,11 @@ import sys
 import logging
 from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QWidget, QApplication, QWizard, QListWidget)
 from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 
-# Classes from your package
+# Assuming these are your custom page classes
 try:
     from mobRobURDF_wizard.classes.WelcomePage import WelcomePage
     from mobRobURDF_wizard.classes.URDFManager import URDFManager
@@ -20,18 +19,13 @@ except ImportError as e:
     print(f"Error importing modules: {e}")
     sys.exit(1)
 
-# Main Wizard Class
 class RobotWizard(QWizard):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Mobile Robot URDF Generator Wizard (v2)")
+        self.setFixedSize(1800, 900)
 
-        # Set a fixed size (e.g., 1200x800) approximating maximized but not full-screen
-        self.setFixedSize(1800, 900)  # Adjust this size as needed (e.g., 1400x900)
-
-        # Ensure window flags include minimize, maximize, and close buttons
-        self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint)
-
+        # Initialize URDFManager
         try:
             self.urdf_manager = URDFManager()
         except Exception as e:
@@ -41,8 +35,6 @@ class RobotWizard(QWizard):
         # Navigation bar
         self.nav_list = QListWidget()
         self.nav_list.addItems(["Welcome", "Select Robot Type", "Configure Parameters", "Future Features"])
-        
-        # Customize navigation bar appearance
         self.nav_list.setFixedWidth(270)
         self.nav_list.setFixedHeight(500)
         self.nav_list.setStyleSheet("""
@@ -69,7 +61,10 @@ class RobotWizard(QWizard):
         self.nav_list.setFont(font)
         self.nav_list.setCurrentRow(0)
 
-        # Pages
+        # Connect navigation
+        self.nav_list.itemClicked.connect(self.navigate_to_page)
+
+        # Add pages
         try:
             self.addPage(WelcomePage())
             self.addPage(RobotTypeSelectionPage())
@@ -79,43 +74,48 @@ class RobotWizard(QWizard):
             logging.error(f"Failed to add pages: {e}")
             raise
 
-        # Layout: Integrate navigation bar with default wizard layout
+        # Layout
         main_widget = QWidget()
         main_layout = QHBoxLayout()
-        
         nav_layout = QVBoxLayout()
         nav_layout.addWidget(self.nav_list)
         nav_layout.addStretch()
-        
         main_layout.addLayout(nav_layout)
         main_layout.addStretch()
-        
         main_widget.setLayout(main_layout)
-        self.setWizardStyle(QWizard.ModernStyle)
-        self.setOption(QWizard.NoDefaultButton, False)
         self.setSideWidget(main_widget)
 
         self.currentIdChanged.connect(self.update_navigation)
-        logging.debug("RobotWizard initialized with fixed size 1200x800")
+        logging.debug("RobotWizard initialized")
 
     def update_navigation(self, page_id):
         page_index = self.pageIds().index(page_id)
         if self.nav_list.currentRow() != page_index:
             self.nav_list.setCurrentRow(page_index)
-        logging.debug(f"Page ID changed to: {page_id}, robot_type field: {self.field('robot_type')}")
+        logging.debug(f"Page ID changed to: {page_id}")
 
-def main(args=None):
-    try:
-        glutInit()
-    except Exception as e:
-        print(f"Failed to initialize GLUT: {e}")
-        sys.exit(1)
+    def navigate_to_page(self, item):
+        """Navigate to the target page by simulating Next/Back button presses."""
+        page_names = ["Welcome", "Select Robot Type", "Configure Parameters", "Future Features"]
+        target_index = page_names.index(item.text())
+        current_index = self.pageIds().index(self.currentId())
 
+        # Navigate forward or backward
+        while current_index < target_index:
+            self.next()
+            current_index += 1
+        while current_index > target_index:
+            self.back()
+            current_index -= 1
+
+        logging.debug(f"Navigated to page: {item.text()} (Index: {target_index})")
+
+def main():
+    glutInit(sys.argv)
     logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
-
     app = QApplication(sys.argv)
     wizard = RobotWizard()
-    wizard.show()  # Show at fixed size instead of maximized
+    wizard.show()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
