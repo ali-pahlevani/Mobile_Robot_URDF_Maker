@@ -12,7 +12,7 @@ class FutureFeaturesPage(QWizardPage):
         self.setTitle("Future Features")
 
         self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images")
-        logging.debug(f"Image directory set to: {self.image_dir}")
+        #logging.debug(f"Image directory set to: {self.image_dir}")
 
         features = [
             ("Gazebo", os.path.join(self.image_dir, "gazebo.png")),
@@ -39,15 +39,15 @@ class FutureFeaturesPage(QWizardPage):
                 border: 1px solid #E0E0E0;
                 border-radius: 5px;
             """)
-            feature_label.setFixedWidth(240)  # Fixed width for consistent spacing
+            feature_label.setFixedWidth(240)
             feature_label.setAlignment(Qt.AlignCenter)  # Center text horizontally and vertically
 
-            # Image label (centered exactly in the row)
+            # Image label
             image_label = QLabel()
             pixmap = QPixmap(image_path)
             if not pixmap.isNull():
-                image_label.setPixmap(pixmap.scaled(250, 250, Qt.KeepAspectRatio))  # Height at 250
-                logging.debug(f"Loaded image for {feature_name}: {image_path}")
+                image_label.setPixmap(pixmap.scaled(250, 250, Qt.KeepAspectRatio))
+                #logging.debug(f"Loaded image for {feature_name}: {image_path}")
             else:
                 image_label.setText(f"{feature_name} Image Not Found")
                 logging.warning(f"Failed to load image for {feature_name}: {image_path}")
@@ -89,4 +89,4 @@ class FutureFeaturesPage(QWizardPage):
         main_layout.addStretch()  # Center the rows vertically
         self.setLayout(main_layout)
         self.setStyleSheet("background-color: #F0F4F8;")  # Light blue-gray page background
-        logging.debug("FutureFeaturesPage initialized")
+        #logging.debug("FutureFeaturesPage initialized")

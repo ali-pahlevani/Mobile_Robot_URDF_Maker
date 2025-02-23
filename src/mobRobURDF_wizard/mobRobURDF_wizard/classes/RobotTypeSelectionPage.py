@@ -18,7 +18,7 @@ class RobotTypeSelectionPage(QWizardPage):
 
         # Image directory
         self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images")
-        logging.debug(f"Image directory set to: {self.image_dir}")
+        #logging.debug(f"Image directory set to: {self.image_dir}")
 
         # Define the three robot options with styled buttons
         self.btn_4w = QPushButton("4-Wheeled Robot")
@@ -108,7 +108,7 @@ class RobotTypeSelectionPage(QWizardPage):
         section_4w = QVBoxLayout()
         section_4w.addStretch(1)  # Stretch above to center content vertically
         section_4w.addWidget(self.btn_4w, alignment=Qt.AlignCenter)
-        section_4w.addSpacing(80)  # Adjustable distance between name and image (default 10px)
+        section_4w.addSpacing(80)  # Adjustable distance between name and image
         section_4w.addWidget(self.label_4w, alignment=Qt.AlignCenter)
         section_4w.addStretch(1)  # Stretch below to center content vertically
         
@@ -119,11 +119,11 @@ class RobotTypeSelectionPage(QWizardPage):
 
         # Section 2: 3-Wheeled Robot (Tricycle)
         section_3w = QVBoxLayout()
-        section_3w.addStretch(1)  # Stretch above to center content vertically
+        section_3w.addStretch(1)
         section_3w.addWidget(self.btn_3w, alignment=Qt.AlignCenter)
-        section_3w.addSpacing(80)  # Adjustable distance between name and image (default 10px)
+        section_3w.addSpacing(80)
         section_3w.addWidget(self.label_3w, alignment=Qt.AlignCenter)
-        section_3w.addStretch(1)  # Stretch below to center content vertically
+        section_3w.addStretch(1)
         
         frame_3w = QFrame()
         frame_3w.setLayout(section_3w)
@@ -132,11 +132,11 @@ class RobotTypeSelectionPage(QWizardPage):
 
         # Section 3: 2-Wheeled Robot with Caster
         section_2wc = QVBoxLayout()
-        section_2wc.addStretch(1)  # Stretch above to center content vertically
+        section_2wc.addStretch(1)
         section_2wc.addWidget(self.btn_2wc, alignment=Qt.AlignCenter)
-        section_2wc.addSpacing(80)  # Adjustable distance between name and image (default 10px)
+        section_2wc.addSpacing(80)
         section_2wc.addWidget(self.label_2wc, alignment=Qt.AlignCenter)
-        section_2wc.addStretch(1)  # Stretch below to center content vertically
+        section_2wc.addStretch(1)
         
         frame_2wc = QFrame()
         frame_2wc.setLayout(section_2wc)
@@ -156,7 +156,7 @@ class RobotTypeSelectionPage(QWizardPage):
         self._robot_type = value  # Sync local variable
         self.robotTypeChanged.emit()  # Emit custom signal
         self.completeChanged.emit()  # Update Next button state
-        logging.debug(f"Set robot_type to: {self.field('robot_type')}")
+        #logging.debug(f"Set robot_type to: {self.field('robot_type')}")
 
         # Reset all buttons to base style
         self.btn_4w.setStyleSheet(self.base_button_style)
@@ -183,7 +183,7 @@ class RobotTypeSelectionPage(QWizardPage):
         pixmap = QPixmap(image_path)
         if not pixmap.isNull():
             label.setPixmap(pixmap.scaled(label.size(), Qt.KeepAspectRatio))
-            logging.debug(f"Loaded image: {image_path}")
+            #logging.debug(f"Loaded image: {image_path}")
         else:
             label.setText("Image Not Found")
             logging.warning(f"Failed to load image: {image_path}")

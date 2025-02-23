@@ -8,7 +8,7 @@ def render_template(template_path, params):
         with open(template_path, 'r') as f:
             tmpl = Template(f.read())
         rendered = tmpl.safe_substitute(params)
-        logging.debug(f"Rendered template: {template_path}")
+        #logging.debug(f"Rendered template: {template_path}")
         return rendered
     except FileNotFoundError:
         logging.error(f"Template file not found: {template_path}")
@@ -25,7 +25,7 @@ def generate_urdf(xacro_file):
                                 stderr=subprocess.PIPE,
                                 check=True,
                                 text=True)
-        logging.debug(f"Generated URDF from: {xacro_file}")
+        #logging.debug(f"Generated URDF from: {xacro_file}")
         return result.stdout
     except subprocess.CalledProcessError as e:
         error_msg = f"Error generating URDF from {xacro_file}:\n{e.stderr}"
@@ -51,5 +51,5 @@ def get_color(color_name):
         "White": (1.0, 1.0, 1.0),
     }
     color = colors.get(color_name.capitalize(), (0.5, 0.5, 0.5))
-    logging.debug(f"Color mapped: {color_name} -> {color}")
+    #logging.debug(f"Color mapped: {color_name} -> {color}")
     return color

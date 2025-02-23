@@ -24,12 +24,12 @@ class OpenGLWidget(QGLWidget):
         self.lidar_color = (1.0, 0.0, 0.0)
         self.camera_color = (0.0, 0.0, 1.0)
         self.robot_type = "4_wheeled"  # Default
-        logging.debug("OpenGLWidget initialized")
+        #logging.debug("OpenGLWidget initialized")
 
     def initializeGL(self):
         glEnable(GL_DEPTH_TEST)
         glClearColor(0.7, 0.7, 0.7, 1.0)
-        logging.debug("OpenGL initialized")
+        #logging.debug("OpenGL initialized")
 
     def resizeGL(self, w, h):
         glViewport(0, 0, w, h)
@@ -178,7 +178,7 @@ class OpenGLWidget(QGLWidget):
             self.robot_type = robot_type
             # Caster radius defaults to wheel_radius for consistency
             self.caster_radius = self.wheel_radius if robot_type == "2_wheeled_caster" else float(caster_radius) if caster_radius is not None else self.wheel_radius
-            logging.debug(f"Updated robot model: type={self.robot_type}, wheel_radius={self.wheel_radius}, caster_radius={self.caster_radius}")
+            #logging.debug(f"Updated robot model: type={self.robot_type}, wheel_radius={self.wheel_radius}, caster_radius={self.caster_radius}")
             self.update()
         except ValueError as e:
             logging.error(f"Error updating robot model parameters: {str(e)}")

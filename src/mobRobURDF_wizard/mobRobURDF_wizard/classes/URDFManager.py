@@ -9,7 +9,7 @@ class URDFManager:
     def __init__(self):
         self.base_dir = os.path.join(get_package_share_directory("mobRobURDF_description"), "urdf")
         self.urdf_text = ""
-        logging.debug(f"URDFManager initialized with base_dir: {self.base_dir}")
+        #logging.debug(f"URDFManager initialized with base_dir: {self.base_dir}")
 
     def generate_urdf(self, robot_type, params):
         try:
@@ -17,7 +17,7 @@ class URDFManager:
             submodules_dir = os.path.join(self.base_dir, "submodules", robot_type)
             macros_dir = os.path.join(self.base_dir, "macros")
             gazebo_dir = os.path.join(self.base_dir, "gazebo_files")
-            logging.debug(f"Generating URDF for {robot_type} in {submodules_dir}")
+            #logging.debug(f"Generating URDF for {robot_type} in {submodules_dir}")
 
             # File paths for robot-type-specific Xacro files
             base_file = os.path.join(submodules_dir, "base.xacro")
@@ -48,7 +48,7 @@ class URDFManager:
             # Create a temporary working directory in the package's share directory
             work_dir = os.path.join(self.base_dir, "temp", robot_type)
             os.makedirs(work_dir, exist_ok=True)
-            logging.debug(f"Created temporary directory: {work_dir}")
+            #logging.debug(f"Created temporary directory: {work_dir}")
 
             # Write rendered Xacro files to the temporary directory
             with open(os.path.join(work_dir, "base.xacro"), 'w') as f:
@@ -69,17 +69,17 @@ class URDFManager:
 
             # Generate the URDF from the rendered mobRob.xacro
             self.urdf_text = generate_urdf(mobRob_path)
-            logging.debug("URDF generated successfully")
+            #logging.debug("URDF generated successfully")
 
             # Save the unified URDF file to the base directory
             unified_urdf_path = os.path.join(self.base_dir, "mobRob.urdf")
             with open(unified_urdf_path, 'w') as f:
                 f.write(self.urdf_text)
-            logging.debug(f"Unified URDF saved to: {unified_urdf_path}")
+            #logging.debug(f"Unified URDF saved to: {unified_urdf_path}")
 
             # Clean up temporary directory
             shutil.rmtree(work_dir)
-            logging.debug(f"Cleaned up temporary directory: {work_dir}")
+            #logging.debug(f"Cleaned up temporary directory: {work_dir}")
 
             return self.urdf_text
         except FileNotFoundError as e:
@@ -96,7 +96,7 @@ class URDFManager:
             try:
                 with open(filename, 'w') as f:
                     f.write(self.urdf_text)
-                logging.debug(f"URDF saved to: {filename}")
+                #logging.debug(f"URDF saved to: {filename}")
             except Exception as e:
                 logging.error(f"Failed to save URDF to {filename}: {str(e)}")
         else:

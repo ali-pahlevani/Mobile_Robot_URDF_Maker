@@ -8,7 +8,7 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 
-# Assuming these are your custom page classes
+# Custom page classes
 try:
     from mobRobURDF_wizard.classes.WelcomePage import WelcomePage
     from mobRobURDF_wizard.classes.URDFManager import URDFManager
@@ -86,13 +86,13 @@ class RobotWizard(QWizard):
         self.setSideWidget(main_widget)
 
         self.currentIdChanged.connect(self.update_navigation)
-        logging.debug("RobotWizard initialized")
+        #logging.debug("RobotWizard initialized")
 
     def update_navigation(self, page_id):
         page_index = self.pageIds().index(page_id)
         if self.nav_list.currentRow() != page_index:
             self.nav_list.setCurrentRow(page_index)
-        logging.debug(f"Page ID changed to: {page_id}")
+        #logging.debug(f"Page ID changed to: {page_id}")
 
     def navigate_to_page(self, item):
         """Navigate to the target page by simulating Next/Back button presses."""
@@ -108,11 +108,11 @@ class RobotWizard(QWizard):
             self.back()
             current_index -= 1
 
-        logging.debug(f"Navigated to page: {item.text()} (Index: {target_index})")
+        #logging.debug(f"Navigated to page: {item.text()} (Index: {target_index})")
 
 def main():
     glutInit(sys.argv)
-    logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+    #logging.basicConfig(level=logging.debug, format="%(asctime)s - %(levelname)s - %(message)s")
     app = QApplication(sys.argv)
     wizard = RobotWizard()
     wizard.show()

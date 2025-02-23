@@ -11,7 +11,7 @@ import logging
 
 # Configuration Page
 class ConfigurationPage(QWizardPage):
-    modelUpdated = pyqtSignal(float, float, float, str, str, str, str, str, tuple, tuple, tuple, tuple, str, str)  # Added caster_radius
+    modelUpdated = pyqtSignal(float, float, float, str, str, str, str, str, tuple, tuple, tuple, tuple, str, str)
 
     def __init__(self, urdf_manager, parent=None):
         super().__init__(parent)
@@ -28,13 +28,13 @@ class ConfigurationPage(QWizardPage):
         left_layout = QVBoxLayout()
         left_widget.setLayout(left_layout)
 
-        # Placeholder for navigation bar (assuming it's 250px wide from RobotWizard)
+        # Placeholder for navigation bar
         nav_spacer = QWidget()
         nav_spacer.setFixedWidth(250)  # Match nav bar width from RobotWizard
 
         # URDF preview text box
         self.previewTextEdit = QTextEdit()
-        self.previewTextEdit.setFixedHeight(750)  # Adjusted height for visibility
+        self.previewTextEdit.setFixedHeight(750)
         self.previewTextEdit.setFixedWidth(300)
         self.previewTextEdit.setReadOnly(True)
         self.previewTextEdit.setStyleSheet("""
@@ -88,11 +88,11 @@ class ConfigurationPage(QWizardPage):
         main_layout.addWidget(self.glWidget, stretch=6)  # Right: OpenGL (larger stretch)
 
         self.setLayout(main_layout)
-        logging.debug("ConfigurationPage initialized")
+        #logging.debug("ConfigurationPage initialized")
 
     def initializePage(self):
         self.robot_type = self.field("robot_type")
-        logging.debug(f"ConfigurationPage initialized with robot_type: {self.robot_type}")
+        #logging.debug(f"ConfigurationPage initialized with robot_type: {self.robot_type}")
         if self.robot_type is None:
             logging.warning("robot_type is None, defaulting to 4_wheeled")
             self.robot_type = "4_wheeled"  # Fallback to avoid crashes
@@ -235,7 +235,7 @@ class ConfigurationPage(QWizardPage):
         chassis_size_str = self.chassisSizeLineEdit.text()
         try:
             L, W, H = map(float, chassis_size_str.split())
-            logging.debug(f"Chassis size parsed: L={L}, W={W}, H={H}")
+            #logging.debug(f"Chassis size parsed: L={L}, W={W}, H={H}")
         except ValueError:
             L, W, H = 1.2, 0.8, 0.3
             chassis_size_str = "1.2 0.8 0.3"
@@ -244,7 +244,7 @@ class ConfigurationPage(QWizardPage):
         camera_size_str = self.cameraSizeLineEdit.text()
         try:
             Lc, Wc, Hc = map(float, camera_size_str.split())
-            logging.debug(f"Camera size parsed: Lc={Lc}, Wc={Wc}, Hc={Hc}")
+            #logging.debug(f"Camera size parsed: Lc={Lc}, Wc={Wc}, Hc={Hc}")
         except ValueError:
             Lc, Wc, Hc = 0.08, 0.2, 0.08
             camera_size_str = "0.08 0.2 0.08"
@@ -332,7 +332,7 @@ class ConfigurationPage(QWizardPage):
 
         urdf_text = self.urdf_manager.generate_urdf(self.robot_type, params)
         self.previewTextEdit.setPlainText(urdf_text)
-        logging.debug("URDF text updated in preview")
+        #logging.debug("URDF text updated in preview")
 
         caster_radius = params["wheel_radius"] if self.robot_type == "2_wheeled_caster" else None
         self.modelUpdated.emit(
@@ -349,14 +349,14 @@ class ConfigurationPage(QWizardPage):
             self.robot_type,
             caster_radius
         )
-        logging.debug(f"Emitted modelUpdated signal for {self.robot_type}")
+        #logging.debug(f"Emitted modelUpdated signal for {self.robot_type}")
         self.glWidget.update()  # Force immediate repaint of OpenGL widget
 
     def saveURDF(self):
         # First, save to the default location
         try:
             self.urdf_manager.save_urdf(self.default_save_path)
-            logging.debug(f"URDF saved to default location: {self.default_save_path}")
+            #logging.debug(f"URDF saved to default location: {self.default_save_path}")
         except Exception as e:
             logging.error(f"Failed to save URDF to default location {self.default_save_path}: {str(e)}")
             return  # Exit if default save fails
@@ -366,6 +366,6 @@ class ConfigurationPage(QWizardPage):
         if filename:
             try:
                 self.urdf_manager.save_urdf(filename)
-                logging.debug(f"URDF saved to: {filename}")
+                #logging.debug(f"URDF saved to: {filename}")
             except Exception as e:
                 logging.error(f"Failed to save URDF to {filename}: {str(e)}")
