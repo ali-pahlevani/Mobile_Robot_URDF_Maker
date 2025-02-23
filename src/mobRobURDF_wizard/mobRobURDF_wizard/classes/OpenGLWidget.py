@@ -55,10 +55,10 @@ class OpenGLWidget(QGLWidget):
         glColor3f(*self.wheel_color)
         if self.robot_type == "4_wheeled":
             wheel_positions = [
-                (self.L / 2, self.W / 2 + self.wheel_width / 2, -self.H / 2),  # Front left
-                (self.L / 2, -self.W / 2 - self.wheel_width / 2, -self.H / 2),  # Front right
-                (-self.L / 2, self.W / 2 + self.wheel_width / 2, -self.H / 2),  # Rear left
-                (-self.L / 2, -self.W / 2 - self.wheel_width / 2, -self.H / 2),  # Rear right
+                (self.L / 2 - self.wheel_radius / 1.5, self.W / 2 + self.wheel_width / 2, -self.H / 2),  # Front left
+                (self.L / 2 - self.wheel_radius / 1.5, -self.W / 2 - self.wheel_width / 2, -self.H / 2),  # Front right
+                (-self.L / 2 + self.wheel_radius / 1.5, self.W / 2 + self.wheel_width / 2, -self.H / 2),  # Rear left
+                (-self.L / 2 + self.wheel_radius / 1.5, -self.W / 2 - self.wheel_width / 2, -self.H / 2),  # Rear right
             ]
             for pos in wheel_positions:
                 glPushMatrix()
@@ -70,8 +70,8 @@ class OpenGLWidget(QGLWidget):
         elif self.robot_type == "3_wheeled":
             wheel_positions = [
                 (self.L / 2, 0, -self.H / 2),  # Front wheel (centered)
-                (-self.L / 2, self.W / 2 + self.wheel_width / 2, -self.H / 2),  # Rear left
-                (-self.L / 2, -self.W / 2 - self.wheel_width / 2, -self.H / 2),  # Rear right
+                (-self.L / 2 + self.wheel_radius / 1.5, self.W / 2 + self.wheel_width / 2, -self.H / 2),  # Rear left
+                (-self.L / 2 + self.wheel_radius / 1.5, -self.W / 2 - self.wheel_width / 2, -self.H / 2),  # Rear right
             ]
             for pos in wheel_positions:
                 glPushMatrix()
@@ -82,8 +82,8 @@ class OpenGLWidget(QGLWidget):
                 glPopMatrix()
         elif self.robot_type == "2_wheeled_caster":
             wheel_positions = [
-                (0, self.W / 2 + self.wheel_width / 2, -self.H / 2),  # Left wheel
-                (0, -self.W / 2 - self.wheel_width / 2, -self.H / 2),  # Right wheel
+                (-self.L / 4, self.W / 2 + self.wheel_width / 2, -self.H / 2),  # Left wheel
+                (-self.L / 4, -self.W / 2 - self.wheel_width / 2, -self.H / 2),  # Right wheel
             ]
             for pos in wheel_positions:
                 glPushMatrix()
@@ -94,7 +94,7 @@ class OpenGLWidget(QGLWidget):
                 glPopMatrix()
             # Caster wheel as a sphere, using wheel_radius
             glPushMatrix()
-            glTranslatef(self.L / 2, 0, -self.H / 2)
+            glTranslatef(self.L / 2 - self.wheel_radius, 0, -self.H / 2)
             glutSolidSphere(self.wheel_radius, 20, 20)  # Changed to wheel_radius
             glPopMatrix()
 
@@ -108,7 +108,12 @@ class OpenGLWidget(QGLWidget):
         # Draw camera
         glColor3f(*self.camera_color)
         glPushMatrix()
-        glTranslatef(self.L / 2 + self.camera_size[0] / 2, 0.0, 0.0)
+        
+        if self.robot_type == "3_wheeled":
+            glTranslatef(self.L / 2 + self.camera_size[0] / 2, 0.0, self.H / 2 - self.camera_size[2] / 2)
+        else:
+            glTranslatef(self.L / 2 + self.camera_size[0] / 2, 0.0, 0.0)
+            
         glScalef(*self.camera_size)
         glutSolidCube(1.0)
         glPopMatrix()

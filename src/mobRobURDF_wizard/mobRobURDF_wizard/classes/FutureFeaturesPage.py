@@ -19,7 +19,7 @@ class FutureFeaturesPage(QWizardPage):
             ("Control", os.path.join(self.image_dir, "control.png")),
             ("SLAM", os.path.join(self.image_dir, "slam.png")),
             ("Navigation", os.path.join(self.image_dir, "navigation.png")),
-            ("Object Tracking", os.path.join(self.image_dir, "object_tracking.png")),
+            ("Obj. Tracking", os.path.join(self.image_dir, "object_tracking.png")),
         ]
 
         # Main layout: Vertical stack of feature rows
@@ -30,10 +30,10 @@ class FutureFeaturesPage(QWizardPage):
             # Feature name label (centered text)
             feature_label = QLabel(feature_name)
             feature_label.setStyleSheet("""
-                font-size: 18pt;
+                font-size: 20pt;
                 font-weight: bold;
                 font-family: "Segoe UI";
-                color: #2E2E2E;
+                color: #8B0000;
                 padding: 10px;
                 background-color: #FFFFFF;
                 border: 1px solid #E0E0E0;

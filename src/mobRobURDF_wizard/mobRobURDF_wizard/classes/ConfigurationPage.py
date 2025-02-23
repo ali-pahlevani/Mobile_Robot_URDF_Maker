@@ -271,40 +271,43 @@ class ConfigurationPage(QWizardPage):
 
         if self.robot_type == "2_wheeled_caster":
             params["caster_radius"] = params["wheel_radius"]  # Enforce same value
+            caster_radius = float(params["caster_radius"])
 
         wheel_width = float(params["wheel_width"])
+        wheel_radius = float(params["wheel_radius"])
         lidar_height = float(params["lidar_height"])
+        
         if self.robot_type == "4_wheeled":
-            params["fl_x"] = str(L / 2)
+            params["fl_x"] = str(L / 2 - wheel_radius / 1.5)
             params["fl_y"] = str(W / 2 + wheel_width / 2)
             params["fl_z"] = str(-H / 2)
-            params["fr_x"] = str(L / 2)
+            params["fr_x"] = str(L / 2 - wheel_radius / 1.5)
             params["fr_y"] = str(-W / 2 - wheel_width / 2)
             params["fr_z"] = str(-H / 2)
-            params["rl_x"] = str(-L / 2)
+            params["rl_x"] = str(-L / 2 + wheel_radius / 1.5)
             params["rl_y"] = str(W / 2 + wheel_width / 2)
             params["rl_z"] = str(-H / 2)
-            params["rr_x"] = str(-L / 2)
+            params["rr_x"] = str(-L / 2 + wheel_radius / 1.5)
             params["rr_y"] = str(-W / 2 - wheel_width / 2)
             params["rr_z"] = str(-H / 2)
         elif self.robot_type == "3_wheeled":
             params["front_x"] = str(L / 2)
             params["front_y"] = "0"
             params["front_z"] = str(-H / 2)
-            params["rl_x"] = str(-L / 2)
+            params["rl_x"] = str(-L / 2 + wheel_radius / 1.5)
             params["rl_y"] = str(W / 2 + wheel_width / 2)
             params["rl_z"] = str(-H / 2)
-            params["rr_x"] = str(-L / 2)
+            params["rr_x"] = str(-L / 2 + wheel_radius / 1.5)
             params["rr_y"] = str(-W / 2 - wheel_width / 2)
             params["rr_z"] = str(-H / 2)
         elif self.robot_type == "2_wheeled_caster":
-            params["l_x"] = "0"
+            params["l_x"] = str(-L / 4)
             params["l_y"] = str(W / 2 + wheel_width / 2)
             params["l_z"] = str(-H / 2)
-            params["r_x"] = "0"
+            params["r_x"] = str(-L / 4)
             params["r_y"] = str(-W / 2 - wheel_width / 2)
             params["r_z"] = str(-H / 2)
-            params["caster_x"] = str(L / 2)
+            params["caster_x"] = str(L / 2 - caster_radius)
             params["caster_y"] = "0"
             params["caster_z"] = str(-H / 2)
         else:
@@ -324,6 +327,8 @@ class ConfigurationPage(QWizardPage):
 
         params["lidar_z"] = str(H / 2 + lidar_height / 2)
         params["camera_x"] = str(L / 2 + Lc / 2)
+        if self.robot_type == "3_wheeled":
+            params["camera_z"] = str(H / 2 - Hc / 2)
 
         urdf_text = self.urdf_manager.generate_urdf(self.robot_type, params)
         self.previewTextEdit.setPlainText(urdf_text)
