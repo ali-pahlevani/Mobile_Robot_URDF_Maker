@@ -9,7 +9,7 @@ from PyQt5.QtGui import QMovie, QFont
 class WelcomePage(QWizardPage):
     def __init__(self, parent=None):
         super().__init__(parent)
-        #self.setTitle("Welcome to Robot Configuration Wizard")
+        self.setTitle("")
 
         # Title label: Big, bold, centered
         title_label = QLabel("Welcome to the Robot Configuration Wizard!")
@@ -56,8 +56,10 @@ class WelcomePage(QWizardPage):
         """Adjust GIF size dynamically when the window is resized."""
         super().resizeEvent(event)
         if self.movie.isValid():
-            # Scale GIF to fit within 80% of the window's smaller dimension (width or height)
-            max_size = min(self.width(), self.height()) * 0.8
-            self.movie.setScaledSize(self.movie.originalSize().scaled(max_size, max_size, Qt.KeepAspectRatio))
+            # Scale GIF to fit the full smaller dimension of the window (width or height)
+            max_size = int(min(self.width(), self.height()) * 1.6)  # Use 100% of smaller dimension
+            original_size = self.movie.currentPixmap().size()  # Get size of current frame
+            scaled_size = original_size.scaled(max_size, max_size, Qt.KeepAspectRatio)
+            self.movie.setScaledSize(scaled_size)
             self.gif_label.adjustSize()
         logging.debug(f"Window resized to {self.width()}x{self.height()}, GIF adjusted")

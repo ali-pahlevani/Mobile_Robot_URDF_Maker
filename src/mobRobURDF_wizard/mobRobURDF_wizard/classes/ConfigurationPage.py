@@ -95,6 +95,7 @@ class ConfigurationPage(QWizardPage):
             self.robot_type = "4_wheeled"  # Fallback to avoid crashes
         self.setTitle(f"Configure {self.robot_type.replace('_', ' ').title()} Parameters")
         self.setup_parameters()
+        self.applyChanges()  # Apply default parameters to update preview
 
     def setup_parameters(self):
         while self.param_layout.count():
