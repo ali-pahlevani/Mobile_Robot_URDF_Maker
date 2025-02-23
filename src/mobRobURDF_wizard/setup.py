@@ -11,7 +11,8 @@ setup(
     data_files=[
         (os.path.join('share', 'ament_index', 'resource_index', 'packages'), [os.path.join('resource', package_name)]),
         (os.path.join('share', package_name), ['package.xml']),
-        (os.path.join('share', package_name, 'images'), glob('images/*.png')),
+        (os.path.join('share', package_name, 'images', 'future_features'), glob('images/future_features/*.png')),
+        (os.path.join('share', package_name, 'images', 'robot_types'), glob('images/robot_types/*.png')),
         (os.path.join('share', package_name, 'images'), glob('images/*.gif')),
     ],
     install_requires=['setuptools'],

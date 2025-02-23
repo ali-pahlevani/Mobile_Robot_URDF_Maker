@@ -4,17 +4,18 @@ import sys
 import logging
 from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QWidget, QApplication, QWizard, QListWidget)
 from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 
 # Custom page classes
 try:
-    from mobRobURDF_wizard.classes.WelcomePage import WelcomePage
+    from mobRobURDF_wizard.classes.pages.WelcomePage import WelcomePage
+    from mobRobURDF_wizard.classes.pages.RobotTypeSelectionPage import RobotTypeSelectionPage
+    from mobRobURDF_wizard.classes.pages.FutureFeaturesPage import FutureFeaturesPage
+    from mobRobURDF_wizard.classes.pages.ConfigurationPage import ConfigurationPage
     from mobRobURDF_wizard.classes.URDFManager import URDFManager
-    from mobRobURDF_wizard.classes.RobotTypeSelectionPage import RobotTypeSelectionPage
-    from mobRobURDF_wizard.classes.FutureFeaturesPage import FutureFeaturesPage
-    from mobRobURDF_wizard.classes.ConfigurationPage import ConfigurationPage
 except ImportError as e:
     print(f"Error importing modules: {e}")
     sys.exit(1)
@@ -22,6 +23,8 @@ except ImportError as e:
 class RobotWizard(QWizard):
     def __init__(self):
         super().__init__()
+        # Add window flags to include minimize, maximize, and close buttons
+        self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint)
         self.setWindowTitle("Mobile Robot URDF Generator Wizard (v2)")
         self.setFixedSize(1800, 900)
 

@@ -17,7 +17,7 @@ class RobotTypeSelectionPage(QWizardPage):
         self._robot_type = None  # Internal storage for the field
 
         # Image directory
-        self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images")
+        self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images", "robot_types")
         #logging.debug(f"Image directory set to: {self.image_dir}")
 
         # Define the three robot options with styled buttons

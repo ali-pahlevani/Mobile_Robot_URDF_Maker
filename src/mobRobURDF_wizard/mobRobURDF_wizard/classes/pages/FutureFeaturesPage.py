@@ -11,7 +11,7 @@ class FutureFeaturesPage(QWizardPage):
         super().__init__(parent)
         self.setTitle("Future Features")
 
-        self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images")
+        self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images", "future_features")
         #logging.debug(f"Image directory set to: {self.image_dir}")
 
         features = [
