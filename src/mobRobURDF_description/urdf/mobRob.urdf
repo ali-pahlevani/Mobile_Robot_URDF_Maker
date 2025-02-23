@@ -30,19 +30,19 @@
     <inertial>
       <mass value="1.0"/>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="0.02416666666666667" ixy="0" ixz="0" iyy="0.08666666666666667" iyz="0" izz="0.10416666666666667"/>
+      <inertia ixx="0.06083333333333334" ixy="0" ixz="0" iyy="0.1275" iyz="0" izz="0.17333333333333334"/>
     </inertial>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="1.0 0.5 0.2"/>
+        <box size="1.2 0.8 0.3"/>
       </geometry>
-      <material name="Gray"/>
+      <material name="Black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="1.0 0.5 0.2"/>
+        <box size="1.2 0.8 0.3"/>
       </geometry>
     </collision>
   </link>
@@ -50,7 +50,7 @@
   <joint name="base_to_chassis" type="fixed">
     <parent link="base_link"/>
     <child link="chassis"/>
-    <origin rpy="0 0 0" xyz="0 0 0.1"/>
+    <origin rpy="0 0 0" xyz="0 0 0.15"/>
   </joint>
   <!-- Front Steering Link for 3-Wheeled Robot -->
   <link name="front_steering_link">
@@ -67,7 +67,7 @@
   <joint name="chassis_to_front_steering" type="revolute">
     <parent link="chassis"/>
     <child link="front_steering_link"/>
-    <origin rpy="0 0 0" xyz="0.5 0 -0.1"/>
+    <origin rpy="0 0 0" xyz="0.6 0 -0.15"/>
     <!-- Position at front wheel base -->
     <axis xyz="0 0 1"/>
     <!-- Rotation around z-axis for steering -->
@@ -123,7 +123,7 @@
   <joint name="rear_left_joint" type="continuous">
     <parent link="chassis"/>
     <child link="rear_left_wheel"/>
-    <origin rpy="0 0 0" xyz="-0.5 0.31 -0.1"/>
+    <origin rpy="0 0 0" xyz="-0.6 0.46 -0.15"/>
     <axis xyz="0 1 0"/>
   </joint>
   <link name="rear_right_wheel">
@@ -149,33 +149,33 @@
   <joint name="rear_right_joint" type="continuous">
     <parent link="chassis"/>
     <child link="rear_right_wheel"/>
-    <origin rpy="0 0 0" xyz="-0.5 -0.31 -0.1"/>
+    <origin rpy="0 0 0" xyz="-0.6 -0.46 -0.15"/>
     <axis xyz="0 1 0"/>
   </joint>
   <link name="lidar">
     <inertial>
       <mass value="0.2"/>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="0.0006066666666666668" ixy="0" ixz="0" iyy="0.0006066666666666668" iyz="0" izz="0.0010000000000000002"/>
+      <inertia ixx="0.0011666666666666668" ixy="0" ixz="0" iyy="0.0011666666666666668" iyz="0" izz="0.0010000000000000002"/>
     </inertial>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.08" radius="0.1"/>
+        <cylinder length="0.2" radius="0.1"/>
       </geometry>
       <material name="Red"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.08" radius="0.1"/>
+        <cylinder length="0.2" radius="0.1"/>
       </geometry>
     </collision>
   </link>
   <joint name="lidar_joint" type="fixed">
     <parent link="chassis"/>
     <child link="lidar"/>
-    <origin rpy="0 0 0" xyz="0 0 0.14"/>
+    <origin rpy="0 0 0" xyz="0 0 0.25"/>
   </joint>
   <!-- Camera Frame -->
   <link name="camera">
@@ -201,7 +201,7 @@
   <joint name="camera_joint" type="fixed">
     <parent link="chassis"/>
     <child link="camera"/>
-    <origin rpy="0 0 0" xyz="0.54 0 0"/>
+    <origin rpy="0 0 0" xyz="0.64 0 0"/>
   </joint>
   <!-- Camera Optical Frame -->
   <link name="camera_optical"/>

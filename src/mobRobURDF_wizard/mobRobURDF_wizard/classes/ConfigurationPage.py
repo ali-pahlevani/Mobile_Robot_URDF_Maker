@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QLabel, QLineEdit, QPushButton, 
-                             QTextEdit, QFileDialog, QSplitter, QWidget)
+                             QTextEdit, QFileDialog, QSplitter, QWidget, QHBoxLayout)
 from PyQt5.QtCore import Qt, pyqtSignal
 from OpenGL.GL import *
 from OpenGL.GLUT import *
@@ -17,20 +17,74 @@ class ConfigurationPage(QWizardPage):
         self.urdf_manager = urdf_manager
         self.robot_type = None
 
-        layout = QVBoxLayout()
-        self.splitter = QSplitter(Qt.Horizontal)
-        self.left_widget = QWidget()
-        self.left_layout = QVBoxLayout()
-        self.left_widget.setLayout(self.left_layout)
-        self.splitter.addWidget(self.left_widget)
+        # Main layout for the entire page
+        main_layout = QHBoxLayout()
 
+        # Left layout: Navigation bar and URDF preview
+        left_widget = QWidget()
+        left_layout = QVBoxLayout()
+        left_widget.setLayout(left_layout)
+
+        # Placeholder for navigation bar (assuming it's 250px wide from RobotWizard)
+        nav_spacer = QWidget()
+        nav_spacer.setFixedWidth(250)  # Match nav bar width from RobotWizard
+
+        # URDF preview text box
+        self.previewTextEdit = QTextEdit()
+        self.previewTextEdit.setFixedHeight(750)  # Adjusted height for visibility
+        self.previewTextEdit.setFixedWidth(300)
+        self.previewTextEdit.setReadOnly(True)
+        self.previewTextEdit.setStyleSheet("""
+            QTextEdit {
+                background-color: #FFFFFF;
+                border: 1px solid #CCCCCC;
+                border-radius: 5px;
+                padding: 5px;
+                font-family: "Courier New";
+                font-size: 12pt;
+            }
+        """)
+
+        # Add nav spacer and preview text box to left layout
+        left_layout.addWidget(nav_spacer)
+        left_layout.addWidget(self.previewTextEdit)
+        left_layout.addStretch()
+
+        # Middle layout: Buttons and parameters
+        middle_widget = QWidget()
+        middle_layout = QVBoxLayout()
+        middle_widget.setLayout(middle_layout)
+
+        # Parameters layout (for inputs)
+        self.param_layout = QVBoxLayout()
+
+        # Buttons
+        self.applyButton = QPushButton("Apply and Preview", styleSheet="font-size: 11pt; font-weight: bold; color: red;")
+        self.applyButton.setFixedWidth(200)
+        self.applyButton.setMinimumHeight(30)
+        self.applyButton.clicked.connect(self.applyChanges)
+
+        self.saveButton = QPushButton("Save URDF to Folder", styleSheet="font-size: 11pt; font-weight: bold; color: blue;")
+        self.saveButton.setFixedWidth(200)
+        self.saveButton.setMinimumHeight(30)
+        self.saveButton.clicked.connect(self.saveURDF)
+
+        # Add parameters and buttons to middle layout
+        middle_layout.addLayout(self.param_layout)
+        middle_layout.addWidget(self.applyButton)
+        middle_layout.addWidget(self.saveButton)
+        middle_layout.addStretch()
+
+        # Right layout: OpenGL preview
         self.glWidget = OpenGLWidget()
-        self.splitter.addWidget(self.glWidget)
-
-        layout.addWidget(self.splitter)
-        self.setLayout(layout)
-        self.splitter.setSizes([int(0.25 * 1200), int(0.75 * 1200)])
         self.modelUpdated.connect(self.glWidget.updateRobotModel)
+
+        # Add all sections to main layout
+        main_layout.addWidget(left_widget, stretch=1)  # Left: Nav + URDF preview
+        main_layout.addWidget(middle_widget, stretch=1)  # Middle: Params + buttons
+        main_layout.addWidget(self.glWidget, stretch=6)  # Right: OpenGL (larger stretch)
+
+        self.setLayout(main_layout)
         logging.debug("ConfigurationPage initialized")
 
     def initializePage(self):
@@ -43,8 +97,8 @@ class ConfigurationPage(QWizardPage):
         self.setup_parameters()
 
     def setup_parameters(self):
-        while self.left_layout.count():
-            item = self.left_layout.takeAt(0)
+        while self.param_layout.count():
+            item = self.param_layout.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
 
@@ -59,112 +113,119 @@ class ConfigurationPage(QWizardPage):
         else:
             logging.error(f"Unknown robot_type: {self.robot_type}, no parameters added")
 
-        self.applyButton = QPushButton("Apply and Preview", styleSheet="font-size: 11pt; font-weight: bold; color: red;")
-        self.applyButton.setMinimumHeight(30)
-        self.left_layout.addWidget(self.applyButton)
-        self.applyButton.clicked.connect(self.applyChanges)
-
-        self.previewTextEdit = QTextEdit()
-        self.previewTextEdit.setFixedHeight(125)
-        self.previewTextEdit.setReadOnly(True)
-        self.left_layout.addWidget(self.previewTextEdit)
-
-        self.saveButton = QPushButton("Save URDF to Folder", styleSheet="font-size: 11pt; font-weight: bold; color: blue;")
-        self.saveButton.setMinimumHeight(30)
-        self.left_layout.addWidget(self.saveButton)
-        self.saveButton.clicked.connect(self.saveURDF)
-
     def add_common_parameters(self):
         self.chassisSizeLineEdit = QLineEdit(placeholderText="e.g., 1 1 0.5", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Chassis Size (L W H):", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.chassisSizeLineEdit)
+        self.chassisSizeLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Chassis Size (L W H):", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.chassisSizeLineEdit)
 
         self.chassisMassLineEdit = QLineEdit(placeholderText="e.g., 1.0", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Chassis Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.chassisMassLineEdit)
+        self.chassisMassLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Chassis Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.chassisMassLineEdit)
 
         self.chassisMaterialLineEdit = QLineEdit(placeholderText="e.g., Gray", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Chassis Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.chassisMaterialLineEdit)
+        self.chassisMaterialLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Chassis Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.chassisMaterialLineEdit)
 
         self.lidarRadiusLineEdit = QLineEdit(placeholderText="e.g., 0.2", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Lidar Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.lidarRadiusLineEdit)
+        self.lidarRadiusLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Lidar Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.lidarRadiusLineEdit)
 
         self.lidarHeightLineEdit = QLineEdit(placeholderText="e.g., 0.1", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Lidar Height:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.lidarHeightLineEdit)
+        self.lidarHeightLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Lidar Height:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.lidarHeightLineEdit)
 
         self.lidarMassLineEdit = QLineEdit(placeholderText="e.g., 0.2", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Lidar Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.lidarMassLineEdit)
+        self.lidarMassLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Lidar Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.lidarMassLineEdit)
 
         self.lidarMaterialLineEdit = QLineEdit(placeholderText="e.g., Red", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Lidar Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.lidarMaterialLineEdit)
+        self.lidarMaterialLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Lidar Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.lidarMaterialLineEdit)
 
         self.cameraSizeLineEdit = QLineEdit(placeholderText="e.g., 0.1 0.1 0.1", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Camera Size (L W H):", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.cameraSizeLineEdit)
+        self.cameraSizeLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Camera Size (L W H):", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.cameraSizeLineEdit)
 
         self.cameraMassLineEdit = QLineEdit(placeholderText="e.g., 0.1", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Camera Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.cameraMassLineEdit)
+        self.cameraMassLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Camera Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.cameraMassLineEdit)
 
         self.cameraMaterialLineEdit = QLineEdit(placeholderText="e.g., Blue", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Camera Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.cameraMaterialLineEdit)
+        self.cameraMaterialLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Camera Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.cameraMaterialLineEdit)
 
     def add_4w_parameters(self):
         self.wheelRadiusLineEdit = QLineEdit(placeholderText="e.g., 0.3", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.wheelRadiusLineEdit)
+        self.wheelRadiusLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Wheel Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.wheelRadiusLineEdit)
 
         self.wheelWidthLineEdit = QLineEdit(placeholderText="e.g., 0.1", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel Width:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.wheelWidthLineEdit)
+        self.wheelWidthLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Wheel Width:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.wheelWidthLineEdit)
 
         self.wheelMassLineEdit = QLineEdit(placeholderText="e.g., 0.5", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.wheelMassLineEdit)
+        self.wheelMassLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Wheel Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.wheelMassLineEdit)
 
         self.wheelMaterialLineEdit = QLineEdit(placeholderText="e.g., Black", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.wheelMaterialLineEdit)
+        self.wheelMaterialLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Wheel Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.wheelMaterialLineEdit)
 
     def add_3w_parameters(self):
         self.wheelRadiusLineEdit = QLineEdit(placeholderText="e.g., 0.3", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.wheelRadiusLineEdit)
+        self.wheelRadiusLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Wheel Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.wheelRadiusLineEdit)
 
         self.wheelWidthLineEdit = QLineEdit(placeholderText="e.g., 0.1", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel Width:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.wheelWidthLineEdit)
+        self.wheelWidthLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Wheel Width:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.wheelWidthLineEdit)
 
         self.wheelMassLineEdit = QLineEdit(placeholderText="e.g., 0.5", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.wheelMassLineEdit)
+        self.wheelMassLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Wheel Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.wheelMassLineEdit)
 
         self.wheelMaterialLineEdit = QLineEdit(placeholderText="e.g., Black", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.wheelMaterialLineEdit)
+        self.wheelMaterialLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Wheel Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.wheelMaterialLineEdit)
 
     def add_2wc_parameters(self):
         self.wheelRadiusLineEdit = QLineEdit(placeholderText="e.g., 0.3", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel and Caster Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.wheelRadiusLineEdit)
+        self.wheelRadiusLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Wheel and Caster Radius:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.wheelRadiusLineEdit)
 
         self.wheelWidthLineEdit = QLineEdit(placeholderText="e.g., 0.1", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel Width:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.wheelWidthLineEdit)
+        self.wheelWidthLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Wheel Width:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.wheelWidthLineEdit)
 
         self.wheelMassLineEdit = QLineEdit(placeholderText="e.g., 0.5", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.wheelMassLineEdit)
+        self.wheelMassLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Wheel Mass:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.wheelMassLineEdit)
 
         self.wheelMaterialLineEdit = QLineEdit(placeholderText="e.g., Black", styleSheet="font-size: 10.5pt;")
-        self.left_layout.addWidget(QLabel("Wheel Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
-        self.left_layout.addWidget(self.wheelMaterialLineEdit)
+        self.wheelMaterialLineEdit.setFixedWidth(200)
+        self.param_layout.addWidget(QLabel("Wheel Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
+        self.param_layout.addWidget(self.wheelMaterialLineEdit)
 
     def applyChanges(self):
         chassis_size_str = self.chassisSizeLineEdit.text()
@@ -200,11 +261,10 @@ class ConfigurationPage(QWizardPage):
 
         if self.robot_type in ["4_wheeled", "3_wheeled", "2_wheeled_caster"]:
             params["wheel_radius"] = self.wheelRadiusLineEdit.text() or "0.22"
-            params["wheel_width"] = self.wheelWidthLineEdit.text() or "0.12"  # Removed comma
+            params["wheel_width"] = self.wheelWidthLineEdit.text() or "0.12"
             params["wheel_mass"] = self.wheelMassLineEdit.text() or "0.5"
             params["wheel_material"] = self.wheelMaterialLineEdit.text() or "Black"
 
-        # For 2_wheeled_caster, caster_radius matches wheel_radius
         if self.robot_type == "2_wheeled_caster":
             params["caster_radius"] = params["wheel_radius"]  # Enforce same value
 
@@ -281,6 +341,7 @@ class ConfigurationPage(QWizardPage):
             caster_radius
         )
         logging.debug(f"Emitted modelUpdated signal for {self.robot_type}")
+        self.glWidget.update()  # Force immediate repaint of OpenGL widget
 
     def saveURDF(self):
         filename, _ = QFileDialog.getSaveFileName(self, "Save URDF", "", "URDF Files (*.urdf)")

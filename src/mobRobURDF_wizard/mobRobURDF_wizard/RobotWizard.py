@@ -4,7 +4,7 @@ import sys
 import logging
 from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QWidget, QApplication, QWizard, QListWidget)
 from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt  # Added for window flags
+from PyQt5.QtCore import Qt
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
@@ -25,7 +25,9 @@ class RobotWizard(QWizard):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Mobile Robot URDF Generator Wizard (v2)")
-        self.resize(1200, 600)
+
+        # Set a fixed size (e.g., 1200x800) approximating maximized but not full-screen
+        self.setFixedSize(1800, 900)  # Adjust this size as needed (e.g., 1400x900)
 
         # Ensure window flags include minimize, maximize, and close buttons
         self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint)
@@ -41,8 +43,8 @@ class RobotWizard(QWizard):
         self.nav_list.addItems(["Welcome", "Select Robot Type", "Configure Parameters", "Future Features"])
         
         # Customize navigation bar appearance
-        self.nav_list.setFixedWidth(250)  # Adjusted width
-        self.nav_list.setFixedHeight(400)  # Optional: Set a fixed height
+        self.nav_list.setFixedWidth(270)
+        self.nav_list.setFixedHeight(500)
         self.nav_list.setStyleSheet("""
             QListWidget {
                 background-color: #2E2E2E;
@@ -86,34 +88,34 @@ class RobotWizard(QWizard):
         nav_layout.addStretch()
         
         main_layout.addLayout(nav_layout)
-        main_layout.addStretch()  # Allow wizard content to expand
+        main_layout.addStretch()
         
         main_widget.setLayout(main_layout)
-        self.setWizardStyle(QWizard.ModernStyle)  # Ensure buttons are visible
-        self.setOption(QWizard.NoDefaultButton, False)  # Enable default buttons
-        self.setSideWidget(main_widget)  # Add nav bar as a side widget
+        self.setWizardStyle(QWizard.ModernStyle)
+        self.setOption(QWizard.NoDefaultButton, False)
+        self.setSideWidget(main_widget)
 
         self.currentIdChanged.connect(self.update_navigation)
+        logging.debug("RobotWizard initialized with fixed size 1200x800")
 
     def update_navigation(self, page_id):
         page_index = self.pageIds().index(page_id)
-        self.nav_list.setCurrentRow(page_index)
+        if self.nav_list.currentRow() != page_index:
+            self.nav_list.setCurrentRow(page_index)
         logging.debug(f"Page ID changed to: {page_id}, robot_type field: {self.field('robot_type')}")
 
 def main(args=None):
-    # Initialize GLUT
     try:
         glutInit()
     except Exception as e:
         print(f"Failed to initialize GLUT: {e}")
         sys.exit(1)
 
-    # Set up logging
     logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
     app = QApplication(sys.argv)
     wizard = RobotWizard()
-    wizard.showMaximized()
+    wizard.show()  # Show at fixed size instead of maximized
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

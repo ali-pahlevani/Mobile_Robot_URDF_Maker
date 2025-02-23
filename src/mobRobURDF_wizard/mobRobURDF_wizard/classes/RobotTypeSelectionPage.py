@@ -5,7 +5,6 @@ from ament_index_python.packages import get_package_share_directory
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-
 class RobotTypeSelectionPage(QWizardPage):
     robotTypeChanged = pyqtSignal()  # Define the custom signal
 
@@ -26,16 +25,16 @@ class RobotTypeSelectionPage(QWizardPage):
         self.btn_3w = QPushButton("3-Wheeled Robot (Tricycle)")
         self.btn_2wc = QPushButton("2-Wheeled Robot with Caster")
 
-        # Style buttons
-        button_style = """
+        # Base button style (unselected state)
+        self.base_button_style = """
             QPushButton {
                 background-color: #4A90E2;  /* Bright blue */
                 color: white;
                 font-size: 16pt;
                 font-weight: bold;
-                font-family: "Segoe UI";  /* Modern font */
+                font-family: "Segoe UI";
                 padding: 10px;
-                border-radius: 8px;       /* Rounded corners */
+                border-radius: 8px;
                 border: 2px solid #357ABD; /* Darker blue border */
             }
             QPushButton:hover {
@@ -45,21 +44,42 @@ class RobotTypeSelectionPage(QWizardPage):
                 background-color: #2E7DB2; /* Darker blue when pressed */
             }
         """
-        self.btn_4w.setStyleSheet(button_style)
-        self.btn_3w.setStyleSheet(button_style)
-        self.btn_2wc.setStyleSheet(button_style)
+        # Selected button style (green)
+        self.selected_button_style = """
+            QPushButton {
+                background-color: #28A745;  /* Green */
+                color: white;
+                font-size: 16pt;
+                font-weight: bold;
+                font-family: "Segoe UI";
+                padding: 10px;
+                border-radius: 8px;
+                border: 2px solid #218838; /* Darker green border */
+            }
+            QPushButton:hover {
+                background-color: #34C759; /* Lighter green on hover */
+            }
+            QPushButton:pressed {
+                background-color: #1E7E34; /* Darker green when pressed */
+            }
+        """
+
+        # Apply initial base style to all buttons
+        self.btn_4w.setStyleSheet(self.base_button_style)
+        self.btn_3w.setStyleSheet(self.base_button_style)
+        self.btn_2wc.setStyleSheet(self.base_button_style)
 
         # Create framed labels for each robot type's image
         self.label_4w = QLabel()
-        self.label_4w.setFixedSize(300, 300)
+        self.label_4w.setFixedSize(400, 250)
         self.load_image(self.label_4w, os.path.join(self.image_dir, "4w_preview.png"))
 
         self.label_3w = QLabel()
-        self.label_3w.setFixedSize(300, 300)
+        self.label_3w.setFixedSize(400, 250)
         self.load_image(self.label_3w, os.path.join(self.image_dir, "3w_preview.png"))
 
         self.label_2wc = QLabel()
-        self.label_2wc.setFixedSize(300, 300)
+        self.label_2wc.setFixedSize(400, 250)
         self.load_image(self.label_2wc, os.path.join(self.image_dir, "2wc_preview.png"))
 
         # Style image labels with a subtle frame
@@ -121,15 +141,29 @@ class RobotTypeSelectionPage(QWizardPage):
         main_widget = QWidget()
         main_widget.setLayout(main_layout)
         main_widget.setStyleSheet("background-color: #F0F4F8;")  # Light blue-gray background for the page
-        self.setLayout(QVBoxLayout())  # Wrap in a QVBoxLayout to ensure proper layout management
+        self.setLayout(QVBoxLayout())
         self.layout().addWidget(main_widget)
 
     def set_robot_type(self, value):
+        """Set the robot type and update button styles."""
         self.setField("robot_type", value)  # Update the wizard's field
         self._robot_type = value  # Sync local variable
         self.robotTypeChanged.emit()  # Emit custom signal
         self.completeChanged.emit()  # Update Next button state
         logging.debug(f"Set robot_type to: {self.field('robot_type')}")
+
+        # Reset all buttons to base style
+        self.btn_4w.setStyleSheet(self.base_button_style)
+        self.btn_3w.setStyleSheet(self.base_button_style)
+        self.btn_2wc.setStyleSheet(self.base_button_style)
+
+        # Set the selected button to green
+        if value == "4_wheeled":
+            self.btn_4w.setStyleSheet(self.selected_button_style)
+        elif value == "3_wheeled":
+            self.btn_3w.setStyleSheet(self.selected_button_style)
+        elif value == "2_wheeled_caster":
+            self.btn_2wc.setStyleSheet(self.selected_button_style)
 
     def robotType(self):
         return self._robot_type
