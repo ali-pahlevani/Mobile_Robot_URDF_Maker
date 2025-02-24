@@ -12,7 +12,7 @@ class WelcomePage(QWizardPage):
         self.setTitle("")
 
         # Title label
-        title_label = QLabel("Welcome to the Robot Configuration Wizard!")
+        title_label = QLabel("Welcome to the 'Mobile Robot URDF Maker' Wizard!")
         title_label.setStyleSheet("""
             font-size: 28pt;          /* Larger font size */
             font-weight: bold;        /* Bold text */

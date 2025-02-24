@@ -25,7 +25,7 @@ class RobotWizard(QWizard):
         super().__init__()
         # Add window flags to include minimize, maximize, and close buttons
         self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint)
-        self.setWindowTitle("Mobile Robot URDF Generator Wizard (v2)")
+        self.setWindowTitle("Mobile Robot URDF Maker Wizard (v2)")
         self.setFixedSize(1800, 900)
 
         # Initialize URDFManager
