@@ -4,7 +4,7 @@
 
 ![Preview_Image](https://github.com/user-attachments/assets/1bb04a0c-5681-4bde-898d-248ff85eab1b)
 
-- Now, you don't have only 1 option (4-wheeled robot). In version 2, you'll have **3 options** to choose (in the next version, I'll introduce **specific controllers** for each of these types, so that you can make **ros2_control config files** for each of these types of **kinematics**):
+- Now, you don't have only 1 option (4-wheeled robot). In version 2, you'll have **3 options** to choose from (in the next version, I'll introduce **specific controllers** for each of these types, so that you can make **ros2_control config files** for each of these types of **kinematics**):
     - **4-Wheeled** Robot
     - **3-Wheeled** Robot (**Tricycle**)
     - **2-Wheeled** Robot with a **Caster Wheel**
