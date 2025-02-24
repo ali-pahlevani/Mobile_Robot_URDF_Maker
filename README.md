@@ -57,7 +57,7 @@ In order to run the launch file, you can run the following line in your **termin
     ros2 launch mobRobURDF_launch urdf_test.launch.py
 ```
 
-![Launch_Test](https://github.com/user-attachments/assets/7e939dec-e5e8-4761-a808-07b84d9f0115)
+![Launch_Test](https://github.com/user-attachments/assets/cd118fb7-b052-4255-86fa-d7b7d663cfef)
 
 
 ---
