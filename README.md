@@ -2,16 +2,16 @@
 
 **Automate** the process of making a **URDF** for your **mobile robot** using this "**Wizard**"
 
-- Now, you don't have only 1 option (4-wheeled robot). In version 2, you'll have 3 options to choose:
-    - 4-Wheeled Robot
-    - 3-Wheeled Robot (Tricycle)
-    - 2-Wheeled Robot with a Caster Wheel
+- Now, you don't have only 1 option (4-wheeled robot). In version 2, you'll have **3 options** to choose (in the next version, I'll introduce **specific controllers** for each of these types, so that you can make **ros2_control config files** for each of these types of **kinematics**):
+    - **4-Wheeled** Robot
+    - **3-Wheeled** Robot (**Tricycle**)
+    - **2-Wheeled** Robot with a **Caster Wheel**
 
-- You can easily choose the type of robot you need to work with, build its URDF automatically (based on the parameters you choose), and get your built URDF file.
-    - In this version, when you hit the save button, first a copy of the URDF file is saved automatically in a specific place for the launch file; so that launch file will recognize it automatically when you launch it (for testing purposes).
-    - Other than that, you can also save another copy of it to any directory you want (or simply close the saving window if you don't need it!).
+- You can easily choose the type of robot you need to work with, build its URDF **automatically** (based on the parameters you choose), and get your built URDF file.
+    - In this version, when you hit the save button, first a **copy of the URDF file** is **saved automatically** in a specific place for the launch file; so that **launch file** will recognize it automatically when you launch it (for **testing** purposes).
+    - Other than that, you can also save **another copy** of it to any **directory you want** (or simply close the saving window if you **don't need** it!).
 
-- As it be seen, the overall structure of the wizard has been enhanced and organized, so that not only you can navigate to different pages using **Navigation Bar**, also at the last page of the wizard (in this version), you can see the upcoming updates for the wizard in the later releases (adding Gazebo files, SLAM and Navigation capability, setting up Controllers, etc.).
+- As it be seen, the overall structure of the wizard has been enhanced and organized, so that not only you can **navigate to different pages** using **Navigation Bar**, also at the last page of the wizard (in this version), you can see the **upcoming updates** for the wizard in the next releases (adding *Gazebo* files, *SLAM* and *Navigation* capability, setting up *Controllers*, etc.).
 
 ---
 
@@ -58,6 +58,8 @@ If you have any question, please let me know: **a.pahlevani1998@gmail.com**
 
 ## Please stay tuned for the next versions of the app.
 
+---
+---
 ---
 
 ## Version 1
