@@ -1,8 +1,14 @@
-# Mobile_Robot_URDF_Maker
+# Mobile_Robot_URDF_Maker (v2)
+
+
+
+
+
+
+---
+## Version 1
 
 **Automate** the process of making a **URDF** for your **4-wheeled mobile robot** using this "**Wizard**"
-
-![Wizard_Overview](https://github.com/user-attachments/assets/a8880c77-7261-4811-b6c2-6da5ce587a67)
 
 ---
 
@@ -51,8 +57,6 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
     ros2 run mobRobURDF_wizard mobRobURDF_wizard
     ```
 
-![Wizard_Gif](https://github.com/user-attachments/assets/42abf021-481b-4386-b3e0-9e0288233829)
-
 ---
 
 3. ### mobRobURDF_launch:
@@ -69,8 +73,6 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
 ```bash
     ros2 launch mobRobURDF_launch urdf_test.launch.py
 ```
-
-![Launch_Gif](https://github.com/user-attachments/assets/17dcad6c-91f0-475f-9f9a-331f2c42962a)
 
 ---
 
