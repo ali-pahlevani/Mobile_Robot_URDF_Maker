@@ -2,7 +2,7 @@
 
 **Automate** the process of making a **URDF** for your **mobile robot** using this "**Wizard**"
 
-Now, you don't have only 1 option (4-wheeled robot). In version 2, you'll have 3 options to choose:
+- Now, you don't have only 1 option (4-wheeled robot). In version 2, you'll have 3 options to choose:
     - 4-Wheeled Robot
     - 3-Wheeled Robot (Tricycle)
     - 2-Wheeled Robot with a Caster Wheel
