@@ -1,11 +1,65 @@
 # Mobile_Robot_URDF_Maker (v2)
 
+**Automate** the process of making a **URDF** for your **mobile robot** using this "**Wizard**"
 
+Now, you don't have only 1 option (4-wheeled robot). In version 2, you'll have 3 options to choose:
+    - **4-Wheeled Robot**
+    - **3-Wheeled Robot (Tricycle)**
+    - **2-Wheeled Robot with a Caster Wheel**
 
+You can easily choose the type of robot you need to work with, build its URDF automatically (based on the parameters you choose), and get your built URDF file.
+    - In this version, when you hit the save button, first a copy of the URDF file is saved automatically in a specific place for the launch file; so that launch file will recognize it automatically when you launch it (for testing purposes).
+    - Other than that, you can also save another copy of it to any directory you want (or simply close the saving window if you don't need it!).
 
-
+As it be seen, the overall structure of the wizard has been enhanced and organized, so that not only you can navigate to different pages using **Navigation Bar**, also at the last page of the wizard (in this version), you can see the upcoming updates for the wizard in the later releases (adding Gazebo files, SLAM and Navigation capability, setting up Controllers, etc.).
 
 ---
+
+## Just like the previous version, the path to run the wizard is as simple as you can see:
+
+In order to run the **Wizard**, first you need to **clone** the workspace:
+
+    ```bash
+    git clone https://github.com/ali-pahlevani/Mobile_Robot_URDF_Maker.git
+    cd Mobile_Robot_URDF_Maker
+    ```
+    
+For the next step, you'll need to install the **dependencies**:
+
+    ```bash
+    sudo apt update
+    rosdep install --from-paths src --ignore-src -r -y
+    sudo apt install python3-pyqt5 python3-pyqt5.qtopengl
+    ```
+
+After that, you should **build** the workspace and **source** the installation:
+
+    ```bash
+    colcon build --symlink-install
+    source install/setup.bash
+    ```
+
+Finally, you can easily run the following line in your **terminal**:
+
+    ```bash
+    ros2 run mobRobURDF_wizard mobRobURDF_wizard
+    ```
+---
+
+In order to run the launch file, you can run the following line in your **terminal**:
+
+```bash
+    ros2 launch mobRobURDF_launch urdf_test.launch.py
+```
+
+---
+
+If you have any question, please let me know: **a.pahlevani1998@gmail.com**
+
+## Please stay tuned for the next versions of the app.
+
+---
+
 ## Version 1
 
 **Automate** the process of making a **URDF** for your **4-wheeled mobile robot** using this "**Wizard**"
@@ -74,9 +128,4 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
     ros2 launch mobRobURDF_launch urdf_test.launch.py
 ```
 
----
-
-If you have any question, please let me know: **a.pahlevani1998@gmail.com**
-
-## Please stay tuned for the next versions of the app.
  
