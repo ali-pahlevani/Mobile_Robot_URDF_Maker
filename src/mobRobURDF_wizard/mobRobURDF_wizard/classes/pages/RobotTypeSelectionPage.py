@@ -71,15 +71,15 @@ class RobotTypeSelectionPage(QWizardPage):
 
         # Create framed labels for each robot type's image
         self.label_4w = QLabel()
-        self.label_4w.setFixedSize(400, 350)
+        self.label_4w.setFixedSize(420, 400)
         self.load_image(self.label_4w, os.path.join(self.image_dir, "4w_preview.png"))
 
         self.label_3w = QLabel()
-        self.label_3w.setFixedSize(400, 350)
+        self.label_3w.setFixedSize(420, 400)
         self.load_image(self.label_3w, os.path.join(self.image_dir, "3w_preview.png"))
 
         self.label_2wc = QLabel()
-        self.label_2wc.setFixedSize(400, 350)
+        self.label_2wc.setFixedSize(420, 400)
         self.load_image(self.label_2wc, os.path.join(self.image_dir, "2wc_preview.png"))
 
         # Style image labels with a subtle frame

@@ -24,13 +24,13 @@ class FutureFeaturesPage(QWizardPage):
 
         # Main layout: Vertical stack of feature rows
         main_layout = QVBoxLayout()
-        main_layout.setSpacing(20)  # Space between rows
+        main_layout.setSpacing(40)  # Space between rows
 
         for feature_name, image_path in features:
             # Feature name label (centered text)
             feature_label = QLabel(feature_name)
             feature_label.setStyleSheet("""
-                font-size: 20pt;
+                font-size: 22pt;
                 font-weight: bold;
                 font-family: "Segoe UI";
                 color: #8B0000;
@@ -46,7 +46,7 @@ class FutureFeaturesPage(QWizardPage):
             image_label = QLabel()
             pixmap = QPixmap(image_path)
             if not pixmap.isNull():
-                image_label.setPixmap(pixmap.scaled(250, 250, Qt.KeepAspectRatio))
+                image_label.setPixmap(pixmap.scaled(600, 100)) # Qt.KeepAspectRatio
                 #logging.debug(f"Loaded image for {feature_name}: {image_path}")
             else:
                 image_label.setText(f"{feature_name} Image Not Found")
