@@ -3,9 +3,9 @@
 **Automate** the process of making a **URDF** for your **mobile robot** using this "**Wizard**"
 
 Now, you don't have only 1 option (4-wheeled robot). In version 2, you'll have 3 options to choose:
-    - **4-Wheeled Robot**
-    - **3-Wheeled Robot (Tricycle)**
-    - **2-Wheeled Robot with a Caster Wheel**
+    - 4-Wheeled Robot
+    - 3-Wheeled Robot (Tricycle)
+    - 2-Wheeled Robot with a Caster Wheel
 
 You can easily choose the type of robot you need to work with, build its URDF automatically (based on the parameters you choose), and get your built URDF file.
     - In this version, when you hit the save button, first a copy of the URDF file is saved automatically in a specific place for the launch file; so that launch file will recognize it automatically when you launch it (for testing purposes).
