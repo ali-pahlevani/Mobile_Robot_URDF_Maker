@@ -19,31 +19,31 @@ As it be seen, the overall structure of the wizard has been enhanced and organiz
 
 In order to run the **Wizard**, first you need to **clone** the workspace:
 
-    ```bash
-    git clone https://github.com/ali-pahlevani/Mobile_Robot_URDF_Maker.git
-    cd Mobile_Robot_URDF_Maker
-    ```
+```bash
+git clone https://github.com/ali-pahlevani/Mobile_Robot_URDF_Maker.git
+cd Mobile_Robot_URDF_Maker
+```
     
 For the next step, you'll need to install the **dependencies**:
 
-    ```bash
-    sudo apt update
-    rosdep install --from-paths src --ignore-src -r -y
-    sudo apt install python3-pyqt5 python3-pyqt5.qtopengl
-    ```
+```bash
+sudo apt update
+rosdep install --from-paths src --ignore-src -r -y
+sudo apt install python3-pyqt5 python3-pyqt5.qtopengl
+```
 
 After that, you should **build** the workspace and **source** the installation:
 
-    ```bash
-    colcon build --symlink-install
-    source install/setup.bash
-    ```
+```bash
+colcon build --symlink-install
+source install/setup.bash
+```
 
 Finally, you can easily run the following line in your **terminal**:
 
-    ```bash
-    ros2 run mobRobURDF_wizard mobRobURDF_wizard
-    ```
+```bash
+ros2 run mobRobURDF_wizard mobRobURDF_wizard
+```
 ---
 
 In order to run the launch file, you can run the following line in your **terminal**:
