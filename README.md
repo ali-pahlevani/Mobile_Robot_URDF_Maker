@@ -21,7 +21,7 @@
 ---
 
 ## Just like the previous version, the path to run the wizard is as simple as you can see:
-
+ 
 In order to run the **Wizard**, first you need to **clone** the workspace:
 
 ```bash
