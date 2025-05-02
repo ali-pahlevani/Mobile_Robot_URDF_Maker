@@ -135,7 +135,7 @@ This workspace has 3 **ROS2** packages (up to now. I have plan for adding other 
     - In order to run the launch file, you can run the following line in your **terminal**:
 
 ```bash
-    ros2 launch mobRobURDF_launch urdf_test.launch.py
+ros2 launch mobRobURDF_launch urdf_test.launch.py
 ```
 
   
