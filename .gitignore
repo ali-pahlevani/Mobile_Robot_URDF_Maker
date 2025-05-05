@@ -6,3 +6,12 @@ log/
 
 # ignore build directory
 build/
+
+# ignore pycache files
+src/mobRobURDF_wizard/mobRobURDF_wizard/__pycache__
+src/mobRobURDF_wizard/mobRobURDF_wizard/classes/__pycache__
+src/mobRobURDF_wizard/mobRobURDF_wizard/utils/__pycache__
+src/mobRobURDF_wizard/mobRobURDF_wizard/classes/pages/__pycache__
+
+# ignore finally creaded mobRob.urdf file
+src/mobRobURDF_description/urdf/mobRob.urdf
