@@ -6,7 +6,6 @@
   <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/3_wheeled/sensors.xacro" />
   <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/inertial_macros.xacro" />
   <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/material_macros.xacro" />
-  <!-- <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_sensors.xacro" /> -->
 
   <!-- Call the macro to define materials -->
   <xacro:define_materials/>
@@ -22,4 +21,9 @@
   <!-- Sensors -->
   <xacro:lidar radius="${lidar_radius}" height="${lidar_height}" mass="${lidar_mass}" material="${lidar_material}" z="${lidar_z}" />
   <xacro:camera size="${camera_size}" mass="${camera_mass}" material="${camera_material}" x="${camera_x}" z="${camera_z}" />
+
+  <!-- Include Gazebo Xacro files -->
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/control/gazebo_ros2_control_3w_triSteer.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_properties.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_sensors.xacro" />
 </robot>

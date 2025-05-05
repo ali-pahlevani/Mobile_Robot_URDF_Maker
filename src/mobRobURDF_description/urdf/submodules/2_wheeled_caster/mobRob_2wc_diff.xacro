@@ -23,7 +23,7 @@
   <xacro:camera size="${camera_size}" mass="${camera_mass}" material="${camera_material}" x="${camera_x}" />
 
   <!-- Include Gazebo Xacro files -->
-  <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/control/gazebo_ros2_control_4w.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/control/gazebo_ros2_control_2wc_diff.xacro" />
   <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_properties.xacro" />
   <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_sensors.xacro" />
 </robot>

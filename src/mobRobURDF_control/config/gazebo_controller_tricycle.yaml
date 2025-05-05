@@ -25,7 +25,7 @@ tricycle_controller:
       max_acceleration: 1.0
       max_deceleration: 1.0
     steering:
-      max_position: 1.57 # pi/2
+      max_position: 0.785 # pi/4
       max_velocity: 1.0
 
 joint_state_broadcaster:
