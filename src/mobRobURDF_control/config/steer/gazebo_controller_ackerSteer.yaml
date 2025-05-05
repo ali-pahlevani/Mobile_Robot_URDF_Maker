@@ -1,0 +1,31 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 50
+    use_sim_time: true
+
+    ackerSteer_controller:
+      type: ackermann_steering_controller/AckermannSteeringController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+ackerSteer_controller:
+  ros__parameters:
+    reference_timeout: 2.0
+    open_loop: false
+    velocity_rolling_window_size: 10
+    position_feedback: false
+    traction_joints_names: [rear_left_joint, rear_right_joint]
+    steering_joints_names: [front_left_joint, front_right_joint]
+
+    wheelbase: 0.5
+    traction_track_width: 0.4
+    traction_wheels_radius: 0.1
+
+joint_state_broadcaster:
+  ros__parameters:
+    joints:
+      - front_left_joint
+      - front_right_joint
+      - rear_left_joint
+      - rear_right_joint
