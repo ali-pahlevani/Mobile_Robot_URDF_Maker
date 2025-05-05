@@ -25,6 +25,7 @@
   <material name="White">
     <color rgba="1.0 1.0 1.0 1.0"/>
   </material>
+  <!-- Chassis Link -->
   <link name="chassis">
     <inertial>
       <mass value="1.0"/>
@@ -123,10 +124,43 @@
       </geometry>
     </collision>
   </link>
-  <joint name="front_caster_joint" type="fixed">
-    <parent link="chassis"/>
+  <joint name="front_caster_joint" type="continuous">
+    <parent link="free-rotating_y_link"/>
     <child link="front_caster_wheel"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <!-- Front free-rotating Link (around y) for 2-Wheeled Robot -->
+  <link name="free-rotating_y_link">
+    <!-- No mass or geometry needed -->
+    <inertial>
+      <mass value="0.001"/>
+      <!-- Minimal mass to avoid simulation issues -->
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+  <joint name="free-rotating_y_joint" type="continuous">
+    <parent link="free-rotating_x_link"/>
+    <child link="free-rotating_y_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+  <!-- Front free-rotating Link (around x) for 2-Wheeled Robot -->
+  <link name="free-rotating_x_link">
+    <!-- No mass or geometry needed -->
+    <inertial>
+      <mass value="0.001"/>
+      <!-- Minimal mass to avoid simulation issues -->
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+  <joint name="free-rotating_x_joint" type="continuous">
+    <parent link="chassis"/>
+    <child link="free-rotating_x_link"/>
     <origin rpy="0 0 0" xyz="0.38 0 -0.15"/>
+    <axis xyz="1 0 0"/>
   </joint>
   <link name="lidar">
     <inertial>

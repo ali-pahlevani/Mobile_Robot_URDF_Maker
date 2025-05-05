@@ -13,6 +13,7 @@
     <xacro:property name="w" value="${size_list[1]}" />
     <xacro:property name="h" value="${size_list[2]}" />
 
+    <!-- Chassis Link -->
     <link name="chassis">
       <inertial>
         <mass value="${mass}" />
