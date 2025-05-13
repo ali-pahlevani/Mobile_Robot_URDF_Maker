@@ -11,47 +11,53 @@ controller_manager:
 
 diffDrive_controller:
   ros__parameters:
+
+    publish_rate: 50.0
+
+    base_frame_id: base_link
+    odom_frame_id: odom
+    enable_odom_tf: true
+
     left_wheel_names: ["left_joint"]
     right_wheel_names: ["right_joint"]
 
-    wheel_separation: 0.5
-    wheel_radius: 0.1
+    wheel_separation: 0.92
+    wheel_radius: 0.22
 
-    wheel_separation_multiplier: 1.0
-    left_wheel_radius_multiplier: 1.0
-    right_wheel_radius_multiplier: 1.0
+    use_stamped_vel: false
 
-    odom_frame_id: odom
-    base_frame_id: base_link
+    #wheel_separation_multiplier: 1.0
+    #left_wheel_radius_multiplier: 1.0
+    #right_wheel_radius_multiplier: 1.0
+
     pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
 
-    position_feedback: false
-    open_loop: true
-    enable_odom_tf: true
+    #position_feedback: false
+    #open_loop: true
 
-    cmd_vel_timeout: 0.5 # seconds
-    publish_limited_velocity: true
-    velocity_rolling_window_size: 10
+    #cmd_vel_timeout: 0.5 # seconds
+    #publish_limited_velocity: true
+    #velocity_rolling_window_size: 10
 
     # Velocity limits
-    linear.x.max_velocity: 1.0
-    linear.x.min_velocity: -1.0
-    linear.x.max_acceleration: 0.5
-    linear.x.max_deceleration: 0.5
-    linear.x.max_acceleration_reverse: 0.5
-    linear.x.max_deceleration_reverse: 0.5
-    linear.x.max_jerk: 1.0
-    linear.x.min_jerk: -1.0
+    #linear.x.max_velocity: 1.0
+    #linear.x.min_velocity: -1.0
+    #linear.x.max_acceleration: 0.5
+    #linear.x.max_deceleration: 0.5
+    #linear.x.max_acceleration_reverse: 0.5
+    #linear.x.max_deceleration_reverse: 0.5
+    #linear.x.max_jerk: 1.0
+    #linear.x.min_jerk: -1.0
 
-    angular.z.max_velocity: 1.0
-    angular.z.min_velocity: -1.0
-    angular.z.max_acceleration: 0.5
-    angular.z.max_deceleration: 0.5
-    angular.z.max_acceleration_reverse: 0.5
-    angular.z.max_deceleration_reverse: 0.5
-    angular.z.max_jerk: 1.0
-    angular.z.min_jerk: -1.0
+    #angular.z.max_velocity: 1.0
+    #angular.z.min_velocity: -1.0
+    #angular.z.max_acceleration: 0.5
+    #angular.z.max_deceleration: 0.5
+    #angular.z.max_acceleration_reverse: 0.5
+    #angular.z.max_deceleration_reverse: 0.5
+    #angular.z.max_jerk: 1.0
+    #angular.z.min_jerk: -1.0
 
 joint_state_broadcaster:
   ros__parameters:

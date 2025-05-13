@@ -11,17 +11,32 @@ controller_manager:
 
 ackerSteer_controller:
   ros__parameters:
-    reference_timeout: 2.0
-    open_loop: false
-    velocity_rolling_window_size: 10
-    position_feedback: false
-    traction_joints_names: [rear_left_joint, rear_right_joint]
-    steering_joints_names: [chassis_to_front_left_steering, chassis_to_front_right_steering]
 
-    wheelbase: 0.5
-    traction_track_width: 0.4
-    traction_wheels_radius: 0.1
+    publish_rate: 50.0
 
+    base_frame_id: base_link
+    odom_frame_id: odom
+    enable_odom_tf: true
+
+    front_steering: true
+
+    front_wheel_track: 0.8
+    rear_wheel_track: 0.8
+    front_wheels_radius: 0.22
+    rear_wheels_radius: 0.22
+    wheelbase: 1.2
+
+    #reference_timeout: 2.0
+    #open_loop: false
+    #velocity_rolling_window_size: 10
+    #position_feedback: false
+    rear_wheels_names: [rear_right_joint, rear_left_joint]
+    front_wheels_names: [chassis_to_front_right_steering, chassis_to_front_left_steering]
+
+    use_stamped_vel: false
+
+    traction_track_width: 0.8
+    traction_wheels_radius: 0.22
 joint_state_broadcaster:
   ros__parameters:
     joints:

@@ -11,22 +11,31 @@ controller_manager:
 
 tricycle_controller:
   ros__parameters:
+
+    publish_rate: 50.0
+
+    base_frame_id: base_link
+    odom_frame_id: odom
+    enable_odom_tf: true
+
     traction_joint_name: front_joint
     steering_joint_name: chassis_to_front_steering
-    wheel_radius: 0.1
-    wheelbase: 0.5
-    enable_odom_tf: true
-    use_sim_time: true
+    wheel_radius: 0.22
+    wheelbase: 1.2
+
+    use_stamped_vel: false
+    open_loop: false
+
     pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
-    odom_only_twist: true
-    publish_ackermann_command: true
-    traction:
-      max_acceleration: 1.0
-      max_deceleration: 1.0
-    steering:
-      max_position: 0.785 # pi/4
-      max_velocity: 1.0
+    #odom_only_twist: true
+    #publish_ackermann_command: true
+    #traction:
+    #  max_acceleration: 1.0
+    #  max_deceleration: 1.0
+    #steering:
+    #  max_position: 0.785 # pi/4
+    #  max_velocity: 1.0
 
 joint_state_broadcaster:
   ros__parameters:
