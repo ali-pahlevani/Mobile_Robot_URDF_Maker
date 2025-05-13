@@ -2,23 +2,16 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>mobRobURDF_wizard</name>
-  <version>0.0.0</version>
+  <version>0.0.1</version>
   <description>Package for generating URDF files with a GUI wizard</description>
   <maintainer email="a.pahlevani1998@gmail.com">Ali Pahlevani</maintainer>
   <license>MIT</license>
 
-  <buildtool_depend>ament_python</buildtool_depend>
-
-  <depend>rclpy</depend>
-  <depend>PyQt5</depend>
-  <depend>python3-opengl</depend>
-  <depend>python3-pyqt5.qtopengl</depend>
-
+  <!-- Test dependencies if you plan to add tests -->
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
-  <exec_depend>ament_index_python</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>

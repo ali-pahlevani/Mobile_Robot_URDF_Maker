@@ -15,8 +15,8 @@ class FutureFeaturesPage(QWizardPage):
         #logging.debug(f"Image directory set to: {self.image_dir}")
 
         features = [
-            ("Gazebo", os.path.join(self.image_dir, "gazebo.png")),
-            ("Control", os.path.join(self.image_dir, "control.png")),
+            #("Gazebo", os.path.join(self.image_dir, "gazebo.png")),
+            #("Control", os.path.join(self.image_dir, "control.png")),
             ("SLAM", os.path.join(self.image_dir, "slam.png")),
             ("Navigation", os.path.join(self.image_dir, "navigation.png")),
             ("Obj. Tracking", os.path.join(self.image_dir, "object_tracking.png")),
@@ -24,13 +24,13 @@ class FutureFeaturesPage(QWizardPage):
 
         # Main layout: Vertical stack of feature rows
         main_layout = QVBoxLayout()
-        main_layout.setSpacing(40)  # Space between rows
+        main_layout.setSpacing(140)  # Space between rows (prev: 40)
 
         for feature_name, image_path in features:
             # Feature name label (centered text)
             feature_label = QLabel(feature_name)
             feature_label.setStyleSheet("""
-                font-size: 22pt;
+                font-size: 36pt;
                 font-weight: bold;
                 font-family: "Segoe UI";
                 color: #8B0000;
@@ -39,18 +39,18 @@ class FutureFeaturesPage(QWizardPage):
                 border: 1px solid #E0E0E0;
                 border-radius: 5px;
             """)
-            feature_label.setFixedWidth(240)
+            feature_label.setFixedWidth(500) #(prev: 240)
             feature_label.setAlignment(Qt.AlignCenter)  # Center text horizontally and vertically
 
             # Image label
             image_label = QLabel()
             pixmap = QPixmap(image_path)
             if not pixmap.isNull():
-                image_label.setPixmap(pixmap.scaled(600, 100)) # Qt.KeepAspectRatio
+                image_label.setPixmap(pixmap.scaled(900, 150)) # Qt.KeepAspectRatio
                 #logging.debug(f"Loaded image for {feature_name}: {image_path}")
             else:
                 image_label.setText(f"{feature_name} Image Not Found")
-                logging.warning(f"Failed to load image for {feature_name}: {image_path}")
+                #logging.warning(f"Failed to load image for {feature_name}: {image_path}")
             image_label.setStyleSheet("""
                 border: 2px solid #4A90E2;
                 border-radius: 10px;

@@ -13,8 +13,9 @@ from OpenGL.GLU import *
 try:
     from mobRobURDF_wizard.classes.pages.WelcomePage import WelcomePage
     from mobRobURDF_wizard.classes.pages.RobotTypeSelectionPage import RobotTypeSelectionPage
-    from mobRobURDF_wizard.classes.pages.FutureFeaturesPage import FutureFeaturesPage
+    from mobRobURDF_wizard.classes.pages.ControlConfigurationPage import ControlConfigurationPage
     from mobRobURDF_wizard.classes.pages.ConfigurationPage import ConfigurationPage
+    from mobRobURDF_wizard.classes.pages.FutureFeaturesPage import FutureFeaturesPage
     from mobRobURDF_wizard.classes.URDFManager import URDFManager
 except ImportError as e:
     print(f"Error importing modules: {e}")
@@ -23,21 +24,18 @@ except ImportError as e:
 class RobotWizard(QWizard):
     def __init__(self):
         super().__init__()
-        # Add window flags to include minimize, maximize, and close buttons
         self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint)
-        self.setWindowTitle("Mobile Robot URDF Maker Wizard (v2)")
+        self.setWindowTitle("Mobile Robot URDF Maker Wizard (v3)")
         self.setFixedSize(1800, 900)
 
-        # Initialize URDFManager
         try:
             self.urdf_manager = URDFManager()
         except Exception as e:
-            logging.error(f"Failed to initialize URDFManager: {e}")
+            #logging.error(f"Failed to initialize URDFManager: {e}")
             raise
 
-        # Navigation bar
         self.nav_list = QListWidget()
-        self.nav_list.addItems(["Welcome", "Select Robot Type", "Configure Parameters", "Future Features"])
+        self.nav_list.addItems(["Welcome", "Select Robot Type", "Select Controller", "Configure Parameters", "Future Features"])
         self.nav_list.setFixedWidth(270)
         self.nav_list.setFixedHeight(500)
         self.nav_list.setStyleSheet("""
@@ -64,20 +62,18 @@ class RobotWizard(QWizard):
         self.nav_list.setFont(font)
         self.nav_list.setCurrentRow(0)
 
-        # Connect navigation
         self.nav_list.itemClicked.connect(self.navigate_to_page)
 
-        # Add pages
         try:
             self.addPage(WelcomePage())
             self.addPage(RobotTypeSelectionPage())
+            self.addPage(ControlConfigurationPage())
             self.addPage(ConfigurationPage(self.urdf_manager))
             self.addPage(FutureFeaturesPage())
         except Exception as e:
-            logging.error(f"Failed to add pages: {e}")
+            #logging.error(f"Failed to add pages: {e}")
             raise
 
-        # Layout
         main_widget = QWidget()
         main_layout = QHBoxLayout()
         nav_layout = QVBoxLayout()
@@ -98,12 +94,10 @@ class RobotWizard(QWizard):
         #logging.debug(f"Page ID changed to: {page_id}")
 
     def navigate_to_page(self, item):
-        """Navigate to the target page by simulating Next/Back button presses."""
-        page_names = ["Welcome", "Select Robot Type", "Configure Parameters", "Future Features"]
+        page_names = ["Welcome", "Select Robot Type", "Select Controller", "Configure Parameters", "Future Features"]
         target_index = page_names.index(item.text())
         current_index = self.pageIds().index(self.currentId())
 
-        # Navigate forward or backward
         while current_index < target_index:
             self.next()
             current_index += 1
@@ -115,7 +109,7 @@ class RobotWizard(QWizard):
 
 def main():
     glutInit(sys.argv)
-    #logging.basicConfig(level=logging.debug, format="%(asctime)s - %(levelname)s - %(message)s")
+    #logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
     app = QApplication(sys.argv)
     wizard = RobotWizard()
     wizard.show()
