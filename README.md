@@ -4,13 +4,129 @@
 
 ![Preview_Image](https://github.com/user-attachments/assets/1bb04a0c-5681-4bde-898d-248ff85eab1b)
 
+- You can now easily choose any **controller** you want for you selected mobile robot. A new page has been added to the wizard which let's you choose one of the **six available controllers**.
+- Based on the type of your robot, you may choose one these controllers:
+    - **2-Wheeled** Robot with a **Caster Wheel**:
+        + **Differential-Drive** Controller
+    - **3-Wheeled** Robot (**Tricycle**):
+        + **Tricycle Controller**
+        + **Tricycle-Steering** Controller
+    - **4-Wheeled** Robot:
+        + **Differential-Drive** Controller (Skid-Steering)
+        + **Ackermann-Steering** Controller
+        + **Mecanum-Drive** Controller
+- After choosing the controller type and setting the parameters of the robot, the corresponding values for the controller will be set in the specific config file of that controller type (config files can be found at: **/mobRobURDF_control/config/**).
+
+- Other good news is that now you can simulate your robot in **Modern Gazebo** (since the *Gazebo Classic* has reached its *EOL*). In order to do that, a new launch file has been added. By launching this launch file, robot, gazebo world, and all the controllers will be spawned. Also, the Rviz2 window will open up
+- So, please build the workspace, source it, and finally run the following command:
+
+```bash
+ros2 launch mobRobURDF_launch gazebo_test.launch.py
+```
+
+![Preview_Image](https://github.com/user-attachments/assets/1bb04a0c-5681-4bde-898d-248ff85eab1b)
+
+- I should mention that for now, all the twist commands are unstamped; however, the stamped versions are on the way. For now, in order to control the robot in gazebo teleoperately, please run one of these lines in another terminal based on your controller type:
+.
+    + **Differential-Drive** Controller:
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/diffDrive_controller/cmd_vel_unstamped
+```
+.
+    + **Tricycle Controller**:
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/tricycle_controller/cmd_vel
+```
+.
+    + **Tricycle-Steering** Controller:
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/triSteer_controller/reference_unstamped
+```
+.
+    + **Differential-Drive** Controller (Skid-Steering):
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/diffDrive_controller/cmd_vel_unstamped
+```
+.
+    + **Ackermann-Steering** Controller:
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/ackerSteer_controller/reference_unstamped
+```
+.
+    + **Mecanum-Drive** Controller:
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/mecDrive_controller/reference_unstamped
+```
+.
+---
+
+- One more thing to mention is that some of the controllers don't publish odom tf by themselves. For those ones, you'll need to run a separate node for publishing odom tf and topic. Soon, I'll add that necessary nodes as well, so that you'll need to do nothing at all.
+
+- Finally, you can modify the Gazebo physical properties for your simulation in the following file: **/mobRobURDF_description/urdf/gazebo_files/gazebo_properties.xacro**. Also, you may add a new world (based on your needs) in the following directory: **/mobRobURDF_gazebo/worlds/** (and then modify the launch file).
+
+- I almost forgot it. Another good news is that now, by generating the URDF for your robot, now only a .urdf file is creaed, but also a .urdf.xacro file is created as well (**/mobRobURDF_description/urdf/mobRob.urdf** and **/mobRobURDF_description/urdf/mobRob.urdf.xacro**), so that you can easily modify the parameters after closing the wizard.
+
+- Finally, one minor fix is that in this version, the caster wheel (for the 2wc robot type) has 3-DOF for free motion (instead of its previous fixed link).
+
+---
+
+## Just like the previous version, the path to run the wizard is as simple as you can see:
+
+In order to run the **Wizard**, first you need to **clone** the workspace:
+
+```bash
+git clone https://github.com/ali-pahlevani/Mobile_Robot_URDF_Maker.git
+cd Mobile_Robot_URDF_Maker
+```
+    
+For the next step, you'll need to install the **dependencies**:
+
+```bash
+sudo apt update
+rosdep install --from-paths src --ignore-src -r -y
+sudo apt install python3-pyqt5 python3-pyqt5.qtopengl
+```
+
+After that, you should **build** the workspace and **source** the installation:
+
+```bash
+colcon build --symlink-install
+source install/setup.bash
+```
+
+Finally, you can easily run the following line in your **terminal**:
+
+```bash
+ros2 run mobRobURDF_wizard mobRobURDF_wizard
+```
+---
+
+In order to run the new launch file (Gazebo + Rviz2), you can run the following line in your **terminal**:
+
+```bash
+ros2 launch mobRobURDF_launch gazebo_test.launch.py
+```
+
+---
+
+If you have any question, please let me know: **a.pahlevani1998@gmail.com**
+
++ Also, don't forget to check my our website: **SLAMbotics.org**
+
+## Please stay tuned for the next versions of the app.
+
+---
+---
+---
+
+## Version 2
+
+**Automate** the process of making a **URDF** for your **mobile robot** using this "**Wizard**"
+
 - Now, you don't have only 1 option (4-wheeled robot). In version 2, you'll have **3 options** to choose from (in the next version, I'll introduce **specific controllers** for each of these types, so that you can make **ros2_control config files** for each of these types of **kinematics**):
     - **4-Wheeled** Robot
     - **3-Wheeled** Robot (**Tricycle**)
     - **2-Wheeled** Robot with a **Caster Wheel**
-
-![Wizard_Test](https://github.com/user-attachments/assets/948c821c-6540-4ec9-9b90-8443698d42aa)
-
 
 - You can easily choose the type of robot you need to work with, build its URDF **automatically** (based on the parameters you choose), and get your built URDF file.
     - In this version, when you hit the save button, first a **copy of the URDF file** is **saved automatically** in a specific place for the launch file; so that **launch file** will recognize it automatically when you launch it (for **testing** purposes).
