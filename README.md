@@ -2,7 +2,7 @@
 
 **Automate** the process of making a **URDF** for your **mobile robot** using this "**Wizard**"
 
-![Preview_Image](https://github.com/user-attachments/assets/1bb04a0c-5681-4bde-898d-248ff85eab1b)
+![Preview_Image](https://github.com/user-attachments/assets/28fcf660-d92d-4a99-831a-e6a29a9a5c78)
 
 - Now, you don't have only 1 option (4-wheeled robot). In version 2, you'll have **3 options** to choose from (in the next version, I'll introduce **specific controllers** for each of these types, so that you can make **ros2_control config files** for each of these types of **kinematics**):
     - **4-Wheeled** Robot
@@ -11,7 +11,6 @@
 
 ![Wizard_Test](https://github.com/user-attachments/assets/948c821c-6540-4ec9-9b90-8443698d42aa)
  
-  
 - You can easily choose the type of robot you need to work with, build its URDF **automatically** (based on the parameters you choose), and get your built URDF file.
     - In this version, when you hit the save button, first a **copy of the URDF file** is **saved automatically** in a specific place for the launch file; so that **launch file** will recognize it automatically when you launch it (for **testing** purposes).
     - Other than that, you can also save **another copy** of it to any **directory you want** (or simply close the saving window if you **don't need** it!).
