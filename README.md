@@ -27,6 +27,8 @@ ros2 launch mobRobURDF_launch gazebo_test.launch.py
 
 ![Gazebo_Scene](https://github.com/user-attachments/assets/2abbf489-6c52-4d09-b639-26b8e7e7771c)
 
+---
+
 - It should be mentioned that for now, all the *twist commands* are **unstamped**; however, the **stamped versions** are on the way. For now, in order to control the robot in gazebo *teleoperately*, please run one of the following lines in **another terminal** based on your *controller type*:
 
 **Differential-Drive** Controller:
