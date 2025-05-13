@@ -17,8 +17,9 @@
         + **Mecanum-Drive** Controller
 - After choosing the controller type and setting the parameters of the robot, the corresponding values for the controller will be set in the specific config file of that controller type (config files can be found at: **/mobRobURDF_control/config/**).
 
-- Other good news is that now you can simulate your robot in **Modern Gazebo** (since the *Gazebo Classic* has reached its *EOL*). In order to do that, a new launch file has been added. By launching this launch file, robot, gazebo world, and all the controllers will be spawned. Also, the Rviz2 window will open up
-- So, please build the workspace, source it, and finally run the following command:
+![Preview_Image](https://github.com/user-attachments/assets/1bb04a0c-5681-4bde-898d-248ff85eab1b)
+
+- Other good news is that now you can **simulate your robot** in **Modern Gazebo** (since the *Gazebo Classic* has reached its *EOL*). In order to do that, a **new launch file** has been added. By launching this launch file, *robot*, *Gazebo world*, and all the *controllers* will be spawned. Also, *the Rviz2* window will open up. So, please *build* the workspace, *source* it, and finally run the following command:
 
 ```bash
 ros2 launch mobRobURDF_launch gazebo_test.launch.py
@@ -27,42 +28,42 @@ ros2 launch mobRobURDF_launch gazebo_test.launch.py
 ![Preview_Image](https://github.com/user-attachments/assets/1bb04a0c-5681-4bde-898d-248ff85eab1b)
 
 - I should mention that for now, all the twist commands are unstamped; however, the stamped versions are on the way. For now, in order to control the robot in gazebo teleoperately, please run one of these lines in another terminal based on your controller type:
-.
-    + **Differential-Drive** Controller:
+
+**Differential-Drive** Controller:
 ```bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/diffDrive_controller/cmd_vel_unstamped
 ```
-.
-    + **Tricycle Controller**:
+
+**Tricycle Controller**:
 ```bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/tricycle_controller/cmd_vel
 ```
-.
-    + **Tricycle-Steering** Controller:
+
+**Tricycle-Steering** Controller:
 ```bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/triSteer_controller/reference_unstamped
 ```
-.
-    + **Differential-Drive** Controller (Skid-Steering):
+
+**Differential-Drive** Controller (Skid-Steering):
 ```bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/diffDrive_controller/cmd_vel_unstamped
 ```
-.
-    + **Ackermann-Steering** Controller:
+
+**Ackermann-Steering** Controller:
 ```bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/ackerSteer_controller/reference_unstamped
 ```
-.
-    + **Mecanum-Drive** Controller:
+
+**Mecanum-Drive** Controller:
 ```bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/mecDrive_controller/reference_unstamped
 ```
-.
+
 ---
 
-- One more thing to mention is that some of the controllers don't publish odom tf by themselves. For those ones, you'll need to run a separate node for publishing odom tf and topic. Soon, I'll add that necessary nodes as well, so that you'll need to do nothing at all.
+- One more thing to mention is that **some** of the controllers **don't publish odom tf** by themselves. For those ones, you'll need to run a **separate node** for publishing odom tf and topic. Soon, **I'll add** that necessary nodes as well, so that you'll need to do nothing at all.
 
-- Finally, you can modify the Gazebo physical properties for your simulation in the following file: **/mobRobURDF_description/urdf/gazebo_files/gazebo_properties.xacro**. Also, you may add a new world (based on your needs) in the following directory: **/mobRobURDF_gazebo/worlds/** (and then modify the launch file).
+- Finally, you can modify the **Gazebo physical properties** for your simulation in the following file: **/mobRobURDF_description/urdf/gazebo_files/gazebo_properties.xacro**. Also, you may add a new world (based on your needs) in the following directory: **/mobRobURDF_gazebo/worlds/** (and then modify the launch file).
 
 - I almost forgot it. Another good news is that now, by generating the URDF for your robot, now only a .urdf file is creaed, but also a .urdf.xacro file is created as well (**/mobRobURDF_description/urdf/mobRob.urdf** and **/mobRobURDF_description/urdf/mobRob.urdf.xacro**), so that you can easily modify the parameters after closing the wizard.
 
