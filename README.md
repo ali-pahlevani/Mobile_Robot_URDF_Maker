@@ -2,7 +2,7 @@
 
 **Automate** the process of making a **URDF** for your **mobile robot** using this "**Wizard**"
 
-![Preview_Image](https://github.com/user-attachments/assets/1bb04a0c-5681-4bde-898d-248ff85eab1b)
+![Preview_Image](https://github.com/user-attachments/assets/f117642b-6f3c-4057-a417-f05a30a2baa8)
 
 - You can now easily choose any **controller** you want for your selected mobile robot. A **new page** has been added to the wizard which let's you choose one of the **six available controllers**.
 - Based on the type of your robot, you may choose one these controllers:
@@ -17,7 +17,7 @@
     + **Mecanum-Drive** Controller
 - After choosing the controller type and setting the parameters of the robot, the corresponding values for the controller will be set in the specific config file of that controller type (config files can be found at: **/mobRobURDF_control/config/**).
 
-![Preview_Image](https://github.com/user-attachments/assets/1bb04a0c-5681-4bde-898d-248ff85eab1b)
+![Controller_List](https://github.com/user-attachments/assets/945a5620-d423-44a1-b807-2aa61d8e1d83)
 
 - Other good news is that now you can **simulate your robot** in **Modern Gazebo** (since the *Gazebo Classic* has reached its *EOL*). In order to do that, a **new launch file** has been added. By launching this launch file, *robot*, *Gazebo world*, and all the *controllers* will be spawned. Also, *Rviz2* window will open up as well; so, please *build* the workspace, *source* it, and finally *run* the following command:
 
@@ -25,7 +25,7 @@
 ros2 launch mobRobURDF_launch gazebo_test.launch.py
 ```
 
-![Preview_Image](https://github.com/user-attachments/assets/1bb04a0c-5681-4bde-898d-248ff85eab1b)
+![Gazebo_Scene](https://github.com/user-attachments/assets/2abbf489-6c52-4d09-b639-26b8e7e7771c)
 
 - It should be mentioned that for now, all the *twist commands* are **unstamped**; however, the **stamped versions** are on the way. For now, in order to control the robot in gazebo *teleoperately*, please run one of the following lines in **another terminal** based on your *controller type*:
 
@@ -58,6 +58,8 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/ac
 ```bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/mecDrive_controller/reference_unstamped
 ```
+
+![Rviz2](https://github.com/user-attachments/assets/e21d173e-c43c-43de-a6be-9f3a55366c62)
 
 ---
 
