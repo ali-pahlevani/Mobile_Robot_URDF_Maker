@@ -15,20 +15,18 @@
   <xacro:property name="wheel_width" value="0.12"/>
   <xacro:property name="wheel_mass" value="0.5"/>
   <xacro:property name="wheel_material" value="Black"/>
-  <xacro:property name="fl_x" value="0.4533333333333333"/>
-  <xacro:property name="fl_y" value="0.46"/>
-  <xacro:property name="fl_z" value="-0.15"/>
-  <xacro:property name="fr_x" value="0.4533333333333333"/>
-  <xacro:property name="fr_y" value="-0.46"/>
-  <xacro:property name="fr_z" value="-0.15"/>
-  <xacro:property name="rl_x" value="-0.4533333333333333"/>
-  <xacro:property name="rl_y" value="0.46"/>
-  <xacro:property name="rl_z" value="-0.15"/>
-  <xacro:property name="rr_x" value="-0.4533333333333333"/>
-  <xacro:property name="rr_y" value="-0.46"/>
-  <xacro:property name="rr_z" value="-0.15"/>
+  <xacro:property name="caster_radius" value="0.22"/>
+  <xacro:property name="l_x" value="-0.3"/>
+  <xacro:property name="l_y" value="0.46"/>
+  <xacro:property name="l_z" value="-0.15"/>
+  <xacro:property name="r_x" value="-0.3"/>
+  <xacro:property name="r_y" value="-0.46"/>
+  <xacro:property name="r_z" value="-0.15"/>
+  <xacro:property name="caster_x" value="0.38"/>
+  <xacro:property name="caster_y" value="0"/>
+  <xacro:property name="caster_z" value="-0.15"/>
   <xacro:property name="lidar_z" value="0.19"/>
   <xacro:property name="camera_x" value="0.64"/>
-  <xacro:property name="controller_type" value="ackermann"/>
-  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/4_wheeled/ackermann/mobRob_4w_acker.xacro"/>
+  <xacro:property name="controller_type" value="diff_2wc"/>
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/2_wheeled_caster/mobRob_2wc_diff.xacro"/>
 </robot>

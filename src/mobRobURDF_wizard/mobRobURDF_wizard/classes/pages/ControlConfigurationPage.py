@@ -166,9 +166,11 @@ class ControlConfigurationPage(QWizardPage):
             self.completeChanged.emit()  # Update Next button state only if changed
         #logging.debug(f"Set controllerType to: {self.field('controllerType')}")
 
-        for btn in self.buttons.values():
-            btn.setStyleSheet(self.base_button_style)
-        self.buttons[value].setStyleSheet(self.selected_button_style)
+        for controller_id, btn in self.buttons.items():
+            if btn.isEnabled():
+                btn.setStyleSheet(self.base_button_style if controller_id != value else self.selected_button_style)
+            else:
+                btn.setStyleSheet(self.disabled_button_style)
 
     def controllerType(self):
         return self._controller_type

@@ -60,7 +60,7 @@ def generate_launch_description():
     controllers = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["ackerSteer_controller"],
+        arguments=["diffDrive_controller"],
     )
     
     joint_state_broadcaster = Node(
