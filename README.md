@@ -4,22 +4,22 @@
 
 ![Preview_Image](https://github.com/user-attachments/assets/1bb04a0c-5681-4bde-898d-248ff85eab1b)
 
-- You can now easily choose any **controller** you want for you selected mobile robot. A new page has been added to the wizard which let's you choose one of the **six available controllers**.
+- You can now easily choose any **controller** you want for your selected mobile robot. A **new page** has been added to the wizard which let's you choose one of the **six available controllers**.
 - Based on the type of your robot, you may choose one these controllers:
-    - **2-Wheeled** Robot with a **Caster Wheel**:
-        + **Differential-Drive** Controller
-    - **3-Wheeled** Robot (**Tricycle**):
-        + **Tricycle Controller**
-        + **Tricycle-Steering** Controller
-    - **4-Wheeled** Robot:
-        + **Differential-Drive** Controller (Skid-Steering)
-        + **Ackermann-Steering** Controller
-        + **Mecanum-Drive** Controller
+- **2-Wheeled** Robot with a **Caster Wheel**:
+    + **Differential-Drive** Controller
+- **3-Wheeled** Robot (**Tricycle**):
+    + **Tricycle Controller**
+    + **Tricycle-Steering** Controller
+- **4-Wheeled** Robot:
+    + **Differential-Drive** Controller (Skid-Steering)
+    + **Ackermann-Steering** Controller
+    + **Mecanum-Drive** Controller
 - After choosing the controller type and setting the parameters of the robot, the corresponding values for the controller will be set in the specific config file of that controller type (config files can be found at: **/mobRobURDF_control/config/**).
 
 ![Preview_Image](https://github.com/user-attachments/assets/1bb04a0c-5681-4bde-898d-248ff85eab1b)
 
-- Other good news is that now you can **simulate your robot** in **Modern Gazebo** (since the *Gazebo Classic* has reached its *EOL*). In order to do that, a **new launch file** has been added. By launching this launch file, *robot*, *Gazebo world*, and all the *controllers* will be spawned. Also, *the Rviz2* window will open up. So, please *build* the workspace, *source* it, and finally run the following command:
+- Other good news is that now you can **simulate your robot** in **Modern Gazebo** (since the *Gazebo Classic* has reached its *EOL*). In order to do that, a **new launch file** has been added. By launching this launch file, *robot*, *Gazebo world*, and all the *controllers* will be spawned. Also, *Rviz2* window will open up as well; so, please *build* the workspace, *source* it, and finally *run* the following command:
 
 ```bash
 ros2 launch mobRobURDF_launch gazebo_test.launch.py
@@ -27,7 +27,7 @@ ros2 launch mobRobURDF_launch gazebo_test.launch.py
 
 ![Preview_Image](https://github.com/user-attachments/assets/1bb04a0c-5681-4bde-898d-248ff85eab1b)
 
-- I should mention that for now, all the twist commands are unstamped; however, the stamped versions are on the way. For now, in order to control the robot in gazebo teleoperately, please run one of these lines in another terminal based on your controller type:
+- It should be mentioned that for now, all the *twist commands* are **unstamped**; however, the **stamped versions** are on the way. For now, in order to control the robot in gazebo *teleoperately*, please run one of the following lines in **another terminal** based on your *controller type*:
 
 **Differential-Drive** Controller:
 ```bash
@@ -61,13 +61,13 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/me
 
 ---
 
-- One more thing to mention is that **some** of the controllers **don't publish odom tf** by themselves. For those ones, you'll need to run a **separate node** for publishing odom tf and topic. Soon, **I'll add** that necessary nodes as well, so that you'll need to do nothing at all.
+- One more thing to mention is that **some** of the controllers **don't** publish **odom->base_link tf** by themselves. For those ones, you'll need to run a **separate node** for publishing *odom->base_link tf* and *odometry topic*. Soon, **I'll add** those necessary nodes as well, so that you won't need to do anything at all.
 
-- Finally, you can modify the **Gazebo physical properties** for your simulation in the following file: **/mobRobURDF_description/urdf/gazebo_files/gazebo_properties.xacro**. Also, you may add a new world (based on your needs) in the following directory: **/mobRobURDF_gazebo/worlds/** (and then modify the launch file).
+- Finally, you can modify the **Gazebo physical properties** for your simulation in the following file: **/mobRobURDF_description/urdf/gazebo_files/gazebo_properties.xacro**. Also, you may add a *new world* (based on your needs) in the following directory: **/mobRobURDF_gazebo/worlds/** (and then modify the launch file).
 
-- I almost forgot it. Another good news is that now, by generating the URDF for your robot, now only a .urdf file is creaed, but also a .urdf.xacro file is created as well (**/mobRobURDF_description/urdf/mobRob.urdf** and **/mobRobURDF_description/urdf/mobRob.urdf.xacro**), so that you can easily modify the parameters after closing the wizard.
+- I almost forgot it. Another good news is that now, by *generating the URDF* for your robot, not only a **.urdf** file is created, also a **.urdf.xacro** file is created as well (**/mobRobURDF_description/urdf/mobRob.urdf** and **/mobRobURDF_description/urdf/mobRob.urdf.xacro**), so that you can easily modify the parameters after closing the wizard.
 
-- Finally, one minor fix is that in this version, the caster wheel (for the 2wc robot type) has 3-DOF for free motion (instead of its previous fixed link).
+- Finally, one **minor fix** is that in this version, the *caster wheel* (for the *2WC* robot type) has **3-DOF** for *free motion* (instead of its previous *fixed joint*).
 
 ---
 
@@ -102,7 +102,7 @@ ros2 run mobRobURDF_wizard mobRobURDF_wizard
 ```
 ---
 
-In order to run the new launch file (Gazebo + Rviz2), you can run the following line in your **terminal**:
+In order to launch the **new launch file** (Gazebo + Rviz2), you can run the following line in your **terminal**:
 
 ```bash
 ros2 launch mobRobURDF_launch gazebo_test.launch.py
@@ -110,9 +110,9 @@ ros2 launch mobRobURDF_launch gazebo_test.launch.py
 
 ---
 
-If you have any question, please let me know: **a.pahlevani1998@gmail.com**
+If you have any questions, please let me know: **a.pahlevani1998@gmail.com**
 
-+ Also, don't forget to check my our website: **https://www.SLAMbotics.org**
++ Also, please don't forget to check out our **website** at: **https://www.SLAMbotics.org**
 
 ## Please stay tuned for the next versions of the app.
 
@@ -173,9 +173,6 @@ In order to run the launch file, you can run the following line in your **termin
 ```bash
     ros2 launch mobRobURDF_launch urdf_test.launch.py
 ```
-
-![Launch_Test](https://github.com/user-attachments/assets/cd118fb7-b052-4255-86fa-d7b7d663cfef)
-
 
 ---
 
