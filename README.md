@@ -112,7 +112,7 @@ ros2 launch mobRobURDF_launch gazebo_test.launch.py
 
 If you have any question, please let me know: **a.pahlevani1998@gmail.com**
 
-+ Also, don't forget to check my our website: **SLAMbotics.org**
++ Also, don't forget to check my our website: **https://www.SLAMbotics.org**
 
 ## Please stay tuned for the next versions of the app.
 
