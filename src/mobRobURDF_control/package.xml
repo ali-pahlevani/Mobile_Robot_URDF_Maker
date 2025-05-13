@@ -10,10 +10,10 @@
 
   <depend>ament_index_cpp</depend>
   <depend>rclcpp</depend>
+  <depend>rclpy</depend>
   <depend>geometry_msgs</depend>
   <depend>std_msgs</depend>
   <depend>xacro</depend>
-  <!-- <depend>rclpy</depend> -->
 
   <export>
     <build_type>ament_cmake</build_type>

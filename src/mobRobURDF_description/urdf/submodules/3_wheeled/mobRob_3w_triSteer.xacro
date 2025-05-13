@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mobRob">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <!-- Include Xacro files -->
   <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/3_wheeled/base.xacro" />
   <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/3_wheeled/wheels.xacro" />
@@ -24,6 +24,11 @@
 
   <!-- Include Gazebo Xacro files -->
   <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/control/gazebo_ros2_control_3w_triSteer.xacro" />
-  <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_properties.xacro" />
   <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_sensors.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_properties.xacro" />
+  <xacro:gazebo_physical_properties
+  controller_type="${controller_type}"
+  chassis_size="${chassis_size}"
+  wheel_radius="${wheel_radius}"
+  wheel_width="${wheel_width}"/>
 </robot>

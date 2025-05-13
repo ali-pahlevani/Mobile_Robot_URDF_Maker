@@ -14,8 +14,8 @@ find_package(std_msgs REQUIRED)
 
 # Install config files
 install(
-  DIRECTORY config/
-  DESTINATION share/${PROJECT_NAME}/config
+  DIRECTORY config
+  DESTINATION share/${PROJECT_NAME}
 )
 
 # Export the package
