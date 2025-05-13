@@ -38,7 +38,7 @@ class WelcomePage(QWizardPage):
         else:
             self.gif_label.setText("Welcome GIF not found")
             self.gif_label.setAlignment(Qt.AlignCenter)
-            logging.warning(f"Failed to load welcome.gif from {gif_path}")
+            #logging.warning(f"Failed to load welcome.gif from {gif_path}")
 
         # Layout: Stack title and GIF vertically, centered
         layout = QVBoxLayout()

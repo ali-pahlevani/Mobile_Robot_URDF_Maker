@@ -2,26 +2,17 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>mobRobURDF_launch</name>
-  <version>0.0.0</version>
+  <version>0.0.1</version>
   <description>Package for creating launch file for testing the generated URDF</description>
   <maintainer email="a.pahlevani1998@gmail.com">Ali Pahlevani</maintainer>
   <license>MIT</license>
 
-  <buildtool_depend>ament_python</buildtool_depend>
-
-  <depend>ros2launch</depend>
-  <depend>launch</depend>
-  <depend>launch_ros</depend>
-  <depend>robot_state_publisher</depend>
-  <depend>joint_state_publisher_gui</depend>
-  <depend>rviz2</depend>
-
+  <!-- Test dependencies if you plan to add tests -->
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
-  <exec_depend>ament_index_python</exec_depend>
-  
+
   <export>
     <build_type>ament_python</build_type>
   </export>

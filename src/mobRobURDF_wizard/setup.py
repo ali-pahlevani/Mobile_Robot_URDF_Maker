@@ -13,6 +13,7 @@ setup(
         (os.path.join('share', package_name), ['package.xml']),
         (os.path.join('share', package_name, 'images', 'future_features'), glob('images/future_features/*.png')),
         (os.path.join('share', package_name, 'images', 'robot_types'), glob('images/robot_types/*.png')),
+        (os.path.join('share', package_name, 'images', 'control_types'), glob('images/control_types/*.png')),
         (os.path.join('share', package_name, 'images'), glob('images/*.gif')),
     ],
     install_requires=['setuptools'],

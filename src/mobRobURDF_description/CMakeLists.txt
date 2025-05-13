@@ -5,9 +5,10 @@ project(mobRobURDF_description)
 find_package(ament_cmake REQUIRED)
 find_package(xacro REQUIRED)
 
+# Install URDF and Mesh files
 install(
-  DIRECTORY urdf/
-  DESTINATION share/${PROJECT_NAME}/urdf
+  DIRECTORY urdf
+  DESTINATION share/${PROJECT_NAME}
 )
 
 # Export the package

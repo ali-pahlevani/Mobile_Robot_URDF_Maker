@@ -11,10 +11,10 @@ def render_template(template_path, params):
         #logging.debug(f"Rendered template: {template_path}")
         return rendered
     except FileNotFoundError:
-        logging.error(f"Template file not found: {template_path}")
+        #logging.error(f"Template file not found: {template_path}")
         return f"Error: Template file not found: {template_path}"
     except Exception as e:
-        logging.error(f"Error rendering template {template_path}: {str(e)}")
+        #logging.error(f"Error rendering template {template_path}: {str(e)}")
         return f"Error rendering template: {str(e)}"
 
 def generate_urdf(xacro_file):
@@ -25,19 +25,19 @@ def generate_urdf(xacro_file):
                                 stderr=subprocess.PIPE,
                                 check=True,
                                 text=True)
-        #logging.debug(f"Generated URDF from: {xacro_file}")
+        logging.debug(f"Generated URDF from: {xacro_file}")
         return result.stdout
     except subprocess.CalledProcessError as e:
         error_msg = f"Error generating URDF from {xacro_file}:\n{e.stderr}"
-        logging.error(error_msg)
+        #logging.error(error_msg)
         return error_msg
     except FileNotFoundError:
         error_msg = "Error: 'xacro' command not found. Ensure xacro is installed."
-        logging.error(error_msg)
+        #logging.error(error_msg)
         return error_msg
     except Exception as e:
         error_msg = f"Unexpected error generating URDF from {xacro_file}: {str(e)}"
-        logging.error(error_msg)
+        #logging.error(error_msg)
         return error_msg
 
 def get_color(color_name):

@@ -1,0 +1,42 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 50
+    use_sim_time: true
+
+    triSteer_controller:
+      type: tricycle_steering_controller/TricycleSteeringController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+triSteer_controller:
+  ros__parameters:
+
+    publish_rate: 50.0
+
+    base_frame_id: base_link
+    odom_frame_id: odom
+    enable_odom_tf: true
+
+    #reference_timeout: 2.0
+    front_steering: true
+    #open_loop: false
+    #velocity_rolling_window_size: 10
+    position_feedback: true
+    use_stamped_vel: false
+
+    rear_wheels_names: [rear_right_joint, rear_left_joint]
+    front_wheels_names: [chassis_to_front_steering]
+
+    wheelbase: 1.2
+    wheel_track: 0.8
+    front_wheels_radius: 0.22
+    rear_wheels_radius: 0.22
+
+joint_state_broadcaster:
+  ros__parameters:
+    joints:
+      - chassis_to_front_steering
+      - front_joint
+      - rear_left_joint
+      - rear_right_joint

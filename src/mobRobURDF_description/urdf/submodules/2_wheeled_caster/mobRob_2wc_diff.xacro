@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Include Xacro files -->
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/2_wheeled_caster/base.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/2_wheeled_caster/wheels.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/2_wheeled_caster/sensors.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/inertial_macros.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/material_macros.xacro" />
+
+  <!-- Call the macro to define materials -->
+  <xacro:define_materials/>
+
+  <!-- Define the robot -->
+  <xacro:chassis size="${chassis_size}" mass="${chassis_mass}" material="${chassis_material}" />
+
+  <!-- Wheels -->
+  <xacro:wheel name="left" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${l_x}" y="${l_y}" z="${l_z}" />
+  <xacro:wheel name="right" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${r_x}" y="${r_y}" z="${r_z}" />
+  <xacro:caster name="front_caster" radius="${caster_radius}" mass="${wheel_mass}" material="${wheel_material}" x="${caster_x}" y="${caster_y}" z="${caster_z}" />
+
+  <!-- Sensors -->
+  <xacro:lidar radius="${lidar_radius}" height="${lidar_height}" mass="${lidar_mass}" material="${lidar_material}" z="${lidar_z}" />
+  <xacro:camera size="${camera_size}" mass="${camera_mass}" material="${camera_material}" x="${camera_x}" />
+
+  <!-- Include Gazebo Xacro files -->
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/control/gazebo_ros2_control_2wc_diff.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_sensors.xacro" />
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_properties.xacro" />
+  <xacro:gazebo_physical_properties
+  controller_type="${controller_type}"
+  chassis_size="${chassis_size}"
+  wheel_radius="${wheel_radius}"
+  wheel_width="${wheel_width}"/>
+</robot>

@@ -13,7 +13,7 @@ class RobotTypeSelectionPage(QWizardPage):
         self.setTitle("Select Robot Type")
 
         # Register the field with a property and signal
-        self.registerField("robot_type*", self, property="robotType", changedSignal=self.robotTypeChanged)
+        self.registerField("robotType*", self, property="robotType", changedSignal=self.robotTypeChanged)
         self._robot_type = None  # Internal storage for the field
 
         # Image directory
@@ -150,13 +150,21 @@ class RobotTypeSelectionPage(QWizardPage):
         self.setLayout(QVBoxLayout())
         self.layout().addWidget(main_widget)
 
+    def initializePage(self):
+        value = self.field("robotType")
+        if value is not None and value != self._robot_type:
+            self._robot_type = value
+            self.set_robot_type(value)  # Update button styles
+        #logging.debug(f"RobotTypeSelectionPage initialized with robotType: {self._robot_type}")
+
     def set_robot_type(self, value):
         """Set the robot type and update button styles."""
-        self.setField("robot_type", value)  # Update the wizard's field
+        self.setField("robotType", value)  # Update the wizard's field
         self._robot_type = value  # Sync local variable
         self.robotTypeChanged.emit()  # Emit custom signal
-        self.completeChanged.emit()  # Update Next button state
-        #logging.debug(f"Set robot_type to: {self.field('robot_type')}")
+        if self._robot_type != value:
+            self.completeChanged.emit()  # Update Next button state only if changed
+        #logging.debug(f"Set robotType to: {self.field('robotType')}")
 
         # Reset all buttons to base style
         self.btn_4w.setStyleSheet(self.base_button_style)
@@ -175,6 +183,7 @@ class RobotTypeSelectionPage(QWizardPage):
         return self._robot_type
 
     def setRobotType(self, value):
+        #logging.debug(f"QWizard setting robotType to: {value}")
         self._robot_type = value
         self.robotTypeChanged.emit()
 
@@ -186,7 +195,7 @@ class RobotTypeSelectionPage(QWizardPage):
             #logging.debug(f"Loaded image: {image_path}")
         else:
             label.setText("Image Not Found")
-            logging.warning(f"Failed to load image: {image_path}")
+            #logging.warning(f"Failed to load image: {image_path}")
 
     def isComplete(self):
         return self._robot_type is not None

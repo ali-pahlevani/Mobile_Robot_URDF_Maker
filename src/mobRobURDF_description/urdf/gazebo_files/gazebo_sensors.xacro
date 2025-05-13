@@ -2,61 +2,51 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <!-- Gazebo Lidar Plugin -->
   <gazebo reference="lidar">
-    <sensor type="ray" name="lidar_sensor">
-      <pose>0 0 0 0 0 0</pose>
+    <material>Gazebo/Black</material>
+    <sensor name="laser" type="gpu_lidar">
+      <pose> 0 0 0 0 0 0 </pose>
       <visualize>true</visualize>
       <update_rate>10</update_rate>
-      <ray>
+      <lidar>
         <scan>
           <horizontal>
             <samples>360</samples>
-            <resolution>1</resolution>
-            <min_angle>0</min_angle>
-            <max_angle>6.28319</max_angle>
+            <min_angle>-3.14</min_angle>
+            <max_angle>3.14</max_angle>
           </horizontal>
         </scan>
         <range>
-          <min>0.1</min>
-          <max>10</max>
-          <resolution>0.01</resolution>
+          <min>0.3</min>
+          <max>12</max>
         </range>
-      </ray>
-      <plugin name="lidar_plugin" filename="libgazebo_ros_ray_sensor.so">
-        <ros>
-          <namespace>/</namespace>
-          <remapping>~/out:=scan</remapping>
-        </ros>
-        <output_type>sensor_msgs/LaserScan</output_type>
-        <frame_name>lidar</frame_name>
-      </plugin>
+      </lidar>
+        <topic>scan</topic>
+        <gz_frame_id>laser_frame</gz_frame_id>
     </sensor>
   </gazebo>
 
   <!-- Gazebo Camera Plugin -->
   <gazebo reference="camera">
-    <sensor type="camera" name="camera_sensor">
-      <pose>0 0 0 0 0 0</pose>
+    <material>Gazebo/Black</material>
+    <sensor name="camera" type="camera">
+      <pose> 0 0 0 0 0 0 </pose>
       <visualize>true</visualize>
-      <update_rate>30</update_rate>
+      <update_rate>10</update_rate>
       <camera>
-        <horizontal_fov>1.0472</horizontal_fov>
+        <camera_info_topic>camera/camera_info</camera_info_topic>
+        <horizontal_fov>1.089</horizontal_fov>
         <image>
+          <format>R8G8B8</format>
           <width>640</width>
           <height>480</height>
         </image>
         <clip>
-          <near>0.1</near>
-          <far>100</far>
+          <near>0.05</near>
+          <far>8.0</far>
         </clip>
       </camera>
-      <plugin name="camera_plugin" filename="libgazebo_ros_camera.so">
-        <ros>
-          <namespace>/</namespace>
-          <remapping>~/image_raw:=camera/image_raw</remapping>
-        </ros>
-        <camera_name>camera</camera_name>
-        <frame_name>camera_optical</frame_name> <!-- Use camera_optical frame -->
-      </plugin>
+      <topic>camera/image_raw</topic>
+      <gz_frame_id>camera_link_optical</gz_frame_id>
     </sensor>
   </gazebo>
 </robot>
