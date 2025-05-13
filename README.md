@@ -9,7 +9,7 @@
 - **2-Wheeled** Robot with a **Caster Wheel**:
     + **Differential-Drive** Controller
 - **3-Wheeled** Robot (**Tricycle**):
-    + **Tricycle Controller**
+    + **Tricycle** Controller
     + **Tricycle-Steering** Controller
 - **4-Wheeled** Robot:
     + **Differential-Drive** Controller (Skid-Steering)
