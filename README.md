@@ -89,6 +89,8 @@ For the next step, you'll need to install the **dependencies**:
 sudo apt update
 rosdep install --from-paths src --ignore-src -r -y
 sudo apt install python3-pyqt5 python3-pyqt5.qtopengl
+pip install PyOpenGL PyOpenGL_accelerate
+pip install ruamel.yaml
 ```
 
 After that, you should **build** the workspace and **source** the installation:
