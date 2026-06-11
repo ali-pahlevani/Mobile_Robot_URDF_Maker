@@ -7,11 +7,36 @@ from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 import os
 
+def read_selected_controller(description_share):
+    """Read the controller spawner name chosen in the wizard.
+
+    Falls back to a sensible default if the file is missing (e.g. on a fresh
+    clone before the wizard has been run).
+    """
+    controller_file = os.path.join(description_share, 'urdf', 'selected_controller.txt')
+    try:
+        with open(controller_file, 'r') as f:
+            name = f.read().strip()
+            if name:
+                return name
+    except OSError:
+        pass
+    return 'diffDrive_controller'
+
+
 def generate_launch_description():
-    
-    urdf_path = get_package_share_directory('mobRobURDF_description') + '/urdf/mobRob.urdf.xacro'
-    
+
+    description_share = get_package_share_directory('mobRobURDF_description')
+
+    urdf_path = os.path.join(
+        description_share,
+        'urdf',
+        'mobRob.urdf.xacro'
+    )
+
     processed_urdf = xacro.process_file(urdf_path).toxml()
+
+    controller_name = read_selected_controller(description_share)
 
     rviz_config_path = PathJoinSubstitution([ 
         get_package_share_directory('mobRobURDF_launch'),
@@ -33,10 +58,22 @@ def generate_launch_description():
         description='World to load'
     )
 
+    #gazebo = IncludeLaunchDescription(
+    #    PythonLaunchDescriptionSource([os.path.join(
+    #        get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')]),
+    #        launch_arguments={'gz_args': ['-r -v4 ', world], 'on_exit_shutdown': 'true'}.items()
+    #)
+
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')]),
-            launch_arguments={'gz_args': ['-r -v4 ', world], 'on_exit_shutdown': 'true'}.items()
+        launch_arguments={
+            'gz_args': ['-r -v4 ', world],
+            'on_exit_shutdown': 'true',
+            'extra_gz_args': '--ros-args --params-file ' + os.path.join(
+                get_package_share_directory('mobRobURDF_gazebo'), 'config', 'use_sim_time.yaml'
+            )
+        }.items()
     )
 
     node_robot_state_publisher = Node(
@@ -54,19 +91,22 @@ def generate_launch_description():
         package='ros_gz_sim', 
         executable='create',
         arguments=['-topic', 'robot_description', '-name', 'mobRobURDF', '-z', '0.5'],
-        output='screen'
+        output='screen',
+        parameters=[{'use_sim_time': True}]
     )
 
     controllers = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["diffDrive_controller"],
+        arguments=[controller_name],
+        parameters=[{'use_sim_time': True}]
     )
     
     joint_state_broadcaster = Node(
         package="controller_manager",
         executable="spawner",
         arguments=["joint_state_broadcaster"],
+        parameters=[{'use_sim_time': True}]
     )
 
     bridge_params = os.path.join(get_package_share_directory('mobRobURDF_gazebo'),'config','gz_bridge.yaml')
@@ -78,13 +118,15 @@ def generate_launch_description():
             '--ros-args',
             '-p',
             f'config_file:={bridge_params}',
-        ]
+        ],
+        parameters=[{'use_sim_time': True}]
     )
 
     ros_gz_image_bridge = Node(
         package="ros_gz_image",
         executable="image_bridge",
-        arguments=["/camera/image_raw"]
+        arguments=["/camera/image_raw"],
+        parameters=[{'use_sim_time': True}]
     )
 
     rviz = Node(
@@ -92,7 +134,8 @@ def generate_launch_description():
         executable='rviz2',
         name='rviz2',
         output='screen',
-        arguments=['-d', rviz_config_path]
+        arguments=['-d', rviz_config_path],
+        parameters=[{'use_sim_time': True}]
     )
 
     return LaunchDescription([

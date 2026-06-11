@@ -2,19 +2,21 @@ import subprocess
 from string import Template
 import logging
 
+logger = logging.getLogger(__name__)
+
 def render_template(template_path, params):
     """Render a template file with given parameters."""
     try:
         with open(template_path, 'r') as f:
             tmpl = Template(f.read())
         rendered = tmpl.safe_substitute(params)
-        #logging.debug(f"Rendered template: {template_path}")
+        logger.debug("Rendered template: %s", template_path)
         return rendered
     except FileNotFoundError:
-        #logging.error(f"Template file not found: {template_path}")
+        logger.error("Template file not found: %s", template_path)
         return f"Error: Template file not found: {template_path}"
     except Exception as e:
-        #logging.error(f"Error rendering template {template_path}: {str(e)}")
+        logger.error("Error rendering template %s: %s", template_path, str(e))
         return f"Error rendering template: {str(e)}"
 
 def generate_urdf(xacro_file):
@@ -25,19 +27,19 @@ def generate_urdf(xacro_file):
                                 stderr=subprocess.PIPE,
                                 check=True,
                                 text=True)
-        logging.debug(f"Generated URDF from: {xacro_file}")
+        logger.debug("Generated URDF from: %s", xacro_file)
         return result.stdout
     except subprocess.CalledProcessError as e:
         error_msg = f"Error generating URDF from {xacro_file}:\n{e.stderr}"
-        #logging.error(error_msg)
+        logger.error(error_msg)
         return error_msg
     except FileNotFoundError:
         error_msg = "Error: 'xacro' command not found. Ensure xacro is installed."
-        #logging.error(error_msg)
+        logger.error(error_msg)
         return error_msg
     except Exception as e:
         error_msg = f"Unexpected error generating URDF from {xacro_file}: {str(e)}"
-        #logging.error(error_msg)
+        logger.error(error_msg)
         return error_msg
 
 def get_color(color_name):
@@ -51,5 +53,5 @@ def get_color(color_name):
         "White": (1.0, 1.0, 1.0),
     }
     color = colors.get(color_name.capitalize(), (0.5, 0.5, 0.5))
-    #logging.debug(f"Color mapped: {color_name} -> {color}")
+    logger.debug("Color mapped: %s -> %s", color_name, color)
     return color

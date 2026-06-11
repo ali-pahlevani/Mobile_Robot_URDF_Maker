@@ -5,9 +5,7 @@ import logging
 from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QWidget, QApplication, QWizard, QListWidget)
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
-from OpenGL.GL import *
-from OpenGL.GLUT import *
-from OpenGL.GLU import *
+from OpenGL.GLUT import glutInit
 
 # Custom page classes
 try:
@@ -25,13 +23,16 @@ class RobotWizard(QWizard):
     def __init__(self):
         super().__init__()
         self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint)
-        self.setWindowTitle("Mobile Robot URDF Maker Wizard (v3)")
-        self.setFixedSize(1800, 900)
+        self.setWindowTitle("Mobile Robot URDF Maker Wizard (v4)")
+        # Resizable so the wizard works on smaller screens; the maximize button
+        # in the window flags is now meaningful.
+        self.setMinimumSize(1280, 720)
+        self.resize(1800, 900)
 
         try:
             self.urdf_manager = URDFManager()
         except Exception as e:
-            #logging.error(f"Failed to initialize URDFManager: {e}")
+            logging.error(f"Failed to initialize URDFManager: {e}")
             raise
 
         self.nav_list = QListWidget()
@@ -71,7 +72,7 @@ class RobotWizard(QWizard):
             self.addPage(ConfigurationPage(self.urdf_manager))
             self.addPage(FutureFeaturesPage())
         except Exception as e:
-            #logging.error(f"Failed to add pages: {e}")
+            logging.error(f"Failed to add pages: {e}")
             raise
 
         main_widget = QWidget()
@@ -98,18 +99,26 @@ class RobotWizard(QWizard):
         target_index = page_names.index(item.text())
         current_index = self.pageIds().index(self.currentId())
 
+        # Going forward runs page validation; if a mandatory field is missing the
+        # page won't advance. Detect a stalled step and stop instead of looping
+        # forever. The nav list is resynced to the page we actually reached.
         while current_index < target_index:
             self.next()
-            current_index += 1
+            reached = self.pageIds().index(self.currentId())
+            if reached == current_index:
+                logging.debug("Navigation blocked at page index %d (incomplete page)", current_index)
+                break
+            current_index = reached
         while current_index > target_index:
             self.back()
-            current_index -= 1
+            current_index = self.pageIds().index(self.currentId())
 
+        self.update_navigation(self.currentId())
         #logging.debug(f"Navigated to page: {item.text()} (Index: {target_index})")
 
 def main():
     glutInit(sys.argv)
-    #logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     app = QApplication(sys.argv)
     wizard = RobotWizard()
     wizard.show()

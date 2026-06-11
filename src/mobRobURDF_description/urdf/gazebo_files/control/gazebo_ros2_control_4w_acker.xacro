@@ -42,16 +42,14 @@
             <state_interface name="position"/>
         </joint>
 
-        <!-- - - - Not-motorized - - - -->
+        <!-- - - - Not-motorized (passive joints: state interfaces only) - - - -->
 
         <joint name="front_left_joint">
-            <command_interface name="velocity"></command_interface>
             <state_interface name="velocity"/>
             <state_interface name="position"/>
         </joint>
 
         <joint name="front_right_joint">
-            <command_interface name="velocity"></command_interface>
             <state_interface name="velocity"/>
             <state_interface name="position"/>
         </joint>

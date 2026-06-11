@@ -2,25 +2,28 @@ from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QLabel, QLineEdit, QPushB
                              QTextEdit, QFileDialog, QWidget, QHBoxLayout)
 from ament_index_python.packages import get_package_share_directory
 from PyQt5.QtCore import pyqtSignal
-from OpenGL.GL import *
-from OpenGL.GLUT import *
-from OpenGL.GLU import *
 from mobRobURDF_wizard.classes.OpenGLWidget import OpenGLWidget
 from mobRobURDF_wizard.utils.utils import get_color
 import logging
 import os
 
 class ConfigurationPage(QWizardPage):
-    modelUpdated = pyqtSignal(float, float, float, str, str, str, str, str, tuple, tuple, tuple, tuple, str, str)
+    # NOTE: the last argument (caster_radius) is `object` rather than `str`
+    # because it is None for every non-2WC robot type.
+    modelUpdated = pyqtSignal(float, float, float, str, str, str, str, str, tuple, tuple, tuple, tuple, str, object)
 
     def __init__(self, urdf_manager, parent=None):
         super().__init__(parent)
         self.urdf_manager = urdf_manager
         self.robot_type = None
         self.controller_type = None
-        
-        # Set default save path to source directory
-        self.default_save_path = os.path.join(os.path.expanduser("~"), "Mobile_Robot_URDF_Maker", "src", "mobRobURDF_description", "urdf", "mobRob")
+
+        # Default save location: the description package's urdf directory, so the
+        # launch files can pick it up. Resolved dynamically (works for any clone
+        # location, unlike a hardcoded home path).
+        self.default_save_path = os.path.join(
+            get_package_share_directory("mobRobURDF_description"), "urdf", "mobRob"
+        )
 
         main_layout = QHBoxLayout()
 
@@ -126,7 +129,7 @@ class ConfigurationPage(QWizardPage):
         self.param_layout.addWidget(self.chassisMassLineEdit)
 
         self.chassisMaterialLineEdit = QLineEdit(placeholderText="e.g., Gray", styleSheet="font-size: 10.5pt;")
-        self.chassisMassLineEdit.setFixedWidth(200)
+        self.chassisMaterialLineEdit.setFixedWidth(200)
         self.param_layout.addWidget(QLabel("Chassis Material:", styleSheet="font-size: 11pt; font-weight: bold;"))
         self.param_layout.addWidget(self.chassisMaterialLineEdit)
 

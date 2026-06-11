@@ -24,22 +24,19 @@
             <state_interface name="position"/>
         </joint>
 
-        <!-- - - - Not-motorized - - - -->
+        <!-- - - - Not-motorized (passive joints: state interfaces only) - - - -->
 
         <joint name="front_caster_joint">
-            <command_interface name="velocity"></command_interface>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
         </joint>
 
         <joint name="free-rotating_x_joint">
-            <command_interface name="velocity"></command_interface>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
         </joint>
 
         <joint name="free-rotating_y_joint">
-            <command_interface name="velocity"></command_interface>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
         </joint>

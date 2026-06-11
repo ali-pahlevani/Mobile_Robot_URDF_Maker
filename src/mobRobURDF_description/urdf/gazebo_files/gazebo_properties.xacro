@@ -64,8 +64,8 @@
       <xacro:drive_wheel_properties wheel_link="left_wheel" wheel_joint="left_joint"/>
       <xacro:drive_wheel_properties wheel_link="right_wheel" wheel_joint="right_joint"/>
 
-      <!-- Caster -->
-      <gazebo reference="front_caster">
+      <!-- Caster (link name is "<caster_name>_wheel", i.e. front_caster_wheel) -->
+      <gazebo reference="front_caster_wheel">
         <collision>
           <surface>
             <friction>
@@ -206,8 +206,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>0.8</mu>
-                  <mu2>0.8</mu2>
+                  <mu>1.0</mu>
+                  <mu2>1.0</mu2>
                 </ode>
               </friction>
               <contact>
@@ -271,8 +271,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>0.8</mu>
-                  <mu2>0.8</mu2>
+                  <mu>1.0</mu>
+                  <mu2>1.0</mu2>
                 </ode>
               </friction>
               <contact>
@@ -344,8 +344,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>0.8</mu>
-                  <mu2>0.8</mu2>
+                  <mu>1.0</mu>
+                  <mu2>1.0</mu2>
                 </ode>
               </friction>
               <contact>
