@@ -1,92 +1,47 @@
 import os
 import logging
-from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QHBoxLayout, QLabel, QWidget)
+from PyQt5.QtWidgets import QWizardPage, QVBoxLayout, QHBoxLayout, QLabel
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
 from ament_index_python.packages import get_package_share_directory
 
-# Future Features Page
+from mobRobURDF_wizard.classes.cards import FeatureCard
+
+logger = logging.getLogger(__name__)
+
+
 class FutureFeaturesPage(QWizardPage):
+    # (title, image_basename, badge)
+    _FEATURES = [
+        ("SLAM", "slam.png", "In Progress"),
+        ("Navigation", "navigation.png", "Planned"),
+        ("Object Tracking", "object_tracking.png", "Planned"),
+    ]
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setTitle("Future Features")
 
-        self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images", "future_features")
-        #logging.debug(f"Image directory set to: {self.image_dir}")
+        image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images", "future_features")
 
-        features = [
-            #("Gazebo", os.path.join(self.image_dir, "gazebo.png")),
-            #("Control", os.path.join(self.image_dir, "control.png")),
-            ("SLAM", os.path.join(self.image_dir, "slam.png")),
-            ("Navigation", os.path.join(self.image_dir, "navigation.png")),
-            ("Obj. Tracking", os.path.join(self.image_dir, "object_tracking.png")),
-        ]
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(30, 20, 30, 20)
+        layout.setSpacing(20)
 
-        # Main layout: Vertical stack of feature rows
-        main_layout = QVBoxLayout()
-        main_layout.setSpacing(140)  # Space between rows (prev: 40)
+        header = QLabel("What's next for the URDF Maker")
+        header.setAlignment(Qt.AlignCenter)
+        header.setStyleSheet("font-size: 16pt; font-weight: bold; color: #2C3E50;")
+        layout.addWidget(header)
 
-        for feature_name, image_path in features:
-            # Feature name label (centered text)
-            feature_label = QLabel(feature_name)
-            feature_label.setStyleSheet("""
-                font-size: 36pt;
-                font-weight: bold;
-                font-family: "Segoe UI";
-                color: #8B0000;
-                padding: 10px;
-                background-color: #FFFFFF;
-                border: 1px solid #E0E0E0;
-                border-radius: 5px;
-            """)
-            feature_label.setFixedWidth(500) #(prev: 240)
-            feature_label.setAlignment(Qt.AlignCenter)  # Center text horizontally and vertically
+        sub = QLabel("These capabilities are currently under development.")
+        sub.setAlignment(Qt.AlignCenter)
+        sub.setStyleSheet("font-size: 11pt; color: #7F8C8D;")
+        layout.addWidget(sub)
 
-            # Image label
-            image_label = QLabel()
-            pixmap = QPixmap(image_path)
-            if not pixmap.isNull():
-                image_label.setPixmap(pixmap.scaled(900, 150)) # Qt.KeepAspectRatio
-                #logging.debug(f"Loaded image for {feature_name}: {image_path}")
-            else:
-                image_label.setText(f"{feature_name} Image Not Found")
-                #logging.warning(f"Failed to load image for {feature_name}: {image_path}")
-            image_label.setStyleSheet("""
-                border: 2px solid #4A90E2;
-                border-radius: 10px;
-                background-color: #F5F5F5;
-                padding: 5px;
-            """)
+        cards_row = QHBoxLayout()
+        cards_row.setSpacing(20)
+        for title, image_name, badge in self._FEATURES:
+            cards_row.addWidget(FeatureCard(os.path.join(image_dir, image_name), title, badge=badge))
 
-            # Row layout: Name at start, image centered exactly
-            feature_row = QHBoxLayout()
-            feature_row.addWidget(feature_label)  # Name at the start (left)
-            feature_row.addStretch(2)  # Stretch to push image toward center
-            feature_row.addWidget(image_label, alignment=Qt.AlignCenter)  # Image centered
-            feature_row.addStretch(2)  # Stretch to balance centering
-            feature_row.setSpacing(15)  # Space between name and image
-
-            # Wrap row in a widget for styling
-            row_widget = QWidget()
-            row_widget.setLayout(feature_row)
-            row_widget.setStyleSheet("""
-                background-color: #FFFFFF;
-                border: 1px solid #E0E0E0;
-                border-radius: 8px;
-                padding: 10px;
-            """)
-            # Hover effect
-            row_widget.setProperty("class", "feature-row")
-            row_widget.setStyleSheet(row_widget.styleSheet() + """
-                .feature-row:hover {
-                    background-color: #F0F4F8;
-                    border: 1px solid #4A90E2;
-                }
-            """)
-
-            main_layout.addWidget(row_widget)
-
-        main_layout.addStretch()  # Center the rows vertically
-        self.setLayout(main_layout)
-        self.setStyleSheet("background-color: #F0F4F8;")  # Light blue-gray page background
-        #logging.debug("FutureFeaturesPage initialized")
+        layout.addStretch(1)
+        layout.addLayout(cards_row)
+        layout.addStretch(1)

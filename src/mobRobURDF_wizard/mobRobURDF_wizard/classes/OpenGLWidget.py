@@ -28,7 +28,8 @@ class OpenGLWidget(QGLWidget):
 
     def initializeGL(self):
         glEnable(GL_DEPTH_TEST)
-        glClearColor(0.7, 0.7, 0.7, 1.0)
+        # Match the light page background (#F4F6F9) for visual consistency.
+        glClearColor(0.957, 0.965, 0.976, 1.0)
         #logging.debug("OpenGL initialized")
 
     def resizeGL(self, w, h):
