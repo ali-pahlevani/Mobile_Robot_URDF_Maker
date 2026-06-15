@@ -20,7 +20,7 @@
   <xacro:property name="rr_x" value="-0.4533333333333333"/>
   <xacro:property name="rr_y" value="-0.46"/>
   <xacro:property name="rr_z" value="-0.15"/>
-  <xacro:property name="controller_type" value="diff_4w"/>
-  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/4_wheeled/mobRob_4w_diff.xacro"/>
+  <xacro:property name="controller_type" value="mecanum"/>
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/4_wheeled/mobRob_4w_mec.xacro"/>
   <xacro:include filename="$(find mobRobURDF_description)/urdf/user_sensors.xacro"/>
 </robot>

@@ -64,23 +64,23 @@ def _make_item(image_path: str, title_text: str, badge_text: str, badge_color: s
 
     title_lbl = QLabel(title_text)
     title_lbl.setWordWrap(True)
-    title_lbl.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+    title_lbl.setAlignment(Qt.AlignCenter)
     title_lbl.setStyleSheet(
-        "font-size: 14pt; font-weight: bold; color: #2C3E50; "
+        "font-size: 17pt; font-weight: bold; color: #2C3E50; "
         "background: transparent; border: none;"
     )
     text_col.addWidget(title_lbl)
 
     badge_lbl = QLabel(badge_text)
-    badge_lbl.setFixedHeight(28)
+    badge_lbl.setFixedHeight(34)
     badge_lbl.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
     badge_lbl.setAlignment(Qt.AlignCenter)
     badge_lbl.setStyleSheet(
-        f"font-size: 9pt; font-weight: bold; color: #FFFFFF; "
+        f"font-size: 11pt; font-weight: bold; color: #FFFFFF; "
         f"background-color: {badge_color}; "
-        f"border-radius: 5px; padding: 0px 16px; border: none;"
+        f"border-radius: 6px; padding: 0px 20px; border: none;"
     )
-    text_col.addWidget(badge_lbl, alignment=Qt.AlignLeft)
+    text_col.addWidget(badge_lbl, alignment=Qt.AlignHCenter)
 
     text_col.addStretch()
     row.addLayout(text_col, 7)   # text gets 7 parts → image ≈ 65 %, text ≈ 35 %
