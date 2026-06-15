@@ -28,7 +28,7 @@ mecDrive_controller:
     kinematics:
       base_frame_offset: {x: 0.0, y: 0.0, theta: 0.0}
       wheels_radius: 0.22
-      sum_of_robot_center_projection_on_X_Y_axis: 2.0
+      sum_of_robot_center_projection_on_X_Y_axis: 0.9133333333333333
 
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
     pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]

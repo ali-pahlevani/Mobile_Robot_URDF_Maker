@@ -33,10 +33,9 @@
             <state_interface name="position"/>
         </joint>
 
-        <!-- - - - Not-motorized - - - -->
+        <!-- Passive front wheel: state interfaces only — no command so gz rolls it freely -->
 
         <joint name="front_joint">
-            <command_interface name="velocity"></command_interface>
             <state_interface name="velocity"/>
             <state_interface name="position"/>
         </joint>

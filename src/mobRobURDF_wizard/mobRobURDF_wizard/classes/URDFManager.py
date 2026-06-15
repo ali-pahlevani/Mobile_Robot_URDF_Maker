@@ -255,8 +255,12 @@ class URDFManager:
                 config["diffDrive_controller"]["ros__parameters"]["wheel_separation"] = W + wheel_width
                 config["diffDrive_controller"]["ros__parameters"]["wheel_radius"] = wheel_radius
             elif controller_type == "mecanum":
+                # sum_of_robot_center_projection_on_X_Y_axis = |wheel_x| + |wheel_y|
+                # Wheels are at (L/2 - r/1.5) in X and (W/2 + w/2) in Y from robot center.
+                wheel_x = L / 2 - wheel_radius / 1.5
+                wheel_y = W / 2 + wheel_width / 2
                 config["mecDrive_controller"]["ros__parameters"]["kinematics"]["wheels_radius"] = wheel_radius
-                config["mecDrive_controller"]["ros__parameters"]["kinematics"]["sum_of_robot_center_projection_on_X_Y_axis"] = L + W
+                config["mecDrive_controller"]["ros__parameters"]["kinematics"]["sum_of_robot_center_projection_on_X_Y_axis"] = wheel_x + wheel_y
             elif controller_type == "tricycle":
                 config["tricycle_controller"]["ros__parameters"]["wheel_radius"] = wheel_radius
                 config["tricycle_controller"]["ros__parameters"]["wheelbase"] = L
