@@ -15,6 +15,7 @@ try:
     from mobRobURDF_wizard.classes.pages.ConfigurationPage import ConfigurationPage
     from mobRobURDF_wizard.classes.pages.ControllerTunerPage import ControllerTunerPage
     from mobRobURDF_wizard.classes.pages.FinalCheckPage import FinalCheckPage
+    from mobRobURDF_wizard.classes.pages.TeleoperationPage import TeleoperationPage
     from mobRobURDF_wizard.classes.pages.FutureFeaturesPage import FutureFeaturesPage
     from mobRobURDF_wizard.classes.URDFManager import URDFManager
     from mobRobURDF_wizard.utils.style import (
@@ -25,7 +26,8 @@ except ImportError as e:
     sys.exit(1)
 
 _NAV_LABELS = ["Welcome", "Select Robot Type", "Select Controller",
-               "Configure Parameters", "Tune Controller", "Final Check", "Future Features"]
+               "Configure Parameters", "Tune Controller", "Final Check",
+               "Teleoperation", "Future Features"]
 
 
 class RobotWizard(QWizard):
@@ -89,6 +91,8 @@ class RobotWizard(QWizard):
             self.addPage(self.tuner_page)
             self.final_check_page = FinalCheckPage(self.urdf_manager)
             self.addPage(self.final_check_page)
+            self.teleop_page = TeleoperationPage(self.urdf_manager)
+            self.addPage(self.teleop_page)
             self.addPage(FutureFeaturesPage())
         except Exception as e:
             logging.error(f"Failed to add pages: {e}")
@@ -119,6 +123,9 @@ class RobotWizard(QWizard):
         page = getattr(self, "config_page", None)
         if page is not None and getattr(page, "launch_manager", None) is not None:
             page.launch_manager.shutdown()
+        teleop = getattr(self, "teleop_page", None)
+        if teleop is not None:
+            teleop._disconnect()
         event.accept()
 
     # ── Wizard button styling ──────────────────────────────────────────────
