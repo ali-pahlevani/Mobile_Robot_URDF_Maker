@@ -10,6 +10,7 @@ The page writes its parameters into URDFManager.last_tuner_params so that
 subsequent Apply clicks on the ConfigurationPage always re-apply them.
 """
 
+import os
 import logging
 import math
 from PyQt5.QtWidgets import (
@@ -17,9 +18,11 @@ from PyQt5.QtWidgets import (
     QLabel, QLineEdit, QCheckBox, QScrollArea, QWidget, QSizePolicy,
     QMessageBox,
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QPixmap
+from ament_index_python.packages import get_package_share_directory
 
-from mobRobURDF_wizard.classes.responsive_widgets import WrapButton, ButtonRow
+from mobRobURDF_wizard.classes.responsive_widgets import WrapButton, ButtonRow, ScaledPixmapLabel
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +38,16 @@ _CTRL_DISPLAY = {
 
 # Which controller types have steering limits
 _HAS_STEERING = {'tricycle', 'triSteer', 'ackermann'}
+
+# controller_type → image filename in images/control_types/
+_CTRL_IMAGE = {
+    'diff_4w':   'diff_4w.png',
+    'diff_2wc':  'diff_2wc.png',
+    'mecanum':   'mecanum.png',
+    'tricycle':  'tricycle.png',
+    'triSteer':  'triSteer.png',
+    'ackermann': 'ackermann.png',
+}
 
 # Typical max motor angular velocity (rad/s) used for auto-suggest
 _MOTOR_MAX_RAD_S = 12.0
@@ -117,7 +130,17 @@ class ControllerTunerPage(QWizardPage):
         info_lbl.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         info_lbl.setStyleSheet("font-size: 10.5pt; color: #2C3E50; line-height: 160%;")
         iv.addWidget(info_lbl)
-        iv.addStretch(1)
+
+        iv.addSpacing(12)
+
+        # ── Controller kinematics image ───────────────────────────────────
+        self._ctrl_img_dir = os.path.join(
+            get_package_share_directory("mobRobURDF_wizard"),
+            "images", "control_types",
+        )
+        self._ctrl_img = ScaledPixmapLabel(hint=QSize(340, 220))
+        self._ctrl_img.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        iv.addWidget(self._ctrl_img, 1)
 
         outer.addWidget(info_widget, 1)
 
@@ -168,6 +191,17 @@ class ControllerTunerPage(QWizardPage):
         self.setTitle(f"Tune Controller Parameters — {display}")
         self._build_form(ct)
         self._load_existing_tuner_params()
+        self._update_ctrl_image(ct)
+
+    def _update_ctrl_image(self, controller_type: str):
+        img_file = _CTRL_IMAGE.get(controller_type, '')
+        if img_file:
+            path = os.path.join(self._ctrl_img_dir, img_file)
+            if os.path.exists(path):
+                self._ctrl_img.setSourcePixmap(QPixmap(path))
+                return
+        self._ctrl_img.setText("No image available")
+        self._ctrl_img.setStyleSheet("color: #95A5A6; border: none; background: transparent;")
 
     def _build_form(self, controller_type):
         self._clear_form()
