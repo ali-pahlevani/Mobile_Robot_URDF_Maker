@@ -119,13 +119,9 @@ class RobotWizard(QWizard):
         self._apply_responsive_layout()
 
     def closeEvent(self, event):
-        # Tear down any running simulation so we don't orphan Gazebo/RViz.
-        page = getattr(self, "config_page", None)
-        if page is not None and getattr(page, "launch_manager", None) is not None:
-            page.launch_manager.shutdown()
         teleop = getattr(self, "teleop_page", None)
         if teleop is not None:
-            teleop._disconnect()
+            teleop.shutdown()
         event.accept()
 
     # ── Wizard button styling ──────────────────────────────────────────────

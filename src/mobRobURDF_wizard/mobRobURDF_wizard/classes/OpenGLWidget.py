@@ -109,6 +109,9 @@ class OpenGLWidget(QGLWidget):
             glRotatef(math.degrees(s.pitch), 0, 1, 0)
             glRotatef(math.degrees(s.roll),  1, 0, 0)
             if s.sensor_type == 'lidar':
+                # glutSolidCylinder draws from z=0 to z=length (not centered).
+                # Translate -length/2 so the cylinder center matches the URDF joint origin.
+                glTranslatef(0, 0, -s.length / 2)
                 glutSolidCylinder(s.radius, s.length, 20, 20)
             else:
                 glScalef(s.cam_depth, s.cam_width, s.cam_height)

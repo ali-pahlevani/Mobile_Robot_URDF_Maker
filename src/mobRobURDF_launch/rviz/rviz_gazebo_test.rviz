@@ -5,9 +5,8 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /TF1
-      Splitter Ratio: 0.5
-    Tree Height: 628
+      Splitter Ratio: 0.6438746452331543
+    Tree Height: 524
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -71,12 +70,12 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera:
+        camera_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        camera_optical:
+        camera_1_optical:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -85,25 +84,17 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        front_left_steering_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         front_left_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        front_right_steering_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         front_right_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        lidar:
+        lidar_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -133,44 +124,38 @@ Visualization Manager:
         All Enabled: false
         base_link:
           Value: true
-        camera:
-          Value: false
-        camera_optical:
+        camera_1:
+          Value: true
+        camera_1_optical:
           Value: false
         chassis:
           Value: false
-        front_left_steering_link:
-          Value: true
         front_left_wheel:
           Value: false
-        front_right_steering_link:
-          Value: true
         front_right_wheel:
           Value: false
-        lidar:
-          Value: false
+        lidar_1:
+          Value: true
         rear_left_wheel:
           Value: false
         rear_right_wheel:
           Value: false
-      Marker Scale: 8
+      Marker Scale: 1.2000000476837158
       Name: TF
       Show Arrows: true
       Show Axes: true
-      Show Names: false
+      Show Names: true
       Tree:
         base_link:
           chassis:
-            camera:
-              camera_optical:
+            camera_1:
+              camera_1_optical:
                 {}
-            front_left_steering_link:
-              front_left_wheel:
-                {}
-            front_right_steering_link:
-              front_right_wheel:
-                {}
-            lidar:
+            front_left_wheel:
+              {}
+            front_right_wheel:
+              {}
+            lidar_1:
               {}
             rear_left_wheel:
               {}
@@ -190,7 +175,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /camera/image_raw
+        Value: /camera_1/image_raw
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -214,7 +199,7 @@ Visualization Manager:
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.20000000298023224
+      Size (m): 0.10000000149011612
       Style: Flat Squares
       Topic:
         Depth: 5
@@ -222,58 +207,9 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /scan
+        Value: /lidar_1/scan
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
-    - Alpha: 0.699999988079071
-      Class: rviz_default_plugins/Map
-      Color Scheme: costmap
-      Draw Behind: false
-      Enabled: true
-      Name: Map
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        Filter size: 10
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /global_costmap/costmap
-      Update Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /global_costmap/costmap_updates
-      Use Timestamp: false
-      Value: true
-    - Alpha: 1
-      Buffer Length: 1
-      Class: rviz_default_plugins/Path
-      Color: 25; 255; 0
-      Enabled: true
-      Head Diameter: 0.30000001192092896
-      Head Length: 0.20000000298023224
-      Length: 0.30000001192092896
-      Line Style: Lines
-      Line Width: 0.029999999329447746
-      Name: Path
-      Offset:
-        X: 0
-        Y: 0
-        Z: 0
-      Pose Color: 255; 85; 255
-      Pose Style: None
-      Radius: 0.029999999329447746
-      Shaft Diameter: 0.10000000149011612
-      Shaft Length: 0.10000000149011612
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        Filter size: 10
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /received_global_plan
       Value: true
   Enabled: true
   Global Options:
@@ -321,35 +257,35 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 4.326653003692627
+      Distance: 8.895732879638672
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.5229868292808533
-        Y: 0.12722812592983246
-        Z: -0.28325775265693665
+        X: -0.1821141541004181
+        Y: -0.3743036091327667
+        Z: -0.26159989833831787
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: -0.7647970914840698
+      Pitch: 0.48020249605178833
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz_default_plugins)
-      Yaw: 0.7142097353935242
+      Yaw: 2.159214735031128
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1016
+  Height: 1009
   Hide Left Dock: false
-  Hide Right Dock: false
+  Hide Right Dock: true
   Image:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001560000039efc020000000afb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000002b1000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d00610067006501000002f4000000e70000002800fffffffb000000220053006c0061006d0054006f006f006c0062006f00780050006c007500670069006e0000000217000001850000018500ffffff000000010000010f0000039efc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d0000039e000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000049e00000039fc0100000002fb0000000800540069006d006500000000000000049e000002fb00fffffffb0000000800540069006d00650100000000000004500000000000000000000004c90000039e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000016100000389fc020000000afb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006e00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000004700000253000000f100fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d00610067006501000002a10000012f0000002f00fffffffb000000220053006c0061006d0054006f006f006c0062006f00780050006c007500670069006e000000021700000185000001cf00ffffff000000010000010f00000389fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000004700000389000000c200fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000049e00000039fc0100000002fb0000000800540069006d006500000000000000049e0000038100fffffffb0000000800540069006d00650100000000000004500000000000000000000005d20000038900000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   SlamToolboxPlugin:
@@ -359,7 +295,7 @@ Window Geometry:
   Tool Properties:
     collapsed: false
   Views:
-    collapsed: false
+    collapsed: true
   Width: 1850
   X: 70
-  Y: 27
+  Y: 34

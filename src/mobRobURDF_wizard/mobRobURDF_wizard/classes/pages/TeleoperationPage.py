@@ -6,15 +6,17 @@ geometry_msgs/Twist to /cmd_vel at 10 Hz via an rclpy node running in a
 background daemon thread.
 """
 
+import time
 import threading
 import logging
 from PyQt5.QtWidgets import (
     QWizardPage, QVBoxLayout, QHBoxLayout, QGridLayout,
     QLabel, QPushButton, QSlider, QGroupBox, QWidget, QSizePolicy,
-    QLineEdit,
+    QLineEdit, QMessageBox,
 )
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont
+from mobRobURDF_wizard.classes.launch_manager import LaunchManager
 
 logger = logging.getLogger(__name__)
 
@@ -70,11 +72,12 @@ class TeleoperationPage(QWizardPage):
         self._spinning    = False
         self._held_keys   = set()
         self._btn_dirs    = set()   # active directions from D-pad buttons
+        self._launch_start_time = 0.0
 
         self.setTitle("Teleoperation")
         self.setSubTitle(
-            "Drive the robot in real time using the D-pad or keyboard (WASD / arrow keys). "
-            "Launch the simulation first, then click Connect."
+            "Launch the simulation, then connect and drive the robot with the D-pad "
+            "or keyboard (WASD / arrow keys)."
         )
         self.setFocusPolicy(Qt.StrongFocus)
 
@@ -82,6 +85,12 @@ class TeleoperationPage(QWizardPage):
         self._timer = QTimer(self)
         self._timer.setInterval(100)
         self._timer.timeout.connect(self._tick)
+
+        # Simulation launch manager
+        self._launch_manager = LaunchManager(self)
+        self._launch_manager.started.connect(self._on_sim_started)
+        self._launch_manager.stopped.connect(self._on_sim_stopped)
+        self._launch_manager.output.connect(lambda line: logger.info("[sim] %s", line))
 
         self._build_ui()
 
@@ -94,14 +103,27 @@ class TeleoperationPage(QWizardPage):
         root.addWidget(self._build_left_panel(), 1)
         root.addWidget(self._build_right_panel(), 1)
 
-    # ── Left panel: status + D-pad + velocity readout ──────────────────────
+    # ── Left panel: simulation launch + D-pad + velocity readout ─────────────
 
     def _build_left_panel(self):
         box = QGroupBox("Controls")
         vbox = QVBoxLayout(box)
         vbox.setSpacing(14)
 
-        # Status row
+        # ── Simulation launch row ──────────────────────────────────────────
+        self._launch_btn = QPushButton("Launch Simulation")
+        self._launch_btn.setMinimumHeight(42)
+        self._launch_btn.setProperty("btnRole", "success")
+        self._launch_btn.clicked.connect(self._toggle_simulation)
+        vbox.addWidget(self._launch_btn)
+
+        self._sim_status = QLabel("")
+        self._sim_status.setAlignment(Qt.AlignCenter)
+        self._sim_status.setWordWrap(True)
+        self._sim_status.setStyleSheet("font-size: 9pt; color: #7F8C8D;")
+        vbox.addWidget(self._sim_status)
+
+        # ── Teleop connection status row ───────────────────────────────────
         status_row = QHBoxLayout()
         self._status_dot = QLabel("●")
         self._status_dot.setStyleSheet("font-size: 14pt; color: #E74C3C;")
@@ -250,6 +272,50 @@ class TeleoperationPage(QWizardPage):
             g.addWidget(act_lbl, i, 1)
         return grp
 
+    # ── Simulation launch ───────────────────────────────────────────────────
+
+    def _toggle_simulation(self):
+        if self._launch_manager.is_running():
+            self._launch_manager.stop()
+            self._launch_btn.setEnabled(False)
+            self._sim_status.setText("Stopping simulation…")
+        else:
+            urdf = self.urdf_manager.get_urdf_text()
+            if not urdf or urdf.startswith("Error"):
+                QMessageBox.warning(
+                    self, "Cannot launch",
+                    "No valid URDF found. Go back to Configure Parameters and click Apply first."
+                )
+                return
+            self._launch_start_time = time.monotonic()
+            self._launch_manager.start()
+
+    def _on_sim_started(self):
+        self._launch_btn.setText("Stop Simulation")
+        self._launch_btn.setEnabled(True)
+        self._launch_btn.setProperty("btnRole", "danger")
+        self._launch_btn.style().unpolish(self._launch_btn)
+        self._launch_btn.style().polish(self._launch_btn)
+        self._sim_status.setText("Simulation running — Gazebo, controllers and RViz are starting…")
+
+    def _on_sim_stopped(self, rc):
+        self._launch_btn.setText("Launch Simulation")
+        self._launch_btn.setEnabled(True)
+        self._launch_btn.setProperty("btnRole", "success")
+        self._launch_btn.style().unpolish(self._launch_btn)
+        self._launch_btn.style().polish(self._launch_btn)
+        elapsed = time.monotonic() - self._launch_start_time
+        if rc not in (0, -2) and elapsed < 4:
+            self._sim_status.setText("Simulation failed to start.")
+            QMessageBox.warning(
+                self, "Launch failed",
+                f"The simulation exited immediately (code {rc}).\n\n"
+                "Make sure the workspace is built and sourced:\n"
+                "  colcon build --symlink-install\n  source install/setup.bash"
+            )
+        else:
+            self._sim_status.setText("Simulation stopped.")
+
     # ── Connection lifecycle ────────────────────────────────────────────────
 
     def _toggle_connection(self):
@@ -375,3 +441,9 @@ class TeleoperationPage(QWizardPage):
 
     def cleanupPage(self):
         self._disconnect()
+
+    def shutdown(self):
+        """Called on window close to cleanly stop simulation and teleop."""
+        self._disconnect()
+        if self._launch_manager.is_running():
+            self._launch_manager.stop()
