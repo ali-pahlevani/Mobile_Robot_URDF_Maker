@@ -16,7 +16,7 @@ class WrapButton(QPushButton):
     Below ``_WRAP_WIDTH`` px the text splits so the button stays readable
     without clipping; above the threshold the single-line text is restored.
     """
-    _WRAP_WIDTH = 130  # button width (px) below which wrapping activates
+    _WRAP_WIDTH = 180  # button width (px) below which wrapping activates
 
     def __init__(self, text, role=None, parent=None):
         super().__init__(text, parent)
@@ -25,6 +25,8 @@ class WrapButton(QPushButton):
         if role:
             self.setProperty("btnRole", role)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        # Ensure single-line labels always have enough height; wrapped labels need more.
+        self.setMinimumHeight(40)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -40,8 +42,10 @@ class WrapButton(QPushButton):
         cur = self.text()
         if wants_wrap and cur == self._full_text:
             self.setText(wrapped)
+            self.setMinimumHeight(52)  # two wrapped lines need more height
         elif not wants_wrap and cur != self._full_text:
             self.setText(self._full_text)
+            self.setMinimumHeight(40)
 
 
 class ButtonRow(QWidget):

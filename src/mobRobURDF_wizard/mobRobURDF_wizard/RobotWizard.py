@@ -14,6 +14,7 @@ try:
     from mobRobURDF_wizard.classes.pages.ControlConfigurationPage import ControlConfigurationPage
     from mobRobURDF_wizard.classes.pages.ConfigurationPage import ConfigurationPage
     from mobRobURDF_wizard.classes.pages.ControllerTunerPage import ControllerTunerPage
+    from mobRobURDF_wizard.classes.pages.FinalCheckPage import FinalCheckPage
     from mobRobURDF_wizard.classes.pages.FutureFeaturesPage import FutureFeaturesPage
     from mobRobURDF_wizard.classes.URDFManager import URDFManager
     from mobRobURDF_wizard.utils.style import (
@@ -24,7 +25,7 @@ except ImportError as e:
     sys.exit(1)
 
 _NAV_LABELS = ["Welcome", "Select Robot Type", "Select Controller",
-               "Configure Parameters", "Tune Controller", "Future Features"]
+               "Configure Parameters", "Tune Controller", "Final Check", "Future Features"]
 
 
 class RobotWizard(QWizard):
@@ -86,6 +87,8 @@ class RobotWizard(QWizard):
             self.addPage(self.config_page)
             self.tuner_page = ControllerTunerPage(self.urdf_manager)
             self.addPage(self.tuner_page)
+            self.final_check_page = FinalCheckPage(self.urdf_manager)
+            self.addPage(self.final_check_page)
             self.addPage(FutureFeaturesPage())
         except Exception as e:
             logging.error(f"Failed to add pages: {e}")
@@ -147,12 +150,10 @@ class RobotWizard(QWizard):
         if page is None:
             return
 
-        # Configure-parameters page: [ controls | URDF text | 3D preview ].
+        # Configure-parameters page: [ controls | 3D preview ].
         content_w = w - nav_w
-        controls_w = max(min(int(content_w * 0.24), 360), 260)
-        text_w = max(min(int(content_w * 0.26), 380), 240)
+        controls_w = max(min(int(content_w * 0.31), 460), 320)
         page.left_widget.setFixedWidth(controls_w)
-        page.previewTextEdit.setFixedWidth(text_w)
         # The OpenGL widget keeps the remaining space (it has layout stretch).
 
     # ── Navigation ─────────────────────────────────────────────────────────

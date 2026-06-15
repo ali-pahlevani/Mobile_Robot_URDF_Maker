@@ -2,7 +2,7 @@ import os
 import time
 import logging
 from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QHBoxLayout, QFormLayout, QGroupBox,
-                             QLabel, QLineEdit, QTextEdit, QFileDialog, QWidget, QScrollArea,
+                             QLabel, QLineEdit, QFileDialog, QWidget, QScrollArea,
                              QMessageBox, QSizePolicy, QPushButton)
 from PyQt5.QtCore import pyqtSignal, Qt
 from ament_index_python.packages import get_package_share_directory
@@ -50,7 +50,7 @@ class ConfigurationPage(QWizardPage):
 
         # ── Left control panel (scrollable) ───────────────────────────────
         self.left_widget = QWidget()
-        self.left_widget.setFixedWidth(300)
+        self.left_widget.setFixedWidth(360)
         left_layout = QVBoxLayout(self.left_widget)
         left_layout.setContentsMargins(8, 8, 8, 8)
         left_layout.setSpacing(8)
@@ -102,19 +102,12 @@ class ConfigurationPage(QWizardPage):
         self.launch_manager.output.connect(self._on_launch_output)
         self._launch_start_time = 0.0
 
-        # ── URDF text preview ─────────────────────────────────────────────
-        self.previewTextEdit = QTextEdit()
-        self.previewTextEdit.setReadOnly(True)
-        self.previewTextEdit.setFixedWidth(340)
-        self.previewTextEdit.setLineWrapMode(QTextEdit.NoWrap)
-
         # ── 3D preview ─────────────────────────────────────────────────────
         self.glWidget = OpenGLWidget()
         self.glWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.modelUpdated.connect(self.glWidget.updateRobotModel)
 
         main_layout.addWidget(self.left_widget)
-        main_layout.addWidget(self.previewTextEdit)
         main_layout.addWidget(self.glWidget, 1)
 
     # ── Form helpers ────────────────────────────────────────────────────────
@@ -327,8 +320,6 @@ class ConfigurationPage(QWizardPage):
         urdf_text = self.urdf_manager.generate_urdf(
             self.robot_type, self.controller_type, params, sensors
         )
-        self.previewTextEdit.setPlainText(urdf_text)
-
         # Update chassis + wheels in the 3D preview via signal.
         self.modelUpdated.emit(
             L, W, H,

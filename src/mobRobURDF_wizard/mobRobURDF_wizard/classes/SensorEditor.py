@@ -46,7 +46,7 @@ class SensorCard(QGroupBox):
             lbl.setAlignment(Qt.AlignCenter)
             lbl.setStyleSheet('font-size: 7pt; color: #7F8C8D;')
             e = QLineEdit(str(val))
-            e.setFixedWidth(56)
+            e.setFixedWidth(68)
             col.addWidget(lbl)
             col.addWidget(e)
             h.addLayout(col)
