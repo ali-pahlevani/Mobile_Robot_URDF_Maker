@@ -84,12 +84,11 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        front_left_wheel:
+        front_steering_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
-        front_right_wheel:
+        front_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -130,11 +129,13 @@ Visualization Manager:
           Value: false
         chassis:
           Value: false
-        front_left_wheel:
-          Value: false
-        front_right_wheel:
-          Value: false
+        front_steering_link:
+          Value: true
+        front_wheel:
+          Value: true
         lidar_1:
+          Value: true
+        odom:
           Value: true
         rear_left_wheel:
           Value: false
@@ -151,16 +152,17 @@ Visualization Manager:
             camera_1:
               camera_1_optical:
                 {}
-            front_left_wheel:
-              {}
-            front_right_wheel:
-              {}
+            front_steering_link:
+              front_wheel:
+                {}
             lidar_1:
               {}
             rear_left_wheel:
               {}
             rear_right_wheel:
               {}
+        odom:
+          {}
       Update Interval: 0
       Value: true
     - Class: rviz_default_plugins/Image
@@ -214,7 +216,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: base_link
+    Fixed Frame: odom
     Frame Rate: 30
   Name: root
   Tools:

@@ -61,6 +61,12 @@
     <gazebo>
         <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="libgz_ros2_control-system.so">
             <parameters>$(find mobRobURDF_control)/config/steer/gazebo_controller_ackerSteer.yaml</parameters>
+            <ros>
+                <!-- ackermann_steering_controller publishes to ~/tf_odometry and ~/odometry,
+                     not to /tf and /odom. Remap to the standard global topics. -->
+                <remapping>/ackerSteer_controller/tf_odometry:=/tf</remapping>
+                <remapping>/ackerSteer_controller/odometry:=/odom</remapping>
+            </ros>
         </plugin>
     </gazebo>
     

@@ -49,6 +49,12 @@
     <gazebo>
         <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="libgz_ros2_control-system.so">
             <parameters>$(find mobRobURDF_control)/config/drive/gazebo_controller_mecDrive.yaml</parameters>
+            <ros>
+                <!-- mecanum_drive_controller publishes to ~/tf_odometry and ~/odometry,
+                     not to /tf and /odom. Remap to the standard global topics. -->
+                <remapping>/mecDrive_controller/tf_odometry:=/tf</remapping>
+                <remapping>/mecDrive_controller/odometry:=/odom</remapping>
+            </ros>
         </plugin>
     </gazebo>
     
