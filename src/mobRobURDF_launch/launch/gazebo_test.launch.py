@@ -8,6 +8,7 @@ from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 import os
 
+
 def _find_gz_ros2_control_lib_dir():
     """Return the lib dir of the workspace-built gz_ros2_control if available."""
     try:
@@ -20,12 +21,9 @@ def _find_gz_ros2_control_lib_dir():
         pass
     return None
 
-def read_selected_controller(description_share):
-    """Read the controller spawner name chosen in the wizard.
 
-    Falls back to a sensible default if the file is missing (e.g. on a fresh
-    clone before the wizard has been run).
-    """
+def read_selected_controller(description_share):
+    """Read the controller spawner name chosen in the wizard, with a fallback."""
     controller_file = os.path.join(description_share, 'urdf', 'selected_controller.txt')
     try:
         with open(controller_file, 'r') as f:
@@ -37,16 +35,30 @@ def read_selected_controller(description_share):
     return 'diffDrive_controller'
 
 
+def _bridge_params_path(gazebo_config):
+    """Return generated bridge YAML if it exists, otherwise fall back to static one."""
+    generated = os.path.join(gazebo_config, 'gz_bridge_generated.yaml')
+    if os.path.exists(generated):
+        return generated
+    return os.path.join(gazebo_config, 'gz_bridge.yaml')
+
+
+def _camera_image_topics(gazebo_config):
+    """Read the list of camera image topics written by the wizard."""
+    topics_file = os.path.join(gazebo_config, 'gz_image_topics.txt')
+    try:
+        with open(topics_file, 'r') as f:
+            return [t.strip() for t in f.read().splitlines() if t.strip()]
+    except OSError:
+        return ['/camera/image_raw']
+
+
 def generate_launch_description():
 
     description_share = get_package_share_directory('mobRobURDF_description')
+    gazebo_config = os.path.join(get_package_share_directory('mobRobURDF_gazebo'), 'config')
 
-    urdf_path = os.path.join(
-        description_share,
-        'urdf',
-        'mobRob.urdf.xacro'
-    )
-
+    urdf_path = os.path.join(description_share, 'urdf', 'mobRob.urdf.xacro')
     processed_urdf = xacro.process_file(urdf_path).toxml()
 
     controller_name = read_selected_controller(description_share)
@@ -61,7 +73,7 @@ def generate_launch_description():
             SetEnvironmentVariable('GZ_SIM_SYSTEM_PLUGIN_PATH', new_path)
         ]
 
-    rviz_config_path = PathJoinSubstitution([ 
+    rviz_config_path = PathJoinSubstitution([
         get_package_share_directory('mobRobURDF_launch'),
         'rviz',
         'rviz_gazebo_test.rviz'
@@ -74,20 +86,13 @@ def generate_launch_description():
     )
 
     world = LaunchConfiguration('world')
-
     world_arg = DeclareLaunchArgument(
-        'world',
-        default_value=default_world,
-        description='World to load'
-    )
+        'world', default_value=default_world, description='World to load')
 
-    # Gazebo Sim major version: 8 = Harmonic (default), 6 = Fortress.
     gz_version = LaunchConfiguration('gz_version')
     gz_version_arg = DeclareLaunchArgument(
-        'gz_version',
-        default_value='8',
-        description='Gazebo Sim major version (8 = Harmonic, 6 = Fortress)'
-    )
+        'gz_version', default_value='8',
+        description='Gazebo Sim major version (8 = Harmonic, 6 = Fortress)')
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
@@ -107,14 +112,11 @@ def generate_launch_description():
         executable='robot_state_publisher',
         name='robot_state_publisher',
         output='screen',
-        parameters=[{
-            'robot_description': processed_urdf,
-            'use_sim_time': True
-        }]
+        parameters=[{'robot_description': processed_urdf, 'use_sim_time': True}]
     )
 
     spawn_entity = Node(
-        package='ros_gz_sim', 
+        package='ros_gz_sim',
         executable='create',
         arguments=['-topic', 'robot_description', '-name', 'mobRobURDF', '-z', '0.5'],
         output='screen',
@@ -122,36 +124,32 @@ def generate_launch_description():
     )
 
     controllers = Node(
-        package="controller_manager",
-        executable="spawner",
+        package='controller_manager',
+        executable='spawner',
         arguments=[controller_name],
         parameters=[{'use_sim_time': True}]
     )
-    
+
     joint_state_broadcaster = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["joint_state_broadcaster"],
+        package='controller_manager',
+        executable='spawner',
+        arguments=['joint_state_broadcaster'],
         parameters=[{'use_sim_time': True}]
     )
-
-    bridge_params = os.path.join(get_package_share_directory('mobRobURDF_gazebo'),'config','gz_bridge.yaml')
 
     ros_gz_bridge = Node(
-        package="ros_gz_bridge",
-        executable="parameter_bridge",
-        arguments=[
-            '--ros-args',
-            '-p',
-            f'config_file:={bridge_params}',
-        ],
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['--ros-args', '-p', f'config_file:={_bridge_params_path(gazebo_config)}'],
         parameters=[{'use_sim_time': True}]
     )
 
+    # Image bridge: one node handles all camera topics listed by the wizard.
+    image_topics = _camera_image_topics(gazebo_config)
     ros_gz_image_bridge = Node(
-        package="ros_gz_image",
-        executable="image_bridge",
-        arguments=["/camera/image_raw"],
+        package='ros_gz_image',
+        executable='image_bridge',
+        arguments=image_topics,
         parameters=[{'use_sim_time': True}]
     )
 
@@ -164,17 +162,13 @@ def generate_launch_description():
         parameters=[{'use_sim_time': True}]
     )
 
-    # Relay /cmd_vel → the active controller's velocity topic so all controllers
-    # share a single /cmd_vel interface for teleoperation.
+    # Relay /cmd_vel → the active controller's velocity topic.
     cmd_vel_relay = Node(
         package='mobRobURDF_launch',
         executable='cmd_vel_relay',
         name='cmd_vel_relay',
         output='screen',
-        parameters=[{
-            'controller_name': controller_name,
-            'use_sim_time': True,
-        }]
+        parameters=[{'controller_name': controller_name, 'use_sim_time': True}]
     )
 
     return LaunchDescription(

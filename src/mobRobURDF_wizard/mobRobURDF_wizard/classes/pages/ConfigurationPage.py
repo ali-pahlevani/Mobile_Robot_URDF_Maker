@@ -3,12 +3,16 @@ import time
 import logging
 from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QHBoxLayout, QFormLayout, QGroupBox,
                              QLabel, QLineEdit, QTextEdit, QFileDialog, QWidget, QScrollArea,
-                             QMessageBox, QSizePolicy)
+                             QMessageBox, QSizePolicy, QPushButton)
 from PyQt5.QtCore import pyqtSignal, Qt
 from ament_index_python.packages import get_package_share_directory
 from mobRobURDF_wizard.classes.OpenGLWidget import OpenGLWidget
 from mobRobURDF_wizard.classes.responsive_widgets import WrapButton, ButtonRow
 from mobRobURDF_wizard.classes.launch_manager import LaunchManager
+from mobRobURDF_wizard.classes.SensorEditor import SensorCard
+from mobRobURDF_wizard.classes.sensor_config import (
+    SensorConfig, default_sensors, sensor_to_dict, sensor_from_dict,
+)
 from mobRobURDF_wizard.utils.utils import get_color
 from mobRobURDF_wizard.utils import presets
 
@@ -16,22 +20,13 @@ logger = logging.getLogger(__name__)
 
 
 class ConfigurationPage(QWizardPage):
-    # The last argument (caster_radius) is `object` because it is None for
-    # every non-2WC robot type.
-    modelUpdated = pyqtSignal(float, float, float, str, str, str, str, str, tuple, tuple, tuple, tuple, str, object)
+    modelUpdated = pyqtSignal(float, float, float, str, str, tuple, tuple, str, object)
 
-    # Preset key -> line-edit attribute (attributes exist after setup_parameters()).
+    # Preset key -> line-edit attribute (chassis + wheels only; sensors handled separately).
     _PRESET_FIELDS = [
         ("chassis_size", "chassisSizeLineEdit"),
         ("chassis_mass", "chassisMassLineEdit"),
         ("chassis_material", "chassisMaterialLineEdit"),
-        ("lidar_radius", "lidarRadiusLineEdit"),
-        ("lidar_height", "lidarHeightLineEdit"),
-        ("lidar_mass", "lidarMassLineEdit"),
-        ("lidar_material", "lidarMaterialLineEdit"),
-        ("camera_size", "cameraSizeLineEdit"),
-        ("camera_mass", "cameraMassLineEdit"),
-        ("camera_material", "cameraMaterialLineEdit"),
         ("wheel_radius", "wheelRadiusLineEdit"),
         ("wheel_width", "wheelWidthLineEdit"),
         ("wheel_mass", "wheelMassLineEdit"),
@@ -43,8 +38,8 @@ class ConfigurationPage(QWizardPage):
         self.urdf_manager = urdf_manager
         self.robot_type = None
         self.controller_type = None
+        self._sensor_cards = []   # list[SensorCard], in insertion order
 
-        # Default save location: the description package's urdf directory.
         self.default_save_path = os.path.join(
             get_package_share_directory("mobRobURDF_description"), "urdf", "mobRob"
         )
@@ -71,7 +66,7 @@ class ConfigurationPage(QWizardPage):
         self.scroll.setWidget(self._params_container)
         left_layout.addWidget(self.scroll, 1)
 
-        # Preset row (responsive: stacks vertically when narrow)
+        # Preset row
         self.loadPresetButton = WrapButton("Load Preset", "secondary")
         self.loadPresetButton.setMinimumHeight(34)
         self.loadPresetButton.clicked.connect(self.loadPreset)
@@ -90,7 +85,6 @@ class ConfigurationPage(QWizardPage):
         self.saveButton.clicked.connect(self.saveURDF)
         left_layout.addWidget(self.saveButton)
 
-        # One-click simulation launch
         self.launchButton = WrapButton("Launch Simulation", "success")
         self.launchButton.setMinimumHeight(38)
         self.launchButton.clicked.connect(self.launchSimulation)
@@ -141,71 +135,120 @@ class ConfigurationPage(QWizardPage):
     # ── Page lifecycle ────────────────────────────────────────────────────
 
     def initializePage(self):
-        self.robot_type = self.field("robotType")
-        self.controller_type = self.field("controllerType")
-        if self.robot_type is None:
-            logger.warning("robotType is None, defaulting to 4_wheeled")
-            self.robot_type = "4_wheeled"
-        if self.controller_type is None:
-            logger.warning("controllerType is None, defaulting based on robotType")
-            self.controller_type = {"2_wheeled_caster": "diff_2wc", "3_wheeled": "tricycle",
-                                    "4_wheeled": "diff_4w"}.get(self.robot_type, "diff_4w")
+        new_robot_type = self.field("robotType") or "4_wheeled"
+        new_controller_type = self.field("controllerType")
+        if not new_controller_type:
+            new_controller_type = {"2_wheeled_caster": "diff_2wc",
+                                   "3_wheeled": "tricycle",
+                                   "4_wheeled": "diff_4w"}.get(new_robot_type, "diff_4w")
+
+        robot_changed = (new_robot_type != self.robot_type or
+                         new_controller_type != self.controller_type)
+
+        self.robot_type = new_robot_type
+        self.controller_type = new_controller_type
+
         self.setTitle(f"Configure {self.robot_type.replace('_', ' ').title()} Parameters "
                       f"with {self.controller_type.replace('_', ' ').title()} Controller")
         self.setup_parameters()
+
+        if robot_changed:
+            # Reset to one default lidar + one default camera sized to the chassis.
+            chassis_str = self.chassisSizeLineEdit.text() or "1.2 0.8 0.3"
+            self._reset_sensors(default_sensors(self.robot_type, chassis_str))
+
         self.applyChanges()
 
     def setup_parameters(self):
+        # Remove all existing form widgets but preserve sensor cards externally.
         while self.params_layout.count():
             item = self.params_layout.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
+        self._sensor_cards.clear()
 
         self.add_common_parameters()
 
-        if self.robot_type == "4_wheeled":
-            self.add_wheel_parameters("Wheel Radius")
-        elif self.robot_type == "3_wheeled":
-            self.add_wheel_parameters("Wheel Radius")
-        elif self.robot_type == "2_wheeled_caster":
-            self.add_wheel_parameters("Wheel and Caster Radius")
-        else:
-            logger.error("Unknown robot_type: %s, no parameters added", self.robot_type)
+        if self.robot_type in ("4_wheeled", "3_wheeled", "2_wheeled_caster"):
+            self.add_wheel_parameters(
+                "Wheel and Caster Radius" if self.robot_type == "2_wheeled_caster" else "Wheel Radius"
+            )
 
+        self._add_sensor_panel()
         self.params_layout.addStretch(1)
 
     def add_common_parameters(self):
         chassis_box, chassis_form = self._group("Chassis")
-        self.chassisSizeLineEdit = self._field(chassis_form, "Size (L W H)", "e.g., 1 1 0.5")
+        self.chassisSizeLineEdit = self._field(chassis_form, "Size (L W H)", "e.g., 1.2 0.8 0.3")
         self.chassisMassLineEdit = self._field(chassis_form, "Mass", "e.g., 1.0")
         self.chassisMaterialLineEdit = self._field(chassis_form, "Material", "e.g., Gray")
         self.params_layout.addWidget(chassis_box)
 
-        lidar_box, lidar_form = self._group("Lidar")
-        self.lidarRadiusLineEdit = self._field(lidar_form, "Radius", "e.g., 0.2")
-        self.lidarHeightLineEdit = self._field(lidar_form, "Height", "e.g., 0.1")
-        self.lidarMassLineEdit = self._field(lidar_form, "Mass", "e.g., 0.2")
-        self.lidarMaterialLineEdit = self._field(lidar_form, "Material", "e.g., Red")
-        self.params_layout.addWidget(lidar_box)
-
-        camera_box, camera_form = self._group("Camera")
-        self.cameraSizeLineEdit = self._field(camera_form, "Size (L W H)", "e.g., 0.1 0.1 0.1")
-        self.cameraMassLineEdit = self._field(camera_form, "Mass", "e.g., 0.1")
-        self.cameraMaterialLineEdit = self._field(camera_form, "Material", "e.g., Blue")
-        self.params_layout.addWidget(camera_box)
-
     def add_wheel_parameters(self, radius_label):
         wheel_box, wheel_form = self._group("Wheels")
-        self.wheelRadiusLineEdit = self._field(wheel_form, radius_label, "e.g., 0.3")
-        self.wheelWidthLineEdit = self._field(wheel_form, "Wheel Width", "e.g., 0.1")
+        self.wheelRadiusLineEdit = self._field(wheel_form, radius_label, "e.g., 0.22")
+        self.wheelWidthLineEdit = self._field(wheel_form, "Wheel Width", "e.g., 0.12")
         self.wheelMassLineEdit = self._field(wheel_form, "Wheel Mass", "e.g., 0.5")
         self.wheelMaterialLineEdit = self._field(wheel_form, "Wheel Material", "e.g., Black")
         self.params_layout.addWidget(wheel_box)
 
+    # ── Sensor panel ──────────────────────────────────────────────────────
+
+    def _add_sensor_panel(self):
+        """Add the "Sensors" group with Add-Lidar / Add-Camera buttons."""
+        sensor_group = QGroupBox("Sensors")
+        vbox = QVBoxLayout(sensor_group)
+        vbox.setSpacing(6)
+        vbox.setContentsMargins(6, 8, 6, 8)
+
+        btn_row = QHBoxLayout()
+        add_lidar_btn = QPushButton("+ Lidar")
+        add_lidar_btn.setStyleSheet("QPushButton { color: white; font-weight: bold; }")
+        add_lidar_btn.clicked.connect(lambda: self._add_sensor('lidar'))
+        add_cam_btn = QPushButton("+ Camera")
+        add_cam_btn.setStyleSheet("QPushButton { color: white; font-weight: bold; }")
+        add_cam_btn.clicked.connect(lambda: self._add_sensor('camera'))
+        btn_row.addWidget(add_lidar_btn)
+        btn_row.addWidget(add_cam_btn)
+        vbox.addLayout(btn_row)
+
+        self._sensor_cards_layout = vbox
+        self.params_layout.addWidget(sensor_group)
+
+    def _add_sensor(self, sensor_type: str, config: SensorConfig = None):
+        card = SensorCard(sensor_type)
+        if config is not None:
+            card.load_sensor_config(config)
+        else:
+            # Auto-name using next available index.
+            existing = [c for c in self._sensor_cards if c._type == sensor_type]
+            idx = len(existing) + 1
+            card.nameEdit.setText(f'{sensor_type}_{idx}')
+
+        card.deleted.connect(self._remove_sensor_card)
+        self._sensor_cards.append(card)
+        self._sensor_cards_layout.addWidget(card)
+
+    def _remove_sensor_card(self, card: SensorCard):
+        if card in self._sensor_cards:
+            self._sensor_cards.remove(card)
+        self._sensor_cards_layout.removeWidget(card)
+        card.deleteLater()
+
+    def _reset_sensors(self, sensor_configs: list):
+        """Replace all sensor cards with those from sensor_configs."""
+        for card in list(self._sensor_cards):
+            self._remove_sensor_card(card)
+        for sc in sensor_configs:
+            self._add_sensor(sc.sensor_type, sc)
+
+    def _gather_sensors(self) -> list:
+        """Read all SensorCard widgets and return a list of SensorConfig."""
+        return [card.to_sensor_config() for card in self._sensor_cards]
+
     # ── Validation ──────────────────────────────────────────────────────────
 
     def validate_float(self, value, field_name, default, min_val=0.0):
-        """Validate a string input as a float, returning default if invalid or below min_val."""
         try:
             if value.strip():
                 val = float(value)
@@ -225,30 +268,13 @@ class ConfigurationPage(QWizardPage):
             L, W, H = 1.2, 0.8, 0.3
             chassis_size_str = "1.2 0.8 0.3"
 
-        camera_size_str = self.cameraSizeLineEdit.text()
-        try:
-            Lc, Wc, Hc = map(float, camera_size_str.split())
-        except ValueError:
-            Lc, Wc, Hc = 0.08, 0.2, 0.08
-            camera_size_str = "0.08 0.2 0.08"
-
-        # Validate numeric inputs to prevent float conversion errors
         wheel_radius = self.validate_float(self.wheelRadiusLineEdit.text(), "wheel_radius", 0.22)
         wheel_width = self.validate_float(self.wheelWidthLineEdit.text(), "wheel_width", 0.12)
-        lidar_radius = self.validate_float(self.lidarRadiusLineEdit.text(), "lidar_radius", 0.1)
-        lidar_height = self.validate_float(self.lidarHeightLineEdit.text(), "lidar_height", 0.08)
 
         params = {
             "chassis_size": chassis_size_str,
             "chassis_mass": self.chassisMassLineEdit.text() or "1.0",
             "chassis_material": self.chassisMaterialLineEdit.text() or "Gray",
-            "lidar_radius": str(lidar_radius),
-            "lidar_height": str(lidar_height),
-            "lidar_mass": self.lidarMassLineEdit.text() or "0.2",
-            "lidar_material": self.lidarMaterialLineEdit.text() or "Red",
-            "camera_size": camera_size_str,
-            "camera_mass": self.cameraMassLineEdit.text() or "0.1",
-            "camera_material": self.cameraMaterialLineEdit.text() or "Blue",
         }
 
         if self.robot_type in ["4_wheeled", "3_wheeled", "2_wheeled_caster"]:
@@ -297,29 +323,25 @@ class ConfigurationPage(QWizardPage):
             params["caster_y"] = "0"
             params["caster_z"] = str(-H / 2)
 
-        params["lidar_z"] = str(H / 2 + lidar_height / 2)
-        params["camera_x"] = str(L / 2 + Lc / 2)
-        if self.robot_type == "3_wheeled":
-            params["camera_z"] = str(H / 2 - Hc / 2)
-
-        urdf_text = self.urdf_manager.generate_urdf(self.robot_type, self.controller_type, params)
+        sensors = self._gather_sensors()
+        urdf_text = self.urdf_manager.generate_urdf(
+            self.robot_type, self.controller_type, params, sensors
+        )
         self.previewTextEdit.setPlainText(urdf_text)
 
+        # Update chassis + wheels in the 3D preview via signal.
         self.modelUpdated.emit(
             L, W, H,
             str(wheel_radius),
             str(wheel_width),
-            str(lidar_radius),
-            str(lidar_height),
-            camera_size_str,
             get_color(params["chassis_material"]),
-            get_color(params["wheel_material"]),
-            get_color(params["lidar_material"]),
-            get_color(params["camera_material"]),
+            get_color(params.get("wheel_material", "Black")),
             self.robot_type,
             caster_radius
         )
-        self.glWidget.update()
+
+        # Update sensors directly — all sensors with their exact positions and colors.
+        self.glWidget.updateSensors(sensors)
 
     # ── Save ──────────────────────────────────────────────────────────────
 
@@ -365,7 +387,9 @@ class ConfigurationPage(QWizardPage):
         if not path.endswith((".yaml", ".yml")):
             path += ".yaml"
         try:
-            presets.save_preset(path, self.robot_type, self.controller_type, self._gather_params())
+            sensor_dicts = [sensor_to_dict(s) for s in self._gather_sensors()]
+            presets.save_preset(path, self.robot_type, self.controller_type,
+                                self._gather_params(), sensor_dicts)
             QMessageBox.information(self, "Preset saved", f"Preset saved to:\n{path}")
         except Exception as e:
             logger.error("Failed to save preset to %s: %s", path, str(e))
@@ -377,14 +401,12 @@ class ConfigurationPage(QWizardPage):
         if not path:
             return
         try:
-            robot_type, controller_type, params = presets.load_preset(path)
+            robot_type, controller_type, params, sensor_dicts = presets.load_preset(path)
         except Exception as e:
             logger.error("Failed to load preset %s: %s", path, str(e))
             QMessageBox.warning(self, "Load failed", f"Could not load preset:\n{e}")
             return
 
-        # Update wizard fields so the earlier selection pages reflect the load
-        # (they re-sync their highlighted cards in initializePage).
         self.setField("robotType", robot_type)
         self.setField("controllerType", controller_type)
         self.robot_type = robot_type
@@ -397,6 +419,13 @@ class ConfigurationPage(QWizardPage):
             edit = getattr(self, attr, None)
             if edit is not None and key in params:
                 edit.setText(params[key])
+
+        # Restore sensor cards from preset.
+        sensor_configs = [sensor_from_dict(d) for d in sensor_dicts]
+        if not sensor_configs:
+            sensor_configs = default_sensors(robot_type, params.get('chassis_size', '1.2 0.8 0.3'))
+        self._reset_sensors(sensor_configs)
+
         self.applyChanges()
         QMessageBox.information(self, "Preset loaded", f"Loaded configuration from:\n{path}")
 
@@ -409,8 +438,6 @@ class ConfigurationPage(QWizardPage):
             self.launchStatus.setText("Stopping simulation…")
             return
 
-        # Apply the current configuration so the launch uses the latest URDF
-        # and selected controller.
         self.applyChanges()
         urdf = self.urdf_manager.get_urdf_text()
         if not urdf or urdf.startswith("Error"):
@@ -440,8 +467,6 @@ class ConfigurationPage(QWizardPage):
         self._set_launch_button_role("success")
         elapsed = time.monotonic() - self._launch_start_time
         if rc not in (0, -2) and elapsed < 4:
-            # Exited almost immediately with an error — most likely the
-            # workspace wasn't built/sourced.
             self.launchStatus.setText("Simulation failed to start.")
             QMessageBox.warning(
                 self, "Launch failed",
@@ -453,4 +478,3 @@ class ConfigurationPage(QWizardPage):
 
     def _on_launch_output(self, line):
         logger.info("[sim] %s", line)
-

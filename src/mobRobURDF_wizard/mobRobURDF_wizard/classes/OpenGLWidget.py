@@ -1,3 +1,4 @@
+import math
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
@@ -6,7 +7,7 @@ from PyQt5.QtOpenGL import QGLWidget
 from PyQt5.QtCore import Qt
 import logging
 
-# Class for 3D Preview
+
 class OpenGLWidget(QGLWidget):
     def __init__(self, parent=None):
         super(OpenGLWidget, self).__init__(parent)
@@ -15,22 +16,20 @@ class OpenGLWidget(QGLWidget):
         self.zoom = -5
         self.rotation = np.identity(4, dtype=np.float32)
         self.lastPos3D = None
+
+        # Chassis / wheel geometry
         self.L, self.W, self.H = 1.2, 0.8, 0.3
         self.wheel_radius, self.wheel_width = 0.22, 0.12
-        self.lidar_radius, self.lidar_height = 0.1, 0.08
-        self.camera_size = (0.08, 0.2, 0.08)
         self.chassis_color = (0.5, 0.5, 0.5)
         self.wheel_color = (0.0, 0.0, 0.0)
-        self.lidar_color = (1.0, 0.0, 0.0)
-        self.camera_color = (0.0, 0.0, 1.0)
-        self.robot_type = "4_wheeled"  # Default
-        #logging.debug("OpenGLWidget initialized")
+        self.robot_type = "4_wheeled"
+
+        # Sensors: list of SensorConfig objects updated by updateSensors()
+        self.sensors = []
 
     def initializeGL(self):
         glEnable(GL_DEPTH_TEST)
-        # Match the light page background (#F4F6F9) for visual consistency.
         glClearColor(0.957, 0.965, 0.976, 1.0)
-        #logging.debug("OpenGL initialized")
 
     def resizeGL(self, w, h):
         glViewport(0, 0, w, h)
@@ -45,21 +44,21 @@ class OpenGLWidget(QGLWidget):
         glTranslatef(0.0, 0.0, self.zoom)
         glMultMatrixf(self.rotation.T)
 
-        # Draw chassis
+        # ── Chassis ──────────────────────────────────────────────────────────
         glPushMatrix()
         glColor3f(*self.chassis_color)
         glScalef(self.L, self.W, self.H)
         glutSolidCube(1.0)
         glPopMatrix()
 
-        # Draw wheels based on robot type
+        # ── Wheels ───────────────────────────────────────────────────────────
         glColor3f(*self.wheel_color)
         if self.robot_type == "4_wheeled":
             wheel_positions = [
-                (self.L / 2 - self.wheel_radius / 1.5, self.W / 2 + self.wheel_width / 2, -self.H / 2),  # Front left
-                (self.L / 2 - self.wheel_radius / 1.5, -self.W / 2 - self.wheel_width / 2, -self.H / 2),  # Front right
-                (-self.L / 2 + self.wheel_radius / 1.5, self.W / 2 + self.wheel_width / 2, -self.H / 2),  # Rear left
-                (-self.L / 2 + self.wheel_radius / 1.5, -self.W / 2 - self.wheel_width / 2, -self.H / 2),  # Rear right
+                ( self.L / 2 - self.wheel_radius / 1.5,  self.W / 2 + self.wheel_width / 2, -self.H / 2),
+                ( self.L / 2 - self.wheel_radius / 1.5, -self.W / 2 - self.wheel_width / 2, -self.H / 2),
+                (-self.L / 2 + self.wheel_radius / 1.5,  self.W / 2 + self.wheel_width / 2, -self.H / 2),
+                (-self.L / 2 + self.wheel_radius / 1.5, -self.W / 2 - self.wheel_width / 2, -self.H / 2),
             ]
             for pos in wheel_positions:
                 glPushMatrix()
@@ -68,11 +67,12 @@ class OpenGLWidget(QGLWidget):
                 glTranslatef(0, 0, -self.wheel_width / 2)
                 glutSolidCylinder(self.wheel_radius, self.wheel_width, 20, 20)
                 glPopMatrix()
+
         elif self.robot_type == "3_wheeled":
             wheel_positions = [
-                (self.L / 2, 0, -self.H / 2),  # Front wheel (centered)
-                (-self.L / 2 + self.wheel_radius / 1.5, self.W / 2 + self.wheel_width / 2, -self.H / 2),  # Rear left
-                (-self.L / 2 + self.wheel_radius / 1.5, -self.W / 2 - self.wheel_width / 2, -self.H / 2),  # Rear right
+                (self.L / 2, 0, -self.H / 2),
+                (-self.L / 2 + self.wheel_radius / 1.5,  self.W / 2 + self.wheel_width / 2, -self.H / 2),
+                (-self.L / 2 + self.wheel_radius / 1.5, -self.W / 2 - self.wheel_width / 2, -self.H / 2),
             ]
             for pos in wheel_positions:
                 glPushMatrix()
@@ -81,43 +81,75 @@ class OpenGLWidget(QGLWidget):
                 glTranslatef(0, 0, -self.wheel_width / 2)
                 glutSolidCylinder(self.wheel_radius, self.wheel_width, 20, 20)
                 glPopMatrix()
+
         elif self.robot_type == "2_wheeled_caster":
-            wheel_positions = [
-                (-self.L / 4, self.W / 2 + self.wheel_width / 2, -self.H / 2),  # Left wheel
-                (-self.L / 4, -self.W / 2 - self.wheel_width / 2, -self.H / 2),  # Right wheel
-            ]
-            for pos in wheel_positions:
+            for pos in [
+                (-self.L / 4,  self.W / 2 + self.wheel_width / 2, -self.H / 2),
+                (-self.L / 4, -self.W / 2 - self.wheel_width / 2, -self.H / 2),
+            ]:
                 glPushMatrix()
                 glTranslatef(*pos)
                 glRotatef(90, 1, 0, 0)
                 glTranslatef(0, 0, -self.wheel_width / 2)
                 glutSolidCylinder(self.wheel_radius, self.wheel_width, 20, 20)
                 glPopMatrix()
-            # Caster wheel as a sphere, using wheel_radius
             glPushMatrix()
             glTranslatef(self.L / 2 - self.wheel_radius, 0, -self.H / 2)
-            glutSolidSphere(self.wheel_radius, 20, 20)  # Changed to wheel_radius
+            glutSolidSphere(self.wheel_radius, 20, 20)
             glPopMatrix()
 
-        # Draw lidar
-        glColor3f(*self.lidar_color)
-        glPushMatrix()
-        glTranslatef(0.0, 0.0, self.H / 2)
-        glutSolidCylinder(self.lidar_radius, self.lidar_height, 20, 20)
-        glPopMatrix()
+        # ── Sensors ───────────────────────────────────────────────────────────
+        for s in self.sensors:
+            color = self._sensor_gl_color(s)
+            glColor3f(*color)
+            glPushMatrix()
+            glTranslatef(s.x, s.y, s.z)
+            # Apply RPY: yaw (Z) → pitch (Y) → roll (X), OpenGL convention
+            glRotatef(math.degrees(s.yaw),   0, 0, 1)
+            glRotatef(math.degrees(s.pitch), 0, 1, 0)
+            glRotatef(math.degrees(s.roll),  1, 0, 0)
+            if s.sensor_type == 'lidar':
+                glutSolidCylinder(s.radius, s.length, 20, 20)
+            else:
+                glScalef(s.cam_depth, s.cam_width, s.cam_height)
+                glutSolidCube(1.0)
+            glPopMatrix()
 
-        # Draw camera
-        glColor3f(*self.camera_color)
-        glPushMatrix()
-        
-        if self.robot_type == "3_wheeled":
-            glTranslatef(self.L / 2 + self.camera_size[0] / 2, 0.0, self.H / 2 - self.camera_size[2] / 2)
-        else:
-            glTranslatef(self.L / 2 + self.camera_size[0] / 2, 0.0, 0.0)
-            
-        glScalef(*self.camera_size)
-        glutSolidCube(1.0)
-        glPopMatrix()
+    # ── Color lookup ──────────────────────────────────────────────────────────
+
+    _COLOR_MAP = {
+        'Gray':  (0.5,  0.5,  0.5),
+        'Black': (0.05, 0.05, 0.05),
+        'Red':   (1.0,  0.0,  0.0),
+        'Blue':  (0.0,  0.2,  1.0),
+        'Green': (0.0,  0.8,  0.0),
+        'White': (1.0,  1.0,  1.0),
+    }
+
+    def _sensor_gl_color(self, s):
+        return self._COLOR_MAP.get(s.color, (0.5, 0.5, 0.5))
+
+    # ── Public API ────────────────────────────────────────────────────────────
+
+    def updateRobotModel(self, L, W, H, wheel_radius, wheel_width,
+                         chassis_color, wheel_color, robot_type="4_wheeled", caster_radius=None):
+        try:
+            self.L, self.W, self.H = L, W, H
+            self.wheel_radius = float(wheel_radius)
+            self.wheel_width = float(wheel_width)
+            self.chassis_color = chassis_color
+            self.wheel_color = wheel_color
+            self.robot_type = robot_type
+            self.update()
+        except ValueError as e:
+            logging.error("Error updating robot model parameters: %s", e)
+
+    def updateSensors(self, sensors: list):
+        """Replace the sensor list and redraw. Called directly from ConfigurationPage."""
+        self.sensors = list(sensors)
+        self.update()
+
+    # ── Mouse / scroll ────────────────────────────────────────────────────────
 
     def _map_to_sphere(self, x, y):
         width, height = self.width(), self.height()
@@ -150,9 +182,9 @@ class OpenGLWidget(QGLWidget):
             t = 1 - c
             ax, ay, az = axis
             R = np.array([
-                [t*ax*ax + c, t*ax*ay - s*az, t*ax*az + s*ay, 0],
-                [t*ax*ay + s*az, t*ay*ay + c, t*ay*az - s*ax, 0],
-                [t*ax*az - s*ay, t*ay*az + s*ax, t*az*az + c, 0],
+                [t*ax*ax + c,      t*ax*ay - s*az, t*ax*az + s*ay, 0],
+                [t*ax*ay + s*az,   t*ay*ay + c,    t*ay*az - s*ax, 0],
+                [t*ax*az - s*ay,   t*ay*az + s*ax, t*az*az + c,    0],
                 [0, 0, 0, 1]
             ], dtype=np.float32)
             self.rotation = R @ self.rotation
@@ -162,24 +194,3 @@ class OpenGLWidget(QGLWidget):
     def wheelEvent(self, event):
         self.zoom += event.angleDelta().y() / 120 * 0.5
         self.update()
-
-    def updateRobotModel(self, L, W, H, wheel_radius, wheel_width, lidar_radius, lidar_height, camera_size,
-                         chassis_color, wheel_color, lidar_color, camera_color, robot_type="4_wheeled", caster_radius=None):
-        try:
-            self.L, self.W, self.H = L, W, H
-            self.wheel_radius = float(wheel_radius)
-            self.wheel_width = float(wheel_width)
-            self.lidar_radius = float(lidar_radius)
-            self.lidar_height = float(lidar_height)
-            self.camera_size = tuple(map(float, camera_size.split()))
-            self.chassis_color = chassis_color
-            self.wheel_color = wheel_color
-            self.lidar_color = lidar_color
-            self.camera_color = camera_color
-            self.robot_type = robot_type
-            # Caster radius defaults to wheel_radius for consistency
-            self.caster_radius = self.wheel_radius if robot_type == "2_wheeled_caster" else float(caster_radius) if caster_radius is not None else self.wheel_radius
-            #logging.debug(f"Updated robot model: type={self.robot_type}, wheel_radius={self.wheel_radius}, caster_radius={self.caster_radius}")
-            self.update()
-        except ValueError as e:
-            logging.error(f"Error updating robot model parameters: {str(e)}")

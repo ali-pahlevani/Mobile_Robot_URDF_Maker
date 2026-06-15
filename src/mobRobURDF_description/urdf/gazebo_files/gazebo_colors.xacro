@@ -23,14 +23,12 @@
     </gazebo>
   </xacro:macro>
 
-  <!-- Apply colors to every visual link, selecting wheel names by controller_type. -->
+  <!-- Apply colors to chassis and wheels. Sensor colors are now handled by
+       user_sensors.xacro which is generated per-session by the wizard. -->
   <xacro:macro name="gazebo_visual_colors"
-               params="controller_type chassis_material wheel_material lidar_material camera_material">
+               params="controller_type chassis_material wheel_material">
 
-    <!-- Chassis and sensors are the same across all robot types. -->
     <xacro:gz_link_color link_name="chassis" color="${chassis_material}"/>
-    <xacro:gz_link_color link_name="lidar"   color="${lidar_material}"/>
-    <xacro:gz_link_color link_name="camera"  color="${camera_material}"/>
 
     <!-- 4-wheeled robots: diff_4w, mecanum, ackermann -->
     <xacro:if value="${controller_type in ('diff_4w', 'mecanum', 'ackermann')}">

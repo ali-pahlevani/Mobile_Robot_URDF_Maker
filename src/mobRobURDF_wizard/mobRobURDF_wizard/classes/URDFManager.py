@@ -5,17 +5,17 @@ import string
 import logging
 import shutil
 from mobRobURDF_wizard.utils.utils import render_template, generate_urdf
+from mobRobURDF_wizard.classes.sensor_config import (
+    build_user_sensors_xacro, build_bridge_yaml, camera_image_topics,
+)
 from ament_index_python.packages import get_package_share_directory
 from ruamel.yaml import YAML
 
 logger = logging.getLogger(__name__)
 
-# Name of the file (written next to the generated URDF) that stores the
-# controller spawner name. Launch files read it instead of being rewritten.
 SELECTED_CONTROLLER_FILE = "selected_controller.txt"
 DEFAULT_CONTROLLER_NAME = "diffDrive_controller"
 
-# (robot_type, controller_type) -> file/suffix used by the xacro templates.
 CONTROLLER_SUFFIX_MAP = {
     ("2_wheeled_caster", "diff_2wc"): "2wc_diff",
     ("3_wheeled", "tricycle"): "3w_tricycle",
@@ -28,31 +28,30 @@ CONTROLLER_SUFFIX_MAP = {
 
 class URDFManager:
     def __init__(self):
-        # Package share directory (ROS convention). Under `--symlink-install`
-        # this points back at the source tree, which is how generated files
-        # become visible to the launch files.
         self.base_dir = os.path.join(get_package_share_directory("mobRobURDF_description"), "urdf")
-        # Unique temporary directory for intermediate files.
         self.source_dir = os.path.join(
             tempfile.gettempdir(),
             f"mobRobURDF_temp_{''.join(random.choices(string.ascii_lowercase, k=8))}",
         )
         self.urdf_text = ""
         self.control_config_dir = os.path.join(get_package_share_directory("mobRobURDF_control"), "config")
-        self.last_params = {}  # Store last used parameters
+        self.last_params = {}
         self.last_robot_type = None
         self.last_controller_type = None
+        self.last_sensors = []
         os.makedirs(self.source_dir, exist_ok=True)
         logger.debug("URDFManager initialized (base_dir=%s, source_dir=%s)", self.base_dir, self.source_dir)
 
     def _controller_suffix(self, robot_type, controller_type):
         return CONTROLLER_SUFFIX_MAP.get((robot_type, controller_type), "4w_diff")
 
-    def generate_urdf(self, robot_type, controller_type, params):
+    def generate_urdf(self, robot_type, controller_type, params, sensors=None):
+        sensors = sensors or []
         try:
-            self.last_params = params.copy()  # Store parameters for save_urdf
+            self.last_params = params.copy()
             self.last_robot_type = robot_type
             self.last_controller_type = controller_type
+            self.last_sensors = sensors
 
             submodules_dir = os.path.join(self.base_dir, "submodules", robot_type)
             if robot_type == "4_wheeled" and controller_type == "ackermann":
@@ -69,38 +68,42 @@ class URDFManager:
                 logger.error(self.urdf_text)
                 return self.urdf_text
 
-            # The top-level mobRob_*.xacro is the only file containing wizard
-            # placeholders (e.g. ${wheel_radius}); every other template is pulled
-            # in via $(find ...) includes and only contains generic xacro macros,
-            # so rendering them here would be wasted work. It also already includes
-            # gazebo_properties.xacro and calls gazebo_physical_properties itself,
-            # so we must NOT inject that macro again (it would be duplicated).
+            # 1. Write user_sensors.xacro to base_dir so $(find ...) includes work.
+            sensors_xacro_path = os.path.join(self.base_dir, "user_sensors.xacro")
+            with open(sensors_xacro_path, "w") as f:
+                f.write(build_user_sensors_xacro(sensors))
+
+            # 2. Write generated bridge YAML and image topics file.
+            self._write_bridge_yaml(sensors)
+            self._write_image_topics(sensors)
+
+            # 3. Render body template and write to source_dir.
             params_with_controller = params.copy()
             params_with_controller["controller_type"] = controller_type
             mobrob_xacro = render_template(mobrob_file, params_with_controller)
-
-            # Process the rendered top-level file from a throwaway temp file.
-            # Includes resolve through $(find ...), so no companion files are needed.
             rendered_path = os.path.join(self.source_dir, f"mobRob_{controller_suffix}.xacro")
             with open(rendered_path, "w") as f:
                 f.write(mobrob_xacro)
 
-            self.urdf_text = generate_urdf(rendered_path)
-            logger.debug("URDF generated from %s", rendered_path)
+            # 4. Build a temporary wrapper that includes both body and sensors using
+            #    absolute paths so xacro can resolve them without $(find ...).
+            full_path = os.path.join(self.source_dir, "full_src.xacro")
+            with open(full_path, "w") as f:
+                f.write(self._build_full_xacro(rendered_path, sensors_xacro_path))
 
-            # Persist the generated artifacts so the launch files can use them.
+            self.urdf_text = generate_urdf(full_path)
+            logger.debug("URDF generated from %s", full_path)
+
+            # 5. Persist artifacts for launch files.
             with open(os.path.join(self.source_dir, "mobRob.urdf"), "w") as f:
                 f.write(self.urdf_text)
             with open(os.path.join(self.source_dir, "mobRob.urdf.xacro"), "w") as f:
                 f.write(self._build_xacro_wrapper())
 
-            # Refresh the install/share copies on every apply so a subsequent
-            # launch reflects the latest robot (no one-shot guard).
             self._copy_to_install()
-
             self.generate_controller_yaml(robot_type, controller_type, params)
-
             return self.urdf_text
+
         except FileNotFoundError as e:
             self.urdf_text = f"Error: File not found during URDF generation for {robot_type} with {controller_type}: {str(e)}"
             logger.error(self.urdf_text)
@@ -110,14 +113,24 @@ class URDFManager:
             logger.error(self.urdf_text)
             return self.urdf_text
 
+    def _build_full_xacro(self, body_path: str, sensors_path: str) -> str:
+        """Wrapper xacro using absolute paths (for in-process URDF generation)."""
+        return '\n'.join([
+            '<?xml version="1.0" ?>',
+            '<robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro">',
+            f'  <xacro:include filename="{body_path}"/>',
+            f'  <xacro:include filename="{sensors_path}"/>',
+            '</robot>',
+        ])
+
     def _build_xacro_wrapper(self):
-        """Build a parametrised .urdf.xacro that wraps the chosen mobRob template."""
+        """Build mobRob.urdf.xacro that uses $(find ...) paths for launch files."""
         controller_suffix = self._controller_suffix(self.last_robot_type, self.last_controller_type)
 
         lines = [
             '<?xml version="1.0" ?>',
             '<robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro">',
-            "  <!-- Xacro parameters -->",
+            '  <!-- Xacro parameters -->',
         ]
         for param_name, param_value in self.last_params.items():
             lines.append(f'  <xacro:property name="{param_name}" value="{param_value}"/>')
@@ -129,11 +142,40 @@ class URDFManager:
         lines.append(
             f'  <xacro:include filename="$(find mobRobURDF_description)/urdf/{submodules_dir}/mobRob_{controller_suffix}.xacro"/>'
         )
+        lines.append(
+            '  <xacro:include filename="$(find mobRobURDF_description)/urdf/user_sensors.xacro"/>'
+        )
         lines.append("</robot>")
         return "\n".join(lines)
 
+    def _write_bridge_yaml(self, sensors: list):
+        """Write gz_bridge_generated.yaml to the gazebo package's config dir."""
+        try:
+            gazebo_config = os.path.join(
+                get_package_share_directory("mobRobURDF_gazebo"), "config"
+            )
+            path = os.path.join(gazebo_config, "gz_bridge_generated.yaml")
+            with open(path, "w") as f:
+                f.write(build_bridge_yaml(sensors))
+            logger.debug("Wrote generated bridge YAML to %s", path)
+        except Exception as e:
+            logger.warning("Failed to write bridge YAML: %s", e)
+
+    def _write_image_topics(self, sensors: list):
+        """Write gz_image_topics.txt listing camera image topics for ros_gz_image bridge."""
+        try:
+            gazebo_config = os.path.join(
+                get_package_share_directory("mobRobURDF_gazebo"), "config"
+            )
+            topics = camera_image_topics(sensors)
+            path = os.path.join(gazebo_config, "gz_image_topics.txt")
+            with open(path, "w") as f:
+                f.write('\n'.join(topics) + ('\n' if topics else ''))
+            logger.debug("Wrote image topics to %s: %s", path, topics)
+        except Exception as e:
+            logger.warning("Failed to write image topics: %s", e)
+
     def _copy_to_install(self):
-        """Copy the generated mobRob.urdf[.xacro] from source_dir to the share dir."""
         for name in ("mobRob.urdf", "mobRob.urdf.xacro"):
             source = os.path.join(self.source_dir, name)
             dest = os.path.join(self.base_dir, name)
@@ -148,7 +190,6 @@ class URDFManager:
                 logger.warning("Failed to copy %s to install directory: %s", name, str(e))
 
     def _write_selected_controller(self, controller_name):
-        """Record the chosen controller spawner name for the launch files to read."""
         path = os.path.join(self.base_dir, SELECTED_CONTROLLER_FILE)
         try:
             with open(path, "w") as f:
@@ -182,7 +223,6 @@ class URDFManager:
                 logger.error("No YAML file or controller name mapped for controller_type: %s", controller_type)
                 return
 
-            # Determine subdirectory based on controller type
             if controller_type in ("diff_2wc", "diff_4w", "mecanum"):
                 subdir = "drive"
             elif controller_type in ("ackermann", "triSteer"):
@@ -203,10 +243,9 @@ class URDFManager:
             with open(yaml_path, "r") as f:
                 config = yaml.load(f)
 
-            # Extract parameters from params
             chassis = params.get("chassis_size", "1.2 0.8 0.3").split()
-            L = float(chassis[0])  # Length
-            W = float(chassis[1])  # Width
+            L = float(chassis[0])
+            W = float(chassis[1])
             wheel_radius = float(params.get("wheel_radius", "0.22"))
             wheel_width = float(params.get("wheel_width", "0.12"))
 
@@ -248,10 +287,8 @@ class URDFManager:
             return
 
         try:
-            # Ensure directory exists
             os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-            # Derive a clean base name regardless of the extension the user typed.
             if filename.endswith(".urdf.xacro"):
                 base = filename[: -len(".urdf.xacro")]
             elif filename.endswith(".urdf"):
@@ -261,13 +298,11 @@ class URDFManager:
             static_filename = base + ".urdf"
             xacro_filename = base + ".urdf.xacro"
 
-            # Save static URDF
             if self.urdf_text:
                 with open(static_filename, "w") as f:
                     f.write(self.urdf_text)
                 logger.debug("Static URDF saved to: %s", static_filename)
 
-            # Save parametrised xacro
             with open(xacro_filename, "w") as f:
                 f.write(self._build_xacro_wrapper())
             logger.debug("Xacro URDF saved to: %s", xacro_filename)

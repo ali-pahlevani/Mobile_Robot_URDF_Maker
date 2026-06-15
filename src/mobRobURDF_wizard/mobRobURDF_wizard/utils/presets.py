@@ -1,9 +1,7 @@
 """Save / load wizard configurations (presets).
 
-A preset is a small YAML file capturing everything needed to reproduce a
-configuration: the robot type, the controller type, and every parameter the
-user entered. This lets a configuration be reopened and tweaked later instead
-of being lost the moment the URDF is generated.
+A preset captures robot type, controller type, chassis/wheel parameters, and
+the full sensor list so a configuration can be reproduced later.
 """
 
 import os
@@ -12,7 +10,7 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
-PRESET_VERSION = 1
+PRESET_VERSION = 2
 
 VALID_ROBOT_TYPES = {"4_wheeled", "3_wheeled", "2_wheeled_caster"}
 VALID_CONTROLLERS = {
@@ -21,7 +19,6 @@ VALID_CONTROLLERS = {
     "2_wheeled_caster": {"diff_2wc"},
 }
 
-# Default location for user presets.
 DEFAULT_PRESET_DIR = os.path.join(os.path.expanduser("~"), "mobRobURDF_presets")
 
 
@@ -30,14 +27,15 @@ def default_preset_dir():
     return DEFAULT_PRESET_DIR
 
 
-def save_preset(path, robot_type, controller_type, params):
-    """Write a preset YAML. Raises on I/O error."""
+def save_preset(path, robot_type, controller_type, params, sensors=None):
+    """Write a preset YAML. ``sensors`` is a list of sensor dicts (from sensor_to_dict)."""
     data = {
         "format": "mobRobURDF_preset",
         "version": PRESET_VERSION,
         "robot_type": robot_type,
         "controller_type": controller_type,
         "parameters": dict(params),
+        "sensors": list(sensors) if sensors else [],
     }
     with open(path, "w") as f:
         yaml.safe_dump(data, f, sort_keys=False, default_flow_style=False)
@@ -47,7 +45,7 @@ def save_preset(path, robot_type, controller_type, params):
 def load_preset(path):
     """Read and validate a preset YAML.
 
-    Returns (robot_type, controller_type, parameters).
+    Returns (robot_type, controller_type, parameters, sensor_dicts).
     Raises ValueError if the file is malformed or inconsistent.
     """
     with open(path, "r") as f:
@@ -59,6 +57,7 @@ def load_preset(path):
     robot_type = data.get("robot_type")
     controller_type = data.get("controller_type")
     params = data.get("parameters", {})
+    sensors = data.get("sensors", [])
 
     if robot_type not in VALID_ROBOT_TYPES:
         raise ValueError(f"Unknown robot_type: {robot_type!r}")
@@ -68,7 +67,9 @@ def load_preset(path):
         )
     if not isinstance(params, dict):
         raise ValueError("'parameters' must be a mapping.")
+    if not isinstance(sensors, list):
+        sensors = []
 
-    # Coerce every value to a string (the UI line edits operate on strings).
+    # Coerce param values to strings (line edits operate on strings).
     params = {str(k): str(v) for k, v in params.items()}
-    return robot_type, controller_type, params
+    return robot_type, controller_type, params, sensors
