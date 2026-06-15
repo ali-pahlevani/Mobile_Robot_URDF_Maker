@@ -108,6 +108,13 @@ class RobotWizard(QWizard):
         super().resizeEvent(event)
         self._apply_responsive_layout()
 
+    def closeEvent(self, event):
+        # Tear down any running simulation so we don't orphan Gazebo/RViz.
+        page = getattr(self, "config_page", None)
+        if page is not None and getattr(page, "launch_manager", None) is not None:
+            page.launch_manager.shutdown()
+        event.accept()
+
     # ── Wizard button styling ──────────────────────────────────────────────
 
     def _style_wizard_buttons(self):

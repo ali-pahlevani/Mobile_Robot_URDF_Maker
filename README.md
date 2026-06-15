@@ -93,6 +93,22 @@ pip install PyOpenGL PyOpenGL_accelerate
 pip install ruamel.yaml
 ```
 
+> **Gazebo Harmonic** is the target simulator. On **ROS 2 Humble (Ubuntu 22.04)** the
+> default `ros_gz` packages are built against *Fortress*, so to run the simulation on
+> Harmonic you need the Harmonic‑built `ros_gz` and the `gz_ros2_control` plugin:
+>
+> ```bash
+> sudo apt install gz-harmonic
+> sudo apt install ros-humble-ros-gzharmonic ros-humble-gz-ros2-control
+> ```
+>
+> The launch files default to Gazebo **8 (Harmonic)**. To target a different version
+> (e.g. Fortress) pass `gz_version`:
+>
+> ```bash
+> ros2 launch mobRobURDF_launch gazebo_test.launch.py gz_version:=6
+> ```
+
 After that, you should **build** the workspace and **source** the installation:
 
 ```bash

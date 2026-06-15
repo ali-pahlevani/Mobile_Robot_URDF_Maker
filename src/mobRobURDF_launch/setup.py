@@ -27,6 +27,8 @@ setup(
     license='MIT',
     tests_require=['pytest'],
     entry_points={
-        'console_scripts': [],
+        'console_scripts': [
+            'cmd_vel_relay = mobRobURDF_launch.cmd_vel_relay:main',
+        ],
     },
 )

@@ -31,4 +31,11 @@
   chassis_size="${chassis_size}"
   wheel_radius="${wheel_radius}"
   wheel_width="${wheel_width}"/>
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_colors.xacro" />
+  <xacro:gazebo_visual_colors
+  controller_type="${controller_type}"
+  chassis_material="${chassis_material}"
+  wheel_material="${wheel_material}"
+  lidar_material="${lidar_material}"
+  camera_material="${camera_material}"/>
 </robot>

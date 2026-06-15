@@ -1,4 +1,5 @@
 import os
+import time
 import logging
 from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QHBoxLayout, QFormLayout, QGroupBox,
                              QLabel, QLineEdit, QTextEdit, QFileDialog, QWidget, QScrollArea,
@@ -6,8 +7,10 @@ from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QHBoxLayout, QFormLayout,
 from PyQt5.QtCore import pyqtSignal, Qt
 from ament_index_python.packages import get_package_share_directory
 from mobRobURDF_wizard.classes.OpenGLWidget import OpenGLWidget
-from mobRobURDF_wizard.classes.responsive_widgets import WrapButton
+from mobRobURDF_wizard.classes.responsive_widgets import WrapButton, ButtonRow
+from mobRobURDF_wizard.classes.launch_manager import LaunchManager
 from mobRobURDF_wizard.utils.utils import get_color
+from mobRobURDF_wizard.utils import presets
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +19,24 @@ class ConfigurationPage(QWizardPage):
     # The last argument (caster_radius) is `object` because it is None for
     # every non-2WC robot type.
     modelUpdated = pyqtSignal(float, float, float, str, str, str, str, str, tuple, tuple, tuple, tuple, str, object)
+
+    # Preset key -> line-edit attribute (attributes exist after setup_parameters()).
+    _PRESET_FIELDS = [
+        ("chassis_size", "chassisSizeLineEdit"),
+        ("chassis_mass", "chassisMassLineEdit"),
+        ("chassis_material", "chassisMaterialLineEdit"),
+        ("lidar_radius", "lidarRadiusLineEdit"),
+        ("lidar_height", "lidarHeightLineEdit"),
+        ("lidar_mass", "lidarMassLineEdit"),
+        ("lidar_material", "lidarMaterialLineEdit"),
+        ("camera_size", "cameraSizeLineEdit"),
+        ("camera_mass", "cameraMassLineEdit"),
+        ("camera_material", "cameraMaterialLineEdit"),
+        ("wheel_radius", "wheelRadiusLineEdit"),
+        ("wheel_width", "wheelWidthLineEdit"),
+        ("wheel_mass", "wheelMassLineEdit"),
+        ("wheel_material", "wheelMaterialLineEdit"),
+    ]
 
     def __init__(self, urdf_manager, parent=None):
         super().__init__(parent)
@@ -50,6 +71,15 @@ class ConfigurationPage(QWizardPage):
         self.scroll.setWidget(self._params_container)
         left_layout.addWidget(self.scroll, 1)
 
+        # Preset row (responsive: stacks vertically when narrow)
+        self.loadPresetButton = WrapButton("Load Preset", "secondary")
+        self.loadPresetButton.setMinimumHeight(34)
+        self.loadPresetButton.clicked.connect(self.loadPreset)
+        self.savePresetButton = WrapButton("Save Preset", "secondary")
+        self.savePresetButton.setMinimumHeight(34)
+        self.savePresetButton.clicked.connect(self.savePreset)
+        left_layout.addWidget(ButtonRow(self.loadPresetButton, self.savePresetButton))
+
         self.applyButton = WrapButton("Apply and Preview", "success")
         self.applyButton.setMinimumHeight(38)
         self.applyButton.clicked.connect(self.applyChanges)
@@ -59,6 +89,24 @@ class ConfigurationPage(QWizardPage):
         self.saveButton.setMinimumHeight(38)
         self.saveButton.clicked.connect(self.saveURDF)
         left_layout.addWidget(self.saveButton)
+
+        # One-click simulation launch
+        self.launchButton = WrapButton("Launch Simulation", "success")
+        self.launchButton.setMinimumHeight(38)
+        self.launchButton.clicked.connect(self.launchSimulation)
+        left_layout.addWidget(self.launchButton)
+
+        self.launchStatus = QLabel("")
+        self.launchStatus.setAlignment(Qt.AlignCenter)
+        self.launchStatus.setWordWrap(True)
+        self.launchStatus.setStyleSheet("font-size: 9pt; color: #7F8C8D;")
+        left_layout.addWidget(self.launchStatus)
+
+        self.launch_manager = LaunchManager(self)
+        self.launch_manager.started.connect(self._on_launch_started)
+        self.launch_manager.stopped.connect(self._on_launch_stopped)
+        self.launch_manager.output.connect(self._on_launch_output)
+        self._launch_start_time = 0.0
 
         # ── URDF text preview ─────────────────────────────────────────────
         self.previewTextEdit = QTextEdit()
@@ -294,3 +342,115 @@ class ConfigurationPage(QWizardPage):
             except Exception as e:
                 logger.error("Failed to save URDF to %s: %s", filename, str(e))
                 QMessageBox.warning(self, "Save failed", str(e))
+
+    # ── Presets ─────────────────────────────────────────────────────────────
+
+    def _gather_params(self):
+        params = {}
+        for key, attr in self._PRESET_FIELDS:
+            edit = getattr(self, attr, None)
+            if edit is not None:
+                params[key] = edit.text()
+        return params
+
+    def savePreset(self):
+        if not self.robot_type or not self.controller_type:
+            return
+        default = os.path.join(presets.default_preset_dir(),
+                               f"{self.robot_type}_{self.controller_type}.yaml")
+        path, _ = QFileDialog.getSaveFileName(self, "Save Preset", default,
+                                              "Preset Files (*.yaml *.yml)")
+        if not path:
+            return
+        if not path.endswith((".yaml", ".yml")):
+            path += ".yaml"
+        try:
+            presets.save_preset(path, self.robot_type, self.controller_type, self._gather_params())
+            QMessageBox.information(self, "Preset saved", f"Preset saved to:\n{path}")
+        except Exception as e:
+            logger.error("Failed to save preset to %s: %s", path, str(e))
+            QMessageBox.warning(self, "Save failed", str(e))
+
+    def loadPreset(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Load Preset", presets.default_preset_dir(),
+                                              "Preset Files (*.yaml *.yml)")
+        if not path:
+            return
+        try:
+            robot_type, controller_type, params = presets.load_preset(path)
+        except Exception as e:
+            logger.error("Failed to load preset %s: %s", path, str(e))
+            QMessageBox.warning(self, "Load failed", f"Could not load preset:\n{e}")
+            return
+
+        # Update wizard fields so the earlier selection pages reflect the load
+        # (they re-sync their highlighted cards in initializePage).
+        self.setField("robotType", robot_type)
+        self.setField("controllerType", controller_type)
+        self.robot_type = robot_type
+        self.controller_type = controller_type
+        self.setTitle(f"Configure {robot_type.replace('_', ' ').title()} Parameters "
+                      f"with {controller_type.replace('_', ' ').title()} Controller")
+
+        self.setup_parameters()
+        for key, attr in self._PRESET_FIELDS:
+            edit = getattr(self, attr, None)
+            if edit is not None and key in params:
+                edit.setText(params[key])
+        self.applyChanges()
+        QMessageBox.information(self, "Preset loaded", f"Loaded configuration from:\n{path}")
+
+    # ── One-click launch ──────────────────────────────────────────────────
+
+    def launchSimulation(self):
+        if self.launch_manager.is_running():
+            self.launch_manager.stop()
+            self.launchButton.setEnabled(False)
+            self.launchStatus.setText("Stopping simulation…")
+            return
+
+        # Apply the current configuration so the launch uses the latest URDF
+        # and selected controller.
+        self.applyChanges()
+        urdf = self.urdf_manager.get_urdf_text()
+        if not urdf or urdf.startswith("Error"):
+            QMessageBox.warning(
+                self, "Cannot launch",
+                "The current configuration did not produce a valid URDF:\n\n"
+                + (urdf[:400] if urdf else "(empty output)"))
+            return
+
+        self._launch_start_time = time.monotonic()
+        self.launch_manager.start()
+
+    def _set_launch_button_role(self, role):
+        self.launchButton.setProperty("btnRole", role)
+        self.launchButton.style().unpolish(self.launchButton)
+        self.launchButton.style().polish(self.launchButton)
+
+    def _on_launch_started(self):
+        self.launchButton.setText("Stop Simulation")
+        self.launchButton.setEnabled(True)
+        self._set_launch_button_role("danger")
+        self.launchStatus.setText("Simulation running — Gazebo, controllers and RViz are starting…")
+
+    def _on_launch_stopped(self, rc):
+        self.launchButton.setText("Launch Simulation")
+        self.launchButton.setEnabled(True)
+        self._set_launch_button_role("success")
+        elapsed = time.monotonic() - self._launch_start_time
+        if rc not in (0, -2) and elapsed < 4:
+            # Exited almost immediately with an error — most likely the
+            # workspace wasn't built/sourced.
+            self.launchStatus.setText("Simulation failed to start.")
+            QMessageBox.warning(
+                self, "Launch failed",
+                "The simulation exited immediately (code "
+                f"{rc}).\n\nMake sure the workspace is built and sourced:\n"
+                "  colcon build --symlink-install\n  source install/setup.bash")
+        else:
+            self.launchStatus.setText("Simulation stopped.")
+
+    def _on_launch_output(self, line):
+        logger.info("[sim] %s", line)
+

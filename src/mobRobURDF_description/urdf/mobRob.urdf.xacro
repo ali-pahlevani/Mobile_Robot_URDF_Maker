@@ -1,34 +1,32 @@
 <?xml version="1.0" ?>
 <robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Xacro parameters -->
-  <xacro:property name="chassis_size" value="1 2 1"/>
-  <xacro:property name="chassis_mass" value="10"/>
-  <xacro:property name="chassis_material" value="Red"/>
-  <xacro:property name="lidar_radius" value="0.3"/>
-  <xacro:property name="lidar_height" value="0.4"/>
-  <xacro:property name="lidar_mass" value="2"/>
-  <xacro:property name="lidar_material" value="Black"/>
-  <xacro:property name="camera_size" value="0.2 0.2 0.1"/>
-  <xacro:property name="camera_mass" value="1"/>
-  <xacro:property name="camera_material" value="Green"/>
-  <xacro:property name="wheel_radius" value="0.5"/>
-  <xacro:property name="wheel_width" value="0.3"/>
-  <xacro:property name="wheel_mass" value="3"/>
-  <xacro:property name="wheel_material" value="Blue"/>
-  <xacro:property name="fl_x" value="0.16666666666666669"/>
-  <xacro:property name="fl_y" value="1.15"/>
-  <xacro:property name="fl_z" value="-0.5"/>
-  <xacro:property name="fr_x" value="0.16666666666666669"/>
-  <xacro:property name="fr_y" value="-1.15"/>
-  <xacro:property name="fr_z" value="-0.5"/>
-  <xacro:property name="rl_x" value="-0.16666666666666669"/>
-  <xacro:property name="rl_y" value="1.15"/>
-  <xacro:property name="rl_z" value="-0.5"/>
-  <xacro:property name="rr_x" value="-0.16666666666666669"/>
-  <xacro:property name="rr_y" value="-1.15"/>
-  <xacro:property name="rr_z" value="-0.5"/>
-  <xacro:property name="lidar_z" value="0.7"/>
-  <xacro:property name="camera_x" value="0.6"/>
-  <xacro:property name="controller_type" value="mecanum"/>
-  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/4_wheeled/mobRob_4w_mec.xacro"/>
+  <xacro:property name="chassis_size" value="1.2 0.8 0.3"/>
+  <xacro:property name="chassis_mass" value="1.0"/>
+  <xacro:property name="chassis_material" value="Gray"/>
+  <xacro:property name="lidar_radius" value="0.1"/>
+  <xacro:property name="lidar_height" value="0.08"/>
+  <xacro:property name="lidar_mass" value="0.2"/>
+  <xacro:property name="lidar_material" value="Red"/>
+  <xacro:property name="camera_size" value="0.08 0.2 0.08"/>
+  <xacro:property name="camera_mass" value="0.1"/>
+  <xacro:property name="camera_material" value="Blue"/>
+  <xacro:property name="wheel_radius" value="0.22"/>
+  <xacro:property name="wheel_width" value="0.12"/>
+  <xacro:property name="wheel_mass" value="0.5"/>
+  <xacro:property name="wheel_material" value="Black"/>
+  <xacro:property name="caster_radius" value="0.22"/>
+  <xacro:property name="l_x" value="-0.3"/>
+  <xacro:property name="l_y" value="0.46"/>
+  <xacro:property name="l_z" value="-0.15"/>
+  <xacro:property name="r_x" value="-0.3"/>
+  <xacro:property name="r_y" value="-0.46"/>
+  <xacro:property name="r_z" value="-0.15"/>
+  <xacro:property name="caster_x" value="0.38"/>
+  <xacro:property name="caster_y" value="0"/>
+  <xacro:property name="caster_z" value="-0.15"/>
+  <xacro:property name="lidar_z" value="0.19"/>
+  <xacro:property name="camera_x" value="0.64"/>
+  <xacro:property name="controller_type" value="diff_2wc"/>
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/2_wheeled_caster/mobRob_2wc_diff.xacro"/>
 </robot>

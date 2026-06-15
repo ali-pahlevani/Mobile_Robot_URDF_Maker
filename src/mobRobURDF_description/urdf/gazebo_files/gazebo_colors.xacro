@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Apply Gazebo Harmonic visual material (ambient/diffuse) to a single named link.
+       The URDF <material name="..."/> tag is RViz-only; Gazebo Harmonic (gz-sim 8)
+       requires explicit RGBA values inside <gazebo reference="link"><material>. -->
+  <xacro:macro name="gz_link_color" params="link_name color">
+    <xacro:property name="_rgba" value="${
+      '0.5  0.5  0.5  1' if color == 'Gray'  else
+      '0.05 0.05 0.05 1' if color == 'Black' else
+      '1.0  0.0  0.0  1' if color == 'Red'   else
+      '0.0  0.2  1.0  1' if color == 'Blue'  else
+      '0.0  0.8  0.0  1' if color == 'Green' else
+      '1.0  1.0  1.0  1'
+    }"/>
+    <gazebo reference="${link_name}">
+      <material>
+        <ambient>${_rgba}</ambient>
+        <diffuse>${_rgba}</diffuse>
+        <specular>0.1 0.1 0.1 1</specular>
+        <emissive>0 0 0 1</emissive>
+      </material>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Apply colors to every visual link, selecting wheel names by controller_type. -->
+  <xacro:macro name="gazebo_visual_colors"
+               params="controller_type chassis_material wheel_material lidar_material camera_material">
+
+    <!-- Chassis and sensors are the same across all robot types. -->
+    <xacro:gz_link_color link_name="chassis" color="${chassis_material}"/>
+    <xacro:gz_link_color link_name="lidar"   color="${lidar_material}"/>
+    <xacro:gz_link_color link_name="camera"  color="${camera_material}"/>
+
+    <!-- 4-wheeled robots: diff_4w, mecanum, ackermann -->
+    <xacro:if value="${controller_type in ('diff_4w', 'mecanum', 'ackermann')}">
+      <xacro:gz_link_color link_name="front_left_wheel"  color="${wheel_material}"/>
+      <xacro:gz_link_color link_name="front_right_wheel" color="${wheel_material}"/>
+      <xacro:gz_link_color link_name="rear_left_wheel"   color="${wheel_material}"/>
+      <xacro:gz_link_color link_name="rear_right_wheel"  color="${wheel_material}"/>
+    </xacro:if>
+
+    <!-- 3-wheeled robots: tricycle, triSteer -->
+    <xacro:if value="${controller_type in ('tricycle', 'triSteer')}">
+      <xacro:gz_link_color link_name="front_wheel"      color="${wheel_material}"/>
+      <xacro:gz_link_color link_name="rear_left_wheel"  color="${wheel_material}"/>
+      <xacro:gz_link_color link_name="rear_right_wheel" color="${wheel_material}"/>
+    </xacro:if>
+
+    <!-- 2-wheeled with caster: diff_2wc -->
+    <xacro:if value="${controller_type == 'diff_2wc'}">
+      <xacro:gz_link_color link_name="left_wheel"         color="${wheel_material}"/>
+      <xacro:gz_link_color link_name="right_wheel"        color="${wheel_material}"/>
+      <xacro:gz_link_color link_name="front_caster_wheel" color="${wheel_material}"/>
+    </xacro:if>
+
+  </xacro:macro>
+
+</robot>
