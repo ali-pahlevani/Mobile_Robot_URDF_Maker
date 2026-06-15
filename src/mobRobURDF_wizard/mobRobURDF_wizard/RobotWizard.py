@@ -10,6 +10,7 @@ from OpenGL.GLUT import glutInit
 # Custom page classes
 try:
     from mobRobURDF_wizard.classes.pages.WelcomePage import WelcomePage
+    from mobRobURDF_wizard.classes.pages.StartSessionPage import StartSessionPage
     from mobRobURDF_wizard.classes.pages.RobotTypeSelectionPage import RobotTypeSelectionPage
     from mobRobURDF_wizard.classes.pages.ControlConfigurationPage import ControlConfigurationPage
     from mobRobURDF_wizard.classes.pages.ConfigurationPage import ConfigurationPage
@@ -25,7 +26,7 @@ except ImportError as e:
     print(f"Error importing modules: {e}")
     sys.exit(1)
 
-_NAV_LABELS = ["Welcome", "Select Robot Type", "Select Controller",
+_NAV_LABELS = ["Welcome", "Start", "Select Robot Type", "Select Controller",
                "Configure Parameters", "Tune Controller", "Final Check",
                "Teleoperation", "Future Features"]
 
@@ -83,6 +84,8 @@ class RobotWizard(QWizard):
         # ── Pages ──────────────────────────────────────────────────
         try:
             self.addPage(WelcomePage())
+            self.start_session_page = StartSessionPage(self.urdf_manager)
+            self.addPage(self.start_session_page)
             self.addPage(RobotTypeSelectionPage())
             self.addPage(ControlConfigurationPage())
             self.config_page = ConfigurationPage(self.urdf_manager)

@@ -40,6 +40,7 @@ class URDFManager:
         self.last_controller_type = None
         self.last_sensors = []
         self.last_tuner_params = {}   # persists across ConfigurationPage Apply clicks
+        self.pending_restore = None   # set by StartSessionPage; consumed by ConfigurationPage
         os.makedirs(self.source_dir, exist_ok=True)
         logger.debug("URDFManager initialized (base_dir=%s, source_dir=%s)", self.base_dir, self.source_dir)
 

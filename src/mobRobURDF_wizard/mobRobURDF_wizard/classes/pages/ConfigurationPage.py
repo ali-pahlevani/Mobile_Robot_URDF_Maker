@@ -109,6 +109,12 @@ class ConfigurationPage(QWizardPage):
     # ── Page lifecycle ────────────────────────────────────────────────────
 
     def initializePage(self):
+        pending = getattr(self.urdf_manager, 'pending_restore', None)
+        if pending:
+            self._restore_from_session(pending)
+            self.urdf_manager.pending_restore = None
+            return
+
         new_robot_type = self.field("robotType") or "4_wheeled"
         new_controller_type = self.field("controllerType")
         if not new_controller_type:
@@ -138,6 +144,54 @@ class ConfigurationPage(QWizardPage):
             self._reset_sensors(saved_sensors)
 
         self.applyChanges()
+
+    def _restore_from_session(self, data: dict):
+        """Fully restore wizard state from a session dict (loaded from .mobsession)."""
+        robot_type = data.get("robot_type", "4_wheeled")
+        controller_type = data.get("controller_type", "diff_4w")
+        params = data.get("parameters", {})
+        sensor_dicts = data.get("sensors", [])
+        tuner_params = data.get("tuner_params", {})
+        saved_urdf = data.get("urdf_text", "")
+
+        # Sync wizard-level fields so other pages stay consistent.
+        try:
+            self.setField("robotType", robot_type)
+            self.setField("controllerType", controller_type)
+        except Exception:
+            pass
+
+        self.robot_type = robot_type
+        self.controller_type = controller_type
+        self.setTitle(
+            f"Configure {robot_type.replace('_', ' ').title()} Parameters "
+            f"with {controller_type.replace('_', ' ').title()} Controller"
+        )
+
+        self.setup_parameters()
+
+        for key, attr in self._PRESET_FIELDS:
+            edit = getattr(self, attr, None)
+            if edit is not None and key in params:
+                edit.setText(params[key])
+
+        sensor_configs = [sensor_from_dict(d) for d in sensor_dicts]
+        if not sensor_configs:
+            sensor_configs = default_sensors(
+                robot_type, params.get("chassis_size", "1.2 0.8 0.3")
+            )
+        self._reset_sensors(sensor_configs)
+
+        # Restore tuner params so ControllerTunerPage picks them up.
+        if tuner_params:
+            self.urdf_manager.last_tuner_params = tuner_params
+
+        # Generate fresh URDF from restored params (updates 3D preview).
+        self.applyChanges()
+
+        # Override with the saved URDF text (may include manual edits from FinalCheckPage).
+        if saved_urdf:
+            self.urdf_manager.urdf_text = saved_urdf
 
     def setup_parameters(self):
         # Remove all existing form widgets but preserve sensor cards externally.

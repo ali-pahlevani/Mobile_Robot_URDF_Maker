@@ -28,12 +28,31 @@ except ImportError:
     _HAS_RCLPY = False
     logger.warning("rclpy not available — teleop publishing disabled")
 
-# Key groups
+# Cardinal key groups
 _FWD_KEYS   = {Qt.Key_W, Qt.Key_Up}
 _BWD_KEYS   = {Qt.Key_S, Qt.Key_Down}
 _LEFT_KEYS  = {Qt.Key_A, Qt.Key_Left}
 _RIGHT_KEYS = {Qt.Key_D, Qt.Key_Right}
 _STOP_KEYS  = {Qt.Key_Space}
+
+# Diagonal key groups
+_FWD_LEFT_KEYS  = {Qt.Key_Q}
+_FWD_RIGHT_KEYS = {Qt.Key_E}
+_BWD_LEFT_KEYS  = {Qt.Key_Z}
+_BWD_RIGHT_KEYS = {Qt.Key_C}
+
+_DPAD_DIAG_QSS = """
+    QPushButton {
+        background-color: #F0F3F4;
+        border: 2px solid #BDC3C7;
+        border-radius: 10px;
+        color: #5D6D7E;
+        font-size: 12pt;
+        font-weight: bold;
+    }
+    QPushButton:hover  { background-color: #EBF5FB; border-color: #AED6F1; }
+    QPushButton:pressed { background-color: #2980B9; color: white; border-color: #2980B9; }
+"""
 
 _DPAD_BTN_QSS = """
     QPushButton {{
@@ -163,38 +182,62 @@ class TeleoperationPage(QWizardPage):
     def _build_dpad(self):
         w = QWidget()
         g = QGridLayout(w)
-        g.setSpacing(8)
+        g.setSpacing(6)
         g.setContentsMargins(0, 0, 0, 0)
 
-        def btn(symbol, stop=False):
+        def cardinal(symbol, stop=False):
             b = QPushButton(symbol)
             b.setFixedSize(80, 80)
             b.setStyleSheet(_dpad_style(stop))
             return b
 
-        self._btn_fwd  = btn("▲")
-        self._btn_bwd  = btn("▼")
-        self._btn_left = btn("◄")
-        self._btn_rgt  = btn("►")
-        self._btn_stop = btn("■", stop=True)
+        def diagonal(symbol):
+            b = QPushButton(symbol)
+            b.setFixedSize(70, 70)
+            b.setStyleSheet(_DPAD_DIAG_QSS)
+            return b
 
-        # Forward / backward / left / right: held while pressed
+        self._btn_fwd  = cardinal("▲")
+        self._btn_bwd  = cardinal("▼")
+        self._btn_left = cardinal("◄")
+        self._btn_rgt  = cardinal("►")
+        self._btn_stop = cardinal("■", stop=True)
+
+        # Diagonal buttons: Q ↖  E ↗  Z ↙  C ↘
+        self._btn_fl = diagonal("Q\n↖")
+        self._btn_fr = diagonal("E\n↗")
+        self._btn_bl = diagonal("Z\n↙")
+        self._btn_br = diagonal("C\n↘")
+
+        # All movement buttons: add/remove their direction tag while held
         for b, d in (
             (self._btn_fwd,  "fwd"),
             (self._btn_bwd,  "bwd"),
             (self._btn_left, "left"),
             (self._btn_rgt,  "right"),
+            (self._btn_fl,   "diag_fl"),
+            (self._btn_fr,   "diag_fr"),
+            (self._btn_bl,   "diag_bl"),
+            (self._btn_br,   "diag_br"),
         ):
             b.pressed.connect(lambda d=d: self._btn_dirs.add(d))
             b.released.connect(lambda d=d: self._btn_dirs.discard(d))
 
         self._btn_stop.clicked.connect(self._emergency_stop)
 
+        # 3 × 3 grid:
+        #  [Q↖] [W▲] [E↗]
+        #  [A◄] [■ ] [D►]
+        #  [Z↙] [S▼] [C↘]
+        g.addWidget(self._btn_fl,   0, 0)
         g.addWidget(self._btn_fwd,  0, 1)
+        g.addWidget(self._btn_fr,   0, 2)
         g.addWidget(self._btn_left, 1, 0)
         g.addWidget(self._btn_stop, 1, 1)
         g.addWidget(self._btn_rgt,  1, 2)
+        g.addWidget(self._btn_bl,   2, 0)
         g.addWidget(self._btn_bwd,  2, 1)
+        g.addWidget(self._btn_br,   2, 2)
 
         return w
 
@@ -251,23 +294,27 @@ class TeleoperationPage(QWizardPage):
     def _build_keyboard_ref(self):
         grp = QGroupBox("Keyboard Shortcuts")
         g = QGridLayout(grp)
-        g.setSpacing(6)
+        g.setSpacing(5)
         entries = [
-            ("W  /  ↑",    "Forward"),
-            ("S  /  ↓",    "Backward"),
-            ("A  /  ←",    "Turn left"),
-            ("D  /  →",    "Turn right"),
-            ("Space",      "Emergency stop"),
+            ("W  /  ↑",  "Forward"),
+            ("S  /  ↓",  "Backward"),
+            ("A  /  ←",  "Turn left"),
+            ("D  /  →",  "Turn right"),
+            ("Q",        "Forward-left  ↖"),
+            ("E",        "Forward-right  ↗"),
+            ("Z",        "Backward-left  ↙"),
+            ("C",        "Backward-right  ↘"),
+            ("Space",    "Emergency stop"),
         ]
         for i, (key, action) in enumerate(entries):
             key_lbl = QLabel(key)
             key_lbl.setAlignment(Qt.AlignCenter)
             key_lbl.setStyleSheet(
                 "background:#EBF5FB; border:1px solid #AED6F1; "
-                "border-radius:4px; padding:2px 10px; font-weight:bold; font-size:9pt;"
+                "border-radius:4px; padding:2px 8px; font-weight:bold; font-size:9pt;"
             )
             act_lbl = QLabel(action)
-            act_lbl.setStyleSheet("font-size:9.5pt;")
+            act_lbl.setStyleSheet("font-size:9pt;")
             g.addWidget(key_lbl, i, 0)
             g.addWidget(act_lbl, i, 1)
         return grp
@@ -382,20 +429,33 @@ class TeleoperationPage(QWizardPage):
     def _tick(self):
         linear = angular = 0.0
 
-        active = self._held_keys | {
-            Qt.Key_W     if "fwd"   in self._btn_dirs else None,
-            Qt.Key_S     if "bwd"   in self._btn_dirs else None,
-            Qt.Key_A     if "left"  in self._btn_dirs else None,
-            Qt.Key_D     if "right" in self._btn_dirs else None,
-        } - {None}
+        # Map button directions to virtual keys (including diagonal combinations).
+        extra: set = set()
+        for tag, keys in (
+            ("fwd",     {Qt.Key_W}),
+            ("bwd",     {Qt.Key_S}),
+            ("left",    {Qt.Key_A}),
+            ("right",   {Qt.Key_D}),
+            ("diag_fl", {Qt.Key_Q}),
+            ("diag_fr", {Qt.Key_E}),
+            ("diag_bl", {Qt.Key_Z}),
+            ("diag_br", {Qt.Key_C}),
+        ):
+            if tag in self._btn_dirs:
+                extra |= keys
 
-        if active & _FWD_KEYS:
-            linear  =  self._lin
-        elif active & _BWD_KEYS:
-            linear  = -self._lin
-        if active & _LEFT_KEYS:
-            angular =  self._ang
-        elif active & _RIGHT_KEYS:
+        active = self._held_keys | extra
+
+        # Linear: any forward key (including diagonals) → positive; backward → negative.
+        if active & (_FWD_KEYS | _FWD_LEFT_KEYS | _FWD_RIGHT_KEYS):
+            linear = self._lin
+        elif active & (_BWD_KEYS | _BWD_LEFT_KEYS | _BWD_RIGHT_KEYS):
+            linear = -self._lin
+
+        # Angular: any left key → positive (CCW); any right key → negative (CW).
+        if active & (_LEFT_KEYS | _FWD_LEFT_KEYS | _BWD_LEFT_KEYS):
+            angular = self._ang
+        elif active & (_RIGHT_KEYS | _FWD_RIGHT_KEYS | _BWD_RIGHT_KEYS):
             angular = -self._ang
 
         self._publish(linear, angular)
