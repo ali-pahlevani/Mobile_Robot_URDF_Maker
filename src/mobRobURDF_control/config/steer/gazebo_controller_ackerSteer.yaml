@@ -38,6 +38,13 @@ ackerSteer_controller:
 
     traction_track_width: 0.8
     traction_wheels_radius: 0.22
+    cmd_vel_timeout: 0.5
+    traction:
+      max_acceleration: 1.06
+      max_deceleration: 1.06
+    steering:
+      max_position: 0.785
+      max_velocity: 1.0
 joint_state_broadcaster:
   ros__parameters:
     joints:

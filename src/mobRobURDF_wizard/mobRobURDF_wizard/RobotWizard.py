@@ -13,6 +13,7 @@ try:
     from mobRobURDF_wizard.classes.pages.RobotTypeSelectionPage import RobotTypeSelectionPage
     from mobRobURDF_wizard.classes.pages.ControlConfigurationPage import ControlConfigurationPage
     from mobRobURDF_wizard.classes.pages.ConfigurationPage import ConfigurationPage
+    from mobRobURDF_wizard.classes.pages.ControllerTunerPage import ControllerTunerPage
     from mobRobURDF_wizard.classes.pages.FutureFeaturesPage import FutureFeaturesPage
     from mobRobURDF_wizard.classes.URDFManager import URDFManager
     from mobRobURDF_wizard.utils.style import (
@@ -23,7 +24,7 @@ except ImportError as e:
     sys.exit(1)
 
 _NAV_LABELS = ["Welcome", "Select Robot Type", "Select Controller",
-               "Configure Parameters", "Future Features"]
+               "Configure Parameters", "Tune Controller", "Future Features"]
 
 
 class RobotWizard(QWizard):
@@ -83,6 +84,8 @@ class RobotWizard(QWizard):
             self.addPage(ControlConfigurationPage())
             self.config_page = ConfigurationPage(self.urdf_manager)
             self.addPage(self.config_page)
+            self.tuner_page = ControllerTunerPage(self.urdf_manager)
+            self.addPage(self.tuner_page)
             self.addPage(FutureFeaturesPage())
         except Exception as e:
             logging.error(f"Failed to add pages: {e}")

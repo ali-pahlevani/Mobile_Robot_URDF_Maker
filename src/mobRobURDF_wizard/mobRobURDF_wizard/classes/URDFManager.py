@@ -39,6 +39,7 @@ class URDFManager:
         self.last_robot_type = None
         self.last_controller_type = None
         self.last_sensors = []
+        self.last_tuner_params = {}   # persists across ConfigurationPage Apply clicks
         os.makedirs(self.source_dir, exist_ok=True)
         logger.debug("URDFManager initialized (base_dir=%s, source_dir=%s)", self.base_dir, self.source_dir)
 
@@ -273,6 +274,10 @@ class URDFManager:
                 config["ackerSteer_controller"]["ros__parameters"]["front_wheels_radius"] = wheel_radius
                 config["ackerSteer_controller"]["ros__parameters"]["rear_wheels_radius"] = wheel_radius
 
+            # Apply any tuner params that were set from the ControllerTunerPage.
+            if self.last_tuner_params:
+                self._apply_tuner_params_to_config(config, controller_type, controller_name)
+
             with open(yaml_path, "w") as f:
                 yaml.dump(config, f)
             logger.debug("Updated controller YAML: %s", yaml_path)
@@ -280,6 +285,66 @@ class URDFManager:
             self._write_selected_controller(controller_name)
         except Exception as e:
             logger.error("Failed to update controller YAML %s: %s", yaml_path, str(e))
+
+    def _apply_tuner_params_to_config(self, config, controller_type, controller_name):
+        """Write last_tuner_params into the already-loaded YAML config dict."""
+        p = self.last_tuner_params
+        ctrl = config[controller_name]["ros__parameters"]
+
+        ctrl["publish_rate"]   = float(p.get("publish_rate", 50.0))
+        ctrl["enable_odom_tf"] = bool(p.get("enable_odom_tf", True))
+        ctrl["open_loop"]      = bool(p.get("open_loop", False))
+
+        if "cmd_vel_timeout" in p:
+            ctrl["cmd_vel_timeout"] = float(p["cmd_vel_timeout"])
+
+        config["controller_manager"]["ros__parameters"]["update_rate"] = int(p.get("update_rate", 50))
+
+        max_lv = float(p.get("max_linear_velocity", 0.0))
+        max_av = float(p.get("max_angular_velocity", 0.0))
+        max_la = float(p.get("max_linear_acceleration", 0.0))
+        max_aa = float(p.get("max_angular_acceleration", 0.0))
+
+        if controller_type in ("diff_4w", "diff_2wc"):
+            # diff_drive_controller uses linear.x / angular.z nested structure.
+            if "linear" not in ctrl:
+                ctrl["linear"] = {}
+            if "x" not in ctrl["linear"]:
+                ctrl["linear"]["x"] = {}
+            ctrl["linear"]["x"]["max_velocity"]    = max_lv
+            ctrl["linear"]["x"]["min_velocity"]    = -max_lv
+            ctrl["linear"]["x"]["max_acceleration"] = max_la
+            ctrl["linear"]["x"]["max_deceleration"] = max_la
+
+            if "angular" not in ctrl:
+                ctrl["angular"] = {}
+            if "z" not in ctrl["angular"]:
+                ctrl["angular"]["z"] = {}
+            ctrl["angular"]["z"]["max_velocity"]    = max_av
+            ctrl["angular"]["z"]["min_velocity"]    = -max_av
+            ctrl["angular"]["z"]["max_acceleration"] = max_aa
+            ctrl["angular"]["z"]["max_deceleration"] = max_aa
+
+        elif controller_type in ("tricycle", "triSteer", "ackermann"):
+            max_sa = float(p.get("max_steering_angle", 0.785))
+            max_sv = float(p.get("max_steering_velocity", 1.0))
+
+            if "traction" not in ctrl:
+                ctrl["traction"] = {}
+            ctrl["traction"]["max_acceleration"] = max_la
+            ctrl["traction"]["max_deceleration"] = max_la
+
+            if "steering" not in ctrl:
+                ctrl["steering"] = {}
+            ctrl["steering"]["max_position"] = max_sa
+            ctrl["steering"]["max_velocity"] = max_sv
+
+        # mecanum controller does not expose velocity limits via standard YAML keys.
+
+    def apply_tuner_params(self, robot_type, controller_type, params, tuner_params):
+        """Store tuner params and regenerate the controller YAML immediately."""
+        self.last_tuner_params = tuner_params.copy()
+        self.generate_controller_yaml(robot_type, controller_type, params)
 
     def save_urdf(self, filename):
         if not self.last_params or not self.last_robot_type or not self.last_controller_type:

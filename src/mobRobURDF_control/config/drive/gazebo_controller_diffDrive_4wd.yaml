@@ -59,6 +59,19 @@ diffDrive_controller:
     #angular.z.max_jerk: 1.0
     #angular.z.min_jerk: -1.0
 
+    cmd_vel_timeout: 0.5
+    linear:
+      x:
+        max_velocity: 2.64
+        min_velocity: -2.64
+        max_acceleration: 1.06
+        max_deceleration: 1.06
+    angular:
+      z:
+        max_velocity: 5.74
+        min_velocity: -5.74
+        max_acceleration: 2.87
+        max_deceleration: 2.87
 joint_state_broadcaster:
   ros__parameters:
     joints:
