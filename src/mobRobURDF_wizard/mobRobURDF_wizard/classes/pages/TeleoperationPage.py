@@ -42,6 +42,32 @@ _FWD_RIGHT_KEYS = {Qt.Key_E}
 _BWD_LEFT_KEYS  = {Qt.Key_Z}
 _BWD_RIGHT_KEYS = {Qt.Key_C}
 
+_STRAFE_BTN_QSS = """
+    QPushButton {
+        background-color: #F0F3F4;
+        border: 2px solid #BDC3C7;
+        border-radius: 8px;
+        color: #5D6D7E;
+        font-size: 10pt;
+        padding: 4px 12px;
+    }
+    QPushButton:checked {
+        background-color: #2980B9;
+        border-color: #2471A3;
+        color: white;
+        font-weight: bold;
+    }
+    QPushButton:disabled {
+        background-color: #F8F9FA;
+        border-color: #DEE2E6;
+        color: #ADB5BD;
+    }
+    QPushButton:hover:!checked:!disabled {
+        background-color: #EBF5FB;
+        border-color: #AED6F1;
+    }
+"""
+
 _DPAD_DIAG_QSS = """
     QPushButton {
         background-color: #F0F3F4;
@@ -92,6 +118,7 @@ class TeleoperationPage(QWizardPage):
         self._spinning    = False
         self._held_keys   = set()
         self._btn_dirs    = set()   # active directions from D-pad buttons
+        self._strafe_mode = False   # True → left/right → linear.y (mecanum only)
         self._launch_start_time = 0.0
 
         self.setTitle("Teleoperation")
@@ -162,6 +189,21 @@ class TeleoperationPage(QWizardPage):
         center.addWidget(dpad)
         center.addStretch()
         vbox.addLayout(center)
+
+        # Strafe mode toggle — enabled only for mecanum controller
+        self._strafe_btn = QPushButton("⇔  Strafe Mode")
+        self._strafe_btn.setMinimumHeight(36)
+        self._strafe_btn.setCheckable(True)
+        self._strafe_btn.setChecked(False)
+        self._strafe_btn.setEnabled(False)
+        self._strafe_btn.setToolTip(
+            "Mecanum only — toggle lateral strafing.\n"
+            "When active, ◄ / ► (and A/D) slide the robot sideways\n"
+            "instead of rotating (sets linear.y instead of angular.z)."
+        )
+        self._strafe_btn.setStyleSheet(_STRAFE_BTN_QSS)
+        self._strafe_btn.toggled.connect(self._on_strafe_toggled)
+        vbox.addWidget(self._strafe_btn)
 
         # Velocity readout
         self._vel_lbl = QLabel("linear:  0.00 m/s    angular:  0.00 rad/s")
@@ -301,8 +343,8 @@ class TeleoperationPage(QWizardPage):
         entries = [
             ("W  /  ↑",  "Forward"),
             ("S  /  ↓",  "Backward"),
-            ("A  /  ←",  "Turn left"),
-            ("D  /  →",  "Turn right"),
+            ("A  /  ←",  "Turn left  /  Strafe left ⇔"),
+            ("D  /  →",  "Turn right  /  Strafe right ⇔"),
             ("Q",        "Forward-left  ↖"),
             ("E",        "Forward-right  ↗"),
             ("Z",        "Backward-left  ↙"),
@@ -407,7 +449,11 @@ class TeleoperationPage(QWizardPage):
             self._pub = None
         self._conn_btn.setText("Connect to /cmd_vel")
         self._set_status(False, "Disconnected")
-        self._vel_lbl.setText("linear:  0.00 m/s    angular:  0.00 rad/s")
+        self._vel_lbl.setText(
+            "linear.x:  0.00 m/s    linear.y:  0.00 m/s"
+            if self._strafe_mode else
+            "linear:  0.00 m/s    angular:  0.00 rad/s"
+        )
 
     def _spin_loop(self):
         while self._spinning and rclpy.ok():
@@ -418,6 +464,12 @@ class TeleoperationPage(QWizardPage):
         self._status_dot.setStyleSheet(f"font-size: 14pt; color: {color};")
         self._status_lbl.setText(text)
         self._status_lbl.setStyleSheet(f"font-size: 10pt; color: {color};")
+
+    # ── Strafe mode ─────────────────────────────────────────────────────────
+
+    def _on_strafe_toggled(self, checked: bool):
+        self._strafe_mode = checked
+        self._tick()  # immediately reflect the mode change in the readout
 
     # ── Velocity publishing ─────────────────────────────────────────────────
 
@@ -430,7 +482,7 @@ class TeleoperationPage(QWizardPage):
         return self._ang_slider.value() / 10.0
 
     def _tick(self):
-        linear = angular = 0.0
+        linear = angular = lateral = 0.0
 
         # Map button directions to virtual keys (including diagonal combinations).
         extra: set = set()
@@ -449,38 +501,52 @@ class TeleoperationPage(QWizardPage):
 
         active = self._held_keys | extra
 
-        # Linear: any forward key (including diagonals) → positive; backward → negative.
+        # Linear.x: any forward key (including diagonals) → positive; backward → negative.
         if active & (_FWD_KEYS | _FWD_LEFT_KEYS | _FWD_RIGHT_KEYS):
             linear = self._lin
         elif active & (_BWD_KEYS | _BWD_LEFT_KEYS | _BWD_RIGHT_KEYS):
             linear = -self._lin
 
-        # Angular: any left key → positive (CCW); any right key → negative (CW).
-        if active & (_LEFT_KEYS | _FWD_LEFT_KEYS | _BWD_LEFT_KEYS):
-            angular = self._ang
-        elif active & (_RIGHT_KEYS | _FWD_RIGHT_KEYS | _BWD_RIGHT_KEYS):
-            angular = -self._ang
+        if self._strafe_mode:
+            # Strafe mode (mecanum): left/right → linear.y (sideways); angular stays 0.
+            # Diagonal buttons produce true diagonal translation (linear.x + linear.y).
+            if active & (_LEFT_KEYS | _FWD_LEFT_KEYS | _BWD_LEFT_KEYS):
+                lateral = self._lin   # positive Y = left in ROS convention
+            elif active & (_RIGHT_KEYS | _FWD_RIGHT_KEYS | _BWD_RIGHT_KEYS):
+                lateral = -self._lin  # negative Y = right
+        else:
+            # Normal mode: left/right → angular.z (rotation).
+            if active & (_LEFT_KEYS | _FWD_LEFT_KEYS | _BWD_LEFT_KEYS):
+                angular = self._ang
+            elif active & (_RIGHT_KEYS | _FWD_RIGHT_KEYS | _BWD_RIGHT_KEYS):
+                angular = -self._ang
 
-        self._publish(linear, angular)
+        self._publish(linear, angular, lateral)
 
-    def _publish(self, linear: float, angular: float):
+    def _publish(self, linear: float, angular: float, lateral: float = 0.0):
         if self._pub is None:
             return
         msg = Twist()
         msg.linear.x  = linear
+        msg.linear.y  = lateral
         msg.angular.z = angular
         try:
             self._pub.publish(msg)
         except Exception as e:
             logger.debug(f"Teleop publish error: {e}")
-        self._vel_lbl.setText(
-            f"linear:  {linear:+.2f} m/s    angular:  {angular:+.2f} rad/s"
-        )
+        if self._strafe_mode:
+            self._vel_lbl.setText(
+                f"linear.x: {linear:+.2f} m/s    linear.y: {lateral:+.2f} m/s"
+            )
+        else:
+            self._vel_lbl.setText(
+                f"linear:  {linear:+.2f} m/s    angular:  {angular:+.2f} rad/s"
+            )
 
     def _emergency_stop(self):
         self._held_keys.clear()
         self._btn_dirs.clear()
-        self._publish(0.0, 0.0)
+        self._publish(0.0, 0.0, 0.0)
 
     # ── Keyboard events ─────────────────────────────────────────────────────
 
@@ -503,6 +569,20 @@ class TeleoperationPage(QWizardPage):
 
     def initializePage(self):
         self.setFocus()
+        # Enable strafe toggle only for mecanum controller.
+        controller = ""
+        try:
+            controller = self.wizard().field("controllerType") or ""
+        except Exception:
+            pass
+        is_mecanum = (controller == "mecanum")
+        self._strafe_btn.setEnabled(is_mecanum)
+        if not is_mecanum:
+            # Uncheck without calling _tick (no connection yet on page entry)
+            self._strafe_btn.blockSignals(True)
+            self._strafe_btn.setChecked(False)
+            self._strafe_btn.blockSignals(False)
+            self._strafe_mode = False
 
     def cleanupPage(self):
         self._disconnect()
