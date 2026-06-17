@@ -2,8 +2,9 @@
 
 Lets the user drive the robot directly from the wizard using on-screen
 D-pad buttons or keyboard shortcuts (WASD / arrow keys).  Publishes
-geometry_msgs/Twist to /cmd_vel at 10 Hz via an rclpy node running in a
-background daemon thread.
+geometry_msgs/Twist to /cmd_vel at 50 Hz via an rclpy node running in a
+background daemon thread.  An immediate publish is also triggered on every
+key-press/release and button press/release so latency is minimised.
 """
 
 import time
@@ -100,9 +101,10 @@ class TeleoperationPage(QWizardPage):
         )
         self.setFocusPolicy(Qt.StrongFocus)
 
-        # 10 Hz publish timer
+        # 50 Hz publish timer — matches controller update_rate so every
+        # controller cycle receives a fresh setpoint (reduces closed-loop hunting)
         self._timer = QTimer(self)
-        self._timer.setInterval(100)
+        self._timer.setInterval(20)
         self._timer.timeout.connect(self._tick)
 
         # Simulation launch manager
@@ -209,7 +211,8 @@ class TeleoperationPage(QWizardPage):
         self._btn_bl = diagonal("Z\n↙")
         self._btn_br = diagonal("C\n↘")
 
-        # All movement buttons: add/remove their direction tag while held
+        # All movement buttons: add/remove their direction tag while held,
+        # then immediately publish so there's no wait for the next timer tick.
         for b, d in (
             (self._btn_fwd,  "fwd"),
             (self._btn_bwd,  "bwd"),
@@ -220,8 +223,8 @@ class TeleoperationPage(QWizardPage):
             (self._btn_bl,   "diag_bl"),
             (self._btn_br,   "diag_br"),
         ):
-            b.pressed.connect(lambda d=d: self._btn_dirs.add(d))
-            b.released.connect(lambda d=d: self._btn_dirs.discard(d))
+            b.pressed.connect(lambda d=d: (self._btn_dirs.add(d), self._tick()))
+            b.released.connect(lambda d=d: (self._btn_dirs.discard(d), self._tick()))
 
         self._btn_stop.clicked.connect(self._emergency_stop)
 
@@ -489,10 +492,12 @@ class TeleoperationPage(QWizardPage):
             self._emergency_stop()
         else:
             self._held_keys.add(key)
+            self._tick()   # publish immediately instead of waiting for next timer fire
 
     def keyReleaseEvent(self, event):
         if not event.isAutoRepeat():
             self._held_keys.discard(event.key())
+            self._tick()   # send the stop (or reduced) command right away
 
     # ── Wizard page lifecycle ───────────────────────────────────────────────
 

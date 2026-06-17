@@ -135,16 +135,26 @@
 
     <!-- ================================================================
          mecanum: 4-wheeled mecanum drive
+         Mecanum rollers are at ±45° — simulate with anisotropic friction:
+           fdir1 = high-friction direction (perpendicular to roller axis)
+           mu    = high (1.0)  — grips in fdir1 direction
+           mu2   = very low (0.01) — roller slips freely along the other axis
+         X-pattern roller layout (matching mecanum_drive_controller kinematics):
+           FL + RR: roller axis "1 1 0"  → fdir1 = "1 -1 0"
+           FR + RL: roller axis "1 -1 0" → fdir1 = "1 1 0"
          ================================================================ -->
     <xacro:if value="${controller_type == 'mecanum'}">
-      <xacro:macro name="mecanum_wheel" params="wheel_link wheel_joint">
+
+      <!-- FL and RR: rollers at +45°, fdir1 perpendicular = "1 -1 0" -->
+      <xacro:macro name="mecanum_wheel_pos45" params="wheel_link wheel_joint">
         <gazebo reference="${wheel_link}">
           <collision>
             <surface>
               <friction>
                 <ode>
-                  <mu>1.2</mu>
-                  <mu2>1.2</mu2>
+                  <mu>1.0</mu>
+                  <mu2>0.01</mu2>
+                  <fdir1>1 -1 0</fdir1>
                 </ode>
               </friction>
               <contact>
@@ -162,13 +172,45 @@
           </collision>
         </gazebo>
         <gazebo reference="${wheel_joint}">
-          <damping>0.15</damping>
+          <damping>0.05</damping>
         </gazebo>
       </xacro:macro>
-      <xacro:mecanum_wheel wheel_link="front_left_wheel"  wheel_joint="front_left_joint"/>
-      <xacro:mecanum_wheel wheel_link="front_right_wheel" wheel_joint="front_right_joint"/>
-      <xacro:mecanum_wheel wheel_link="rear_left_wheel"   wheel_joint="rear_left_joint"/>
-      <xacro:mecanum_wheel wheel_link="rear_right_wheel"  wheel_joint="rear_right_joint"/>
+
+      <!-- FR and RL: rollers at -45°, fdir1 perpendicular = "1 1 0" -->
+      <xacro:macro name="mecanum_wheel_neg45" params="wheel_link wheel_joint">
+        <gazebo reference="${wheel_link}">
+          <collision>
+            <surface>
+              <friction>
+                <ode>
+                  <mu>1.0</mu>
+                  <mu2>0.01</mu2>
+                  <fdir1>1 1 0</fdir1>
+                </ode>
+              </friction>
+              <contact>
+                <ode>
+                  <kp>1000000.0</kp>
+                  <kd>100.0</kd>
+                  <max_vel>0.1</max_vel>
+                  <min_depth>0.001</min_depth>
+                </ode>
+              </contact>
+              <bounce>
+                <restitution_coefficient>0.0</restitution_coefficient>
+              </bounce>
+            </surface>
+          </collision>
+        </gazebo>
+        <gazebo reference="${wheel_joint}">
+          <damping>0.05</damping>
+        </gazebo>
+      </xacro:macro>
+
+      <xacro:mecanum_wheel_pos45 wheel_link="front_left_wheel"  wheel_joint="front_left_joint"/>
+      <xacro:mecanum_wheel_neg45 wheel_link="front_right_wheel" wheel_joint="front_right_joint"/>
+      <xacro:mecanum_wheel_neg45 wheel_link="rear_left_wheel"   wheel_joint="rear_left_joint"/>
+      <xacro:mecanum_wheel_pos45 wheel_link="rear_right_wheel"  wheel_joint="rear_right_joint"/>
     </xacro:if>
 
     <!-- ================================================================
