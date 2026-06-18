@@ -1,274 +1,278 @@
-# Mobile_Robot_URDF_Maker (v4)
+# Mobile Robot URDF Maker
 
-**Automate** the process of making a **URDF** for your **mobile robot** using this "**Wizard**"
+> **Automate** the creation of a complete, simulation-ready **URDF** for your **mobile robot** — through a guided **wizard**, with no hand-written XML required.
 
 ![Preview_Image](https://github.com/user-attachments/assets/f117642b-6f3c-4057-a417-f05a30a2baa8)
 
-- You can now easily choose any **controller** you want for your selected mobile robot. A **new page** has been added to the wizard which let's you choose one of the **six available controllers**.
-- Based on the type of your robot, you may choose one these controllers:
-- **2-Wheeled** Robot with a **Caster Wheel**:
-    + **Differential-Drive** Controller
-- **3-Wheeled** Robot (**Tricycle**):
-    + **Tricycle** Controller
-    + **Tricycle-Steering** Controller
-- **4-Wheeled** Robot:
-    + **Differential-Drive** Controller (Skid-Steering)
-    + **Ackermann-Steering** Controller
-    + **Mecanum-Drive** Controller
-- After choosing the controller type and setting the parameters of the robot, the corresponding values for the controller will be set in the specific config file of that controller type (config files can be found at: **/mobRobURDF_control/config/**).
+**Mobile Robot URDF Maker** is a ROS 2 desktop application that walks you through building a mobile-robot description step by step: pick a chassis type, choose a `ros2_control` controller, set dimensions, add as many lidars and cameras as you like, tune the controller, and then **simulate and drive the robot in Gazebo — all from inside the wizard.** The result is a clean `.urdf` **and** `.urdf.xacro` pair plus matching controller configuration, ready to drop into your own stack.
 
-![Controller_List](https://github.com/user-attachments/assets/945a5620-d423-44a1-b807-2aa61d8e1d83)
-
-- Other good news is that now you can **simulate your robot** in **Modern Gazebo** (since the *Gazebo Classic* has reached its *EOL*). In order to do that, a **new launch file** has been added. By launching this launch file, *robot*, *Gazebo world*, and all the *controllers* will be spawned. Also, *Rviz2* window will open up as well; so, please *build* the workspace, *source* it, and finally *run* the following command:
-
-```bash
-ros2 launch mobRobURDF_launch gazebo_test.launch.py
-```
-![Gazebo_Scene](https://github.com/user-attachments/assets/2abbf489-6c52-4d09-b639-26b8e7e7771c)
+- **Target platform:** ROS 2 **Humble** (Ubuntu 22.04)
+- **Simulator:** **Gazebo Harmonic** (`gz sim` 8) via `gz_ros2_control`
+- **GUI:** PyQt5 with a live OpenGL 3D preview
 
 ---
 
-- It should be mentioned that for now, all the *twist commands* are **unstamped**; however, the **stamped versions** are on the way. For now, in order to control the robot in gazebo *teleoperately*, please run one of the following lines in **another terminal** based on your *controller type*:
+## Table of Contents
 
-**Differential-Drive** Controller:
-```bash
-ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/diffDrive_controller/cmd_vel_unstamped
-```
+- [Highlights](#highlights)
+- [Supported robots and controllers](#supported-robots-and-controllers)
+- [The wizard, page by page](#the-wizard-page-by-page)
+- [Simulation and teleoperation](#simulation-and-teleoperation)
+- [Sensors](#sensors)
+- [Saving your work: URDF, presets and sessions](#saving-your-work-urdf-presets-and-sessions)
+- [Workspace layout](#workspace-layout)
+- [Installation](#installation)
+- [Running](#running)
+- [Customisation](#customisation)
+- [Roadmap](#roadmap)
+- [Version history](#version-history)
+- [Contact](#contact)
 
-**Tricycle Controller**:
-```bash
-ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/tricycle_controller/cmd_vel
-```
+---
 
-**Tricycle-Steering** Controller:
-```bash
-ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/triSteer_controller/reference_unstamped
-```
+## Highlights
 
-**Differential-Drive** Controller (Skid-Steering):
-```bash
-ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/diffDrive_controller/cmd_vel_unstamped
-```
+- 🧭 **Guided 9-step wizard** with a side navigation bar — go forward, jump back, and revisit any completed step.
+- 🤖 **Three chassis families, six controllers** — differential, mecanum, tricycle, tricycle-steering and Ackermann, each backed by a real `ros2_control` plugin.
+- 🛞 **Geometry-driven kinematics** — wheel separation, wheelbase, track and the mecanum projection term are computed from the dimensions you enter and written straight into the controller YAML.
+- 🎛️ **Controller Tuner** — edit publish/update rates, command timeout, velocity/acceleration and steering limits, or fill them with physics-based **Auto-suggest** values.
+- 🔌 **Selectable hardware interface** — Gazebo simulation, mock hardware, or your own custom `ros2_control` plugin, injected directly into the generated URDF.
+- 📡 **Dynamic multi-sensor system** — add any number of lidars and cameras, each fully configurable, with a live 3D preview and auto-generated Gazebo bridge.
+- 🕹️ **Built-in teleoperation** — launch the simulation and drive with an on-screen D-pad or the keyboard (WASD / arrows, diagonals, strafe), no extra terminals needed.
+- 💾 **Presets and sessions** — save/load chassis+sensor presets, or snapshot the entire wizard state (including manual URDF edits) and resume later.
+- 🧊 **Dual output** — every build produces both a flattened `mobRob.urdf` and a re-editable `mobRob.urdf.xacro`.
 
-**Ackermann-Steering** Controller:
-```bash
-ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/ackerSteer_controller/reference_unstamped
-```
+---
 
-**Mecanum-Drive** Controller:
+## Supported robots and controllers
+
+| Robot type | Controller | `ros2_control` plugin |
+|---|---|---|
+| **2-Wheeled + Caster** | Differential Drive | `diff_drive_controller/DiffDriveController` |
+| **3-Wheeled (Tricycle)** | Tricycle | `tricycle_controller/TricycleController` |
+| **3-Wheeled (Tricycle)** | Tricycle Steering | `tricycle_steering_controller/TricycleSteeringController` |
+| **4-Wheeled** | Differential Drive (skid-steer) | `diff_drive_controller/DiffDriveController` |
+| **4-Wheeled** | Mecanum Drive | `mecanum_drive_controller/MecanumDriveController` |
+| **4-Wheeled** | Ackermann Steering | `ackermann_steering_controller/AckermannSteeringController` |
+
+The wizard only offers the controllers that are valid for the chosen chassis. The matching controller config lives under `src/mobRobURDF_control/config/` and is regenerated from your parameters every time you click **Apply**.
+
+![Controller_List](https://github.com/user-attachments/assets/945a5620-d423-44a1-b807-2aa61d8e1d83)
+
+---
+
+## The wizard, page by page
+
+1. **Welcome** — project intro.
+2. **Start Project** — begin a **new project** or **load a saved session** to resume exactly where you left off.
+3. **Select Robot Type** — choose 4-wheeled, 3-wheeled (tricycle) or 2-wheeled + caster.
+4. **Select Controller** — pick a controller compatible with that chassis (incompatible options are disabled).
+5. **Configure Parameters** — set chassis size/mass/material and wheel dimensions, add sensors, and watch the **live 3D preview**. *Apply and Preview* regenerates the URDF; *Save URDF to Folder* exports it.
+6. **Tune Controller** — review auto-computed geometry (read-only), pick the **hardware interface**, and set motion/steering limits (manually or via **Auto-suggest**).
+7. **Final Check** — review the generated URDF in an editor, make manual edits, copy to clipboard, **Save URDF**, or **Save Session**.
+8. **Simulate & Teleop** — launch Gazebo + RViz and drive the robot.
+9. **Future Features** — a look at what's coming next.
+
+---
+
+## Simulation and teleoperation
+
+From the **Simulate & Teleop** page, click **Launch Simulation**. The launch file
+(`mobRobURDF_launch/gazebo_test.launch.py`) brings up everything for you:
+
+- Gazebo Harmonic with the selected world
+- the robot spawned from `robot_description`
+- `controller_manager` with your chosen controller + `joint_state_broadcaster`
+- the `ros_gz` parameter bridge (clock + all sensor topics) and image bridge
+- RViz2 with a preconfigured view
+- a `cmd_vel_relay` node
+
+![Gazebo_Scene](https://github.com/user-attachments/assets/2abbf489-6c52-4d09-b639-26b8e7e7771c)
+
+**Driving the robot.** Different controllers listen on different command topics
+(`cmd_vel_unstamped`, `cmd_vel`, `reference_unstamped`, …). The built-in
+`cmd_vel_relay` hides this: it subscribes to a single **`/cmd_vel`** and republishes
+to whatever the active controller expects. So you can just:
+
+- use the on-screen **D-pad** or the **keyboard** (`W A S D` / arrow keys; `Q E Z C`
+  for diagonals; `Space` for emergency stop) right inside the wizard, after clicking
+  **Connect to /cmd_vel**, **or**
+- publish to `/cmd_vel` yourself from any tool, e.g.:
+
+  ```bash
+  ros2 run teleop_twist_keyboard teleop_twist_keyboard
+  ```
+
+For the **mecanum** controller, the **Strafe Mode** toggle remaps left/right to lateral
+(`linear.y`) motion so the robot slides sideways instead of turning.
+
+> All bundled controllers publish the `odom → base_link` TF and the odometry topic
+> themselves (`enable_odom_tf: true`), so no extra odometry node is required.
+
+You can also launch the simulation directly from a terminal:
+
 ```bash
-ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/mecDrive_controller/reference_unstamped
+ros2 launch mobRobURDF_launch gazebo_test.launch.py
+# choose a different world:
+ros2 launch mobRobURDF_launch gazebo_test.launch.py world:=/path/to/world.sdf
 ```
 
 ![Rviz2](https://github.com/user-attachments/assets/e21d173e-c43c-43de-a6be-9f3a55366c62)
 
 ---
 
-- One more thing to mention is that **some** of the controllers **don't** publish **odom->base_link tf** by themselves. For those ones, you'll need to run a **separate node** for publishing *odom->base_link tf* and *odometry topic*. Soon, **I'll add** those necessary nodes as well, so that you won't need to do anything at all.
+## Sensors
 
-- Finally, you can modify the **Gazebo physical properties** for your simulation in the following file: **/mobRobURDF_description/urdf/gazebo_files/gazebo_properties.xacro**. Also, you may add a *new world* (based on your needs) in the following directory: **/mobRobURDF_gazebo/worlds/** (and then modify the launch file).
+The **Configure Parameters** page hosts a dynamic sensor list. Click **+ Lidar** or
+**+ Camera** to add as many sensors as you need; each gets its own card where you set:
 
-- I almost forgot it. Another good news is that now, by *generating the URDF* for your robot, not only a **.urdf** file is created, also a **.urdf.xacro** file is created as well (**/mobRobURDF_description/urdf/mobRob.urdf** and **/mobRobURDF_description/urdf/mobRob.urdf.xacro**), so that you can easily modify the parameters after closing the wizard.
+- **Pose** relative to the chassis (x, y, z, roll, pitch, yaw)
+- **Visual/physics** (color, mass, geometry)
+- **Lidar**: samples, min/max angle, range, update rate
+- **Camera**: FOV, image resolution, clip planes, update rate
 
-- Finally, one **minor fix** is that in this version, the *caster wheel* (for the *2WC* robot type) has **3-DOF** for *free motion* (instead of its previous *fixed joint*).
+Every sensor appears immediately in the 3D preview at its exact pose and color. On
+build, the wizard writes `user_sensors.xacro` and a generated `gz_bridge_generated.yaml`
+(plus the image-topic list), so all sensor topics are bridged from Gazebo to ROS 2
+automatically.
 
 ---
 
-## Just like the previous version, the path to run the wizard is as simple as you can see:
+## Saving your work: URDF, presets and sessions
 
-In order to run the **Wizard**, first you need to **clone** the workspace:
+- **URDF** — every build writes both `mobRob.urdf` (flattened) and `mobRob.urdf.xacro`
+  (re-editable) into `mobRobURDF_description/urdf/`, and you can export copies anywhere.
+- **Presets** (`*.yaml`) — capture robot type, controller, chassis/wheel parameters and
+  the full sensor list. Saved to `~/mobRobURDF_presets/` by default.
+- **Sessions** (`*.mobsession`) — snapshot the **entire** wizard state: parameters,
+  sensors, tuner values, hardware interface and the current URDF text (including any
+  manual edits). Saved to `~/mobRobURDF_sessions/`. Reload one from the **Start Project**
+  page to continue right where you stopped.
+
+---
+
+## Workspace layout
+
+| Package | Purpose |
+|---|---|
+| `mobRobURDF_wizard` | The PyQt5 wizard application (main entry point). |
+| `mobRobURDF_description` | Xacro templates, macros, Gazebo files and the generated URDF. |
+| `mobRobURDF_control` | Per-controller `ros2_control` YAML configs. |
+| `mobRobURDF_gazebo` | Gazebo worlds, bridge config and `use_sim_time` settings. |
+| `mobRobURDF_launch` | Launch files (Gazebo test, URDF test) + the `cmd_vel_relay` node. |
+| `mobRobURDF_navigation` | Nav2 / SLAM configs and maps (used by upcoming features). |
+| `gz_ros2_control` | Vendored `gz_ros2_control` plugin (Harmonic), built in-workspace. |
+
+---
+
+## Installation
+
+**1. Clone the workspace**
 
 ```bash
 git clone https://github.com/ali-pahlevani/Mobile_Robot_URDF_Maker.git
 cd Mobile_Robot_URDF_Maker
 ```
-    
-For the next step, you'll need to install the **dependencies**:
+
+**2. Install Gazebo Harmonic and the Harmonic-built `ros_gz` stack**
+
+On ROS 2 Humble the default `ros_gz` packages target *Fortress*; this project uses
+*Harmonic*, so install:
 
 ```bash
 sudo apt update
-rosdep install --from-paths src --ignore-src -r -y
-sudo apt install python3-pyqt5 python3-pyqt5.qtopengl
-pip install PyOpenGL PyOpenGL_accelerate
-pip install ruamel.yaml
+sudo apt install gz-harmonic
+sudo apt install ros-humble-ros-gzharmonic ros-humble-gz-ros2-control
 ```
 
-> **Gazebo Harmonic** is the target simulator. On **ROS 2 Humble (Ubuntu 22.04)** the
-> default `ros_gz` packages are built against *Fortress*, so to run the simulation on
-> Harmonic you need the Harmonic‑built `ros_gz` and the `gz_ros2_control` plugin:
->
-> ```bash
-> sudo apt install gz-harmonic
-> sudo apt install ros-humble-ros-gzharmonic ros-humble-gz-ros2-control
-> ```
->
-> The launch files default to Gazebo **8 (Harmonic)**. To target a different version
-> (e.g. Fortress) pass `gz_version`:
->
-> ```bash
-> ros2 launch mobRobURDF_launch gazebo_test.launch.py gz_version:=6
-> ```
+**3. Install ROS and Python dependencies**
 
-After that, you should **build** the workspace and **source** the installation:
+```bash
+rosdep install --from-paths src --ignore-src -r -y
+sudo apt install python3-pyqt5 python3-pyqt5.qtopengl
+pip install PyOpenGL PyOpenGL_accelerate ruamel.yaml
+```
+
+**4. Build and source**
 
 ```bash
 colcon build --symlink-install
 source install/setup.bash
 ```
 
-Finally, you can easily run the following line in your **terminal**:
+---
+
+## Running
+
+**Launch the wizard:**
 
 ```bash
 ros2 run mobRobURDF_wizard mobRobURDF_wizard
 ```
----
 
-In order to launch the **new launch file** (Gazebo + Rviz2), you can run the following line in your **terminal**:
+**Launch the Gazebo + RViz simulation directly** (the wizard does this for you on the
+Simulate & Teleop page):
 
 ```bash
 ros2 launch mobRobURDF_launch gazebo_test.launch.py
 ```
 
----
-
-If you have any questions, please let me know: **a.pahlevani1998@gmail.com**
-
-+ Also, please don't forget to check out our **website** at: **https://www.SLAMbotics.org**
-
-## Please stay tuned for the next versions of the app.
-
----
----
----
-
-## Version 2
-
-**Automate** the process of making a **URDF** for your **mobile robot** using this "**Wizard**"
-
-- Now, you don't have only 1 option (4-wheeled robot). In version 2, you'll have **3 options** to choose from (in the next version, I'll introduce **specific controllers** for each of these types, so that you can make **ros2_control config files** for each of these types of **kinematics**):
-    - **4-Wheeled** Robot
-    - **3-Wheeled** Robot (**Tricycle**)
-    - **2-Wheeled** Robot with a **Caster Wheel**
-
-- You can easily choose the type of robot you need to work with, build its URDF **automatically** (based on the parameters you choose), and get your built URDF file.
-    - In this version, when you hit the save button, first a **copy of the URDF file** is **saved automatically** in a specific place for the launch file; so that **launch file** will recognize it automatically when you launch it (for **testing** purposes).
-    - Other than that, you can also save **another copy** of it to any **directory you want** (or simply close the saving window if you **don't need** it!).
-
-- As it be seen, the overall structure of the wizard has been enhanced and organized, so that not only you can **navigate to different pages** using **Navigation Bar**, also at the last page of the wizard (in this version), you can see the **upcoming updates** for the wizard in the next releases (adding *Gazebo* files, *SLAM* and *Navigation* capability, setting up *Controllers*, etc.).
-
----
-
-## Just like the previous version, the path to run the wizard is as simple as you can see:
-
-In order to run the **Wizard**, first you need to **clone** the workspace:
+The launch files default to **Gazebo 8 (Harmonic)**. To target another version
+(e.g. Fortress) pass `gz_version`:
 
 ```bash
-git clone https://github.com/ali-pahlevani/Mobile_Robot_URDF_Maker.git
-cd Mobile_Robot_URDF_Maker
-```
-    
-For the next step, you'll need to install the **dependencies**:
-
-```bash
-sudo apt update
-rosdep install --from-paths src --ignore-src -r -y
-sudo apt install python3-pyqt5 python3-pyqt5.qtopengl
-```
-
-After that, you should **build** the workspace and **source** the installation:
-
-```bash
-colcon build --symlink-install
-source install/setup.bash
-```
-
-Finally, you can easily run the following line in your **terminal**:
-
-```bash
-ros2 run mobRobURDF_wizard mobRobURDF_wizard
-```
----
-
-In order to run the launch file, you can run the following line in your **terminal**:
-
-```bash
-    ros2 launch mobRobURDF_launch urdf_test.launch.py
+ros2 launch mobRobURDF_launch gazebo_test.launch.py gz_version:=6
 ```
 
 ---
 
-If you have any question, please let me know: **a.pahlevani1998@gmail.com**
+## Customisation
 
-## Please stay tuned for the next versions of the app.
+You always retain full access to the underlying files:
 
----
----
----
-
-## Version 1
-
-**Automate** the process of making a **URDF** for your **4-wheeled mobile robot** using this "**Wizard**"
+- **Gazebo physics:** `mobRobURDF_description/urdf/gazebo_files/gazebo_properties.xacro`
+- **Worlds:** drop a new `.sdf` into `mobRobURDF_gazebo/worlds/` and pass it via `world:=`
+- **Controller configs:** `mobRobURDF_control/config/` (regenerated on Apply, but yours to edit afterwards)
+- **Xacro templates:** everything under `mobRobURDF_description/urdf/` is editable
 
 ---
 
-This workspace has 3 **ROS2** packages (up to now. I have plan for adding other packages as well for **Gazebo**, **Control**, **Navigation**, etc.):
+## Roadmap
 
-1. ### mobRobURDF_description:
-    - This package includes all the **template Xacro** files necessary for creating the **final URDF** file. The *sub-directories* in this directory are:
-        - **submodules:** containing **base.xacro** (*chassis*), **wheels.xacro** (*4 wheels*), and **sensors.xacro** (*2D-Lidar* + *RGB Camera*) files,
-        - **macros:** containing **inertial_macros.xacro**, and **material.xacro** (*colors*) files,
-        - **gazebo_files:** containing **gazebo_sensors.xacro** file for now (in the future, when the Gazebo package is added, not only this file will be used in the final URDF file, also other Xacro files for Gazebo will be added as well (e.g., **gazebo_properties.xacro** file)).
-    - Finally, all the Xacro files are imported into the *main Xacro file* (**mobRob.xacro**), so that it can be converted to **mobRob.urdf** file.
-    - Good news is that not only you can use the Wizard to make the URDF file you need, but also you have **access** to all the Xacro files. If you ever wanted to **change** any of them and adapt them to your specific case, you're free to go.
+Shown on the wizard's **Future Features** page:
 
----
-
-2. ### mobRobURDF_wizard:
-    - This is the *main package* of the workspace. This package contains the **source codes** of the Wizard. The codebase is composed of different classes and some utility functions, all imported into the main file **robot_wizard.py**. This package used to be a standalone codebase; however, now its a **ROS2 node**.
-    - In the Wizard window, you can apply your changes step by step, with no pressure. You can even fill only *some of the fields* and only apply those changes. Finally, you can **save your created URDF file** to any directory you want. Additionally, for your convenience, you'll have **3-DOF camera rotation**, plus **zooming capability** in the preview window. 
-    - **Attention:** If you want to use the launch file (that is provided for **testing purposes** (check the next part)), you'll need to **save** the created **URDF** file in the following location: **/mobRobURDF_description/urdf/mobRob.urdf**
-
-    - In order to run the **Wizard**, first you need to **clone** the workspace:
-
-    ```bash
-    git clone https://github.com/ali-pahlevani/Mobile_Robot_URDF_Maker.git
-    cd Mobile_Robot_URDF_Maker
-    ```
-    
-    - For the next step, you'll need to install the **dependencies**:
-
-    ```bash
-    sudo apt update
-    rosdep install --from-paths src --ignore-src -r -y
-    sudo apt install python3-pyqt5 python3-pyqt5.qtopengl
-    ```
-
-    - After that, you should **build** the workspace and **source** the installation:
-
-    ```bash
-    colcon build --symlink-install
-    source install/setup.bash
-    ```
-
-    - Finally, you can easily run the following line in your **terminal**:
-
-    ```bash
-    ros2 run mobRobURDF_wizard mobRobURDF_wizard
-    ```
+- More robot models and kinematics — *in progress*
+- SLAM — *in progress*
+- Navigation (Nav2) — *planned*
+- Fleet management — *planned*
 
 ---
 
-3. ### mobRobURDF_launch:
-    - This package includes 2 main directories:
-        - **launch:** containing only one launch file (for now) for testing purposes (**urdf_test.launch.py**). By launching this launch file, 3 nodes will be launched:
-            - **robot_state_publisher**
-            - **joint_state_publisher_gui**
-            - **rviz2**
-        Using these nodes, everyone would be able to **test** the performance of the final URDF file (**visual check** + **testing the joints**)
-        - **rviz:** containing only one *rviz2 config file* (**rviz_test.rviz**). This is the rviz2 config file that is loaded into the discussed launch file.
+## Version history
 
-    - In order to run the launch file, you can run the following line in your **terminal**:
+### Version 4 (current)
+Six selectable `ros2_control` controllers, Gazebo Harmonic simulation, a dynamic
+multi-sensor system, hardware-interface selection, a Controller Tuner, built-in
+teleoperation, and full preset/session save & load. Generates both `.urdf` and
+`.urdf.xacro`, and the 2WC caster now has a 3-DOF free joint.
 
-```bash
-    ros2 launch mobRobURDF_launch urdf_test.launch.py
-```
+### Version 2
+Three chassis types to choose from (4-wheeled, tricycle, 2-wheeled + caster), an
+organised wizard with a navigation bar, automatic URDF copy for the test launch file,
+and a preview of upcoming features.
+
+### Version 1
+The original wizard for a single **4-wheeled** robot: chassis + 4 wheels + a 2D lidar
+and RGB camera, with a 3D preview (rotate + zoom) and URDF export, plus a `urdf_test`
+launch file (`robot_state_publisher` + `joint_state_publisher_gui` + RViz2) for visual
+and joint checks.
+
+---
+
+## Contact
+
+Questions or feedback? **a.pahlevani1998@gmail.com**
+
+Check out the website: **https://www.SLAMbotics.org**
+
+> ⭐ If you find this useful, please star the repo — and stay tuned for the next versions!

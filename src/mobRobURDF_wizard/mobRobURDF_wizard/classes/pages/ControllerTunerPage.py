@@ -292,8 +292,12 @@ class ControllerTunerPage(QWizardPage):
             L = float(params.get('chassis_size', '1.2 0.8 0.3').split()[0])
             W = float(params.get('chassis_size', '1.2 0.8 0.3').split()[1])
             wr = float(params.get('wheel_radius', '0.22'))
+            ww = float(params.get('wheel_width', '0.12'))
+            # Must mirror URDFManager.generate_controller_yaml: the controller's
+            # sum_of_robot_center_projection_on_X_Y_axis = |wheel_x| + |wheel_y|.
+            sum_xy = round((L / 2 - wr / 1.5) + (W / 2 + ww / 2), 4)
             self._geo_fields['wheels_radius'] = self._field(geo_form, 'Wheel radius:', wr, 'm', readonly=True)
-            self._geo_fields['sum_xy']        = self._field(geo_form, 'Sum of X+Y axes:', round(L+W, 4), 'm', readonly=True)
+            self._geo_fields['sum_xy']        = self._field(geo_form, 'Sum of X+Y axes:', sum_xy, 'm', readonly=True)
 
         elif controller_type in ('tricycle', 'triSteer', 'ackermann'):
             L  = float(params.get('chassis_size', '1.2 0.8 0.3').split()[0])
