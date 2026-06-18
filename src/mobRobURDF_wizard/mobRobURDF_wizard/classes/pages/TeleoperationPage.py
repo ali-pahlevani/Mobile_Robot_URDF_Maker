@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont
 from mobRobURDF_wizard.classes.launch_manager import LaunchManager
+from mobRobURDF_wizard.classes.URDFManager import GAZEBO_SIM_PLUGIN
 
 logger = logging.getLogger(__name__)
 
@@ -600,6 +601,18 @@ class TeleoperationPage(QWizardPage):
             self._strafe_btn.setChecked(False)
             self._strafe_btn.blockSignals(False)
             self._strafe_mode = False
+
+        # Enable/disable simulation launch based on the selected hardware interface.
+        hw_plugin = self.urdf_manager.last_hardware_interface
+        is_sim = (hw_plugin == GAZEBO_SIM_PLUGIN)
+        self._launch_btn.setEnabled(is_sim)
+        if not is_sim:
+            self._sim_status.setText(
+                f"Simulation unavailable — hardware interface is set to real robot mode "
+                f"({hw_plugin or 'unknown'})."
+            )
+        else:
+            self._sim_status.setText("")
 
     def cleanupPage(self):
         self._disconnect()

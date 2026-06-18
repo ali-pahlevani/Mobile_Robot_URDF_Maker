@@ -3,7 +3,7 @@
 
     <ros2_control name="GazeboSystem" type="system">
         <hardware>
-            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+            <plugin>${hardware_plugin}</plugin>
         </hardware>
 
         <joint name="front_joint">
@@ -40,10 +40,12 @@
 
     </ros2_control>
 
-    <gazebo>
-        <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="libgz_ros2_control-system.so">
-            <parameters>$(find mobRobURDF_control)/config/gazebo_controller_tricycle.yaml</parameters>
-        </plugin>
-    </gazebo>
+    <xacro:if value="${use_gazebo_sim}">
+        <gazebo>
+            <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="libgz_ros2_control-system.so">
+                <parameters>$(find mobRobURDF_control)/config/gazebo_controller_tricycle.yaml</parameters>
+            </plugin>
+        </gazebo>
+    </xacro:if>
 
 </robot>

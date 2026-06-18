@@ -16,13 +16,14 @@ import math
 from PyQt5.QtWidgets import (
     QWizardPage, QHBoxLayout, QVBoxLayout, QFormLayout, QGroupBox,
     QLabel, QLineEdit, QCheckBox, QScrollArea, QWidget, QSizePolicy,
-    QMessageBox,
+    QMessageBox, QComboBox,
 )
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap
 from ament_index_python.packages import get_package_share_directory
 
 from mobRobURDF_wizard.classes.responsive_widgets import WrapButton, ButtonRow, ScaledPixmapLabel
+from mobRobURDF_wizard.classes.URDFManager import GAZEBO_SIM_PLUGIN
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,15 @@ _CTRL_IMAGE = {
 # Typical max motor angular velocity (rad/s) used for auto-suggest
 _MOTOR_MAX_RAD_S = 12.0
 
+# Hardware interface preset options: (display label, plugin name or None for custom)
+_HW_PRESETS = [
+    ("Gazebo Simulation", GAZEBO_SIM_PLUGIN),
+    ("Mock Hardware (testing, no physical robot)", "mock_components/GenericSystem"),
+    ("Custom Plugin...", None),
+]
+
+_READONLY_FIELD_STYLE = "QLineEdit { background: #ECF0F1; color: #7F8C8D; border: 1px solid #BDC3C7; }"
+
 
 class ControllerTunerPage(QWizardPage):
     def __init__(self, urdf_manager, parent=None):
@@ -64,10 +74,10 @@ class ControllerTunerPage(QWizardPage):
         outer.setSpacing(0)
 
         # ── Left: scrollable form ─────────────────────────────────────────
-        left_wrap = QWidget()
-        left_wrap.setFixedWidth(360)
-        lv = QVBoxLayout(left_wrap)
-        lv.setContentsMargins(10, 10, 10, 10)
+        self.left_widget = QWidget()
+        self.left_widget.setFixedWidth(360)
+        lv = QVBoxLayout(self.left_widget)
+        lv.setContentsMargins(8, 8, 8, 8)
         lv.setSpacing(8)
 
         scroll = QScrollArea()
@@ -95,7 +105,7 @@ class ControllerTunerPage(QWizardPage):
         self._status.setStyleSheet("font-size: 9pt; color: #27AE60;")
         lv.addWidget(self._status)
 
-        outer.addWidget(left_wrap)
+        outer.addWidget(self.left_widget)
 
         # ── Right: explanatory info panel ────────────────────────────────
         info_widget = QWidget()
@@ -144,6 +154,35 @@ class ControllerTunerPage(QWizardPage):
 
         outer.addWidget(info_widget, 1)
 
+    # ── Hardware interface helpers ────────────────────────────────────────
+
+    def _on_hw_combo_changed(self, idx):
+        _, plugin = _HW_PRESETS[idx]
+        if plugin is None:
+            self._hw_plugin_edit.setReadOnly(False)
+            self._hw_plugin_edit.setStyleSheet("")
+            self._hw_plugin_edit.setFocus()
+        else:
+            self._hw_plugin_edit.setReadOnly(True)
+            self._hw_plugin_edit.setStyleSheet(_READONLY_FIELD_STYLE)
+            self._hw_plugin_edit.setText(plugin)
+
+    def _get_current_hw_plugin(self):
+        idx = self._hw_combo.currentIndex()
+        _, plugin = _HW_PRESETS[idx]
+        return self._hw_plugin_edit.text().strip() if plugin is None else plugin
+
+    def _load_existing_hw_interface(self):
+        """Restore hardware interface combo/field from urdf_manager."""
+        plugin = self.urdf_manager.last_hardware_interface
+        for i, (_, p) in enumerate(_HW_PRESETS):
+            if p == plugin:
+                self._hw_combo.setCurrentIndex(i)
+                return
+        # Not a preset → select Custom
+        self._hw_combo.setCurrentIndex(len(_HW_PRESETS) - 1)
+        self._hw_plugin_edit.setText(plugin or "")
+
     # ── Form helpers ──────────────────────────────────────────────────────
 
     def _group(self, title):
@@ -191,6 +230,7 @@ class ControllerTunerPage(QWizardPage):
         self.setTitle(f"Tune Controller Parameters — {display}")
         self._build_form(ct)
         self._load_existing_tuner_params()
+        self._load_existing_hw_interface()
         self._update_ctrl_image(ct)
 
     def _update_ctrl_image(self, controller_type: str):
@@ -208,6 +248,33 @@ class ControllerTunerPage(QWizardPage):
         self._controller_type = controller_type
 
         params = self.urdf_manager.last_params
+
+        # ── Hardware Interface ────────────────────────────────────────────
+        hw_box, hw_form = self._group("Hardware Interface")
+        combo_row = QHBoxLayout()
+        combo_row.setSpacing(4)
+        self._hw_combo = QComboBox()
+        self._hw_combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self._hw_combo.setMinimumContentsLength(15)
+        for label, _ in _HW_PRESETS:
+            self._hw_combo.addItem(label)
+        combo_row.addWidget(self._hw_combo)
+        hw_form.addRow("Interface:", combo_row)
+        plugin_row = QHBoxLayout()
+        plugin_row.setSpacing(4)
+        self._hw_plugin_edit = QLineEdit()
+        self._hw_plugin_edit.setPlaceholderText("e.g. my_pkg/MyHardwareSystem")
+        plugin_row.addWidget(self._hw_plugin_edit)
+        hw_form.addRow("Plugin:", plugin_row)
+        hw_note = QLabel(
+            "Non-simulation interface: disables Launch Simulation and sets "
+            "use_sim_time to false. Click Apply to regenerate the URDF."
+        )
+        hw_note.setWordWrap(True)
+        hw_note.setStyleSheet("font-size: 8.5pt; color: #7F8C8D; font-style: italic;")
+        hw_form.addRow(hw_note)
+        self._hw_combo.currentIndexChanged.connect(self._on_hw_combo_changed)
+        self._form_layout.addWidget(hw_box)
 
         # ── Auto-computed geometry (read-only) ────────────────────────────
         geo_box, geo_form = self._group("Auto-computed Geometry (from URDF)")
@@ -372,6 +439,14 @@ class ControllerTunerPage(QWizardPage):
                                 "Please configure the robot on the previous page first.")
             return
         try:
+            hw_plugin = self._get_current_hw_plugin()
+            if not hw_plugin:
+                QMessageBox.warning(self, "Invalid Plugin",
+                                    "Please enter a hardware interface plugin name.")
+                return
+            hw_changed = hw_plugin != self.urdf_manager.last_hardware_interface
+            self.urdf_manager.last_hardware_interface = hw_plugin
+
             tuner_params = self._gather_tuner_params()
             self.urdf_manager.apply_tuner_params(
                 self.urdf_manager.last_robot_type,
@@ -379,7 +454,19 @@ class ControllerTunerPage(QWizardPage):
                 self.urdf_manager.last_params,
                 tuner_params,
             )
-            self._status.setText("Controller YAML updated successfully.")
+
+            if hw_changed:
+                self.urdf_manager.generate_urdf(
+                    self.urdf_manager.last_robot_type,
+                    self.urdf_manager.last_controller_type,
+                    self.urdf_manager.last_params,
+                    self.urdf_manager.last_sensors,
+                )
+                self._status.setText(
+                    "Controller YAML and URDF updated with new hardware interface."
+                )
+            else:
+                self._status.setText("Controller YAML updated successfully.")
             self._status.setStyleSheet("font-size: 9pt; color: #27AE60;")
         except Exception as e:
             logger.error("Failed to apply tuner params: %s", e)

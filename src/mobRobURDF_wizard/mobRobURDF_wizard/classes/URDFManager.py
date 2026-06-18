@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 SELECTED_CONTROLLER_FILE = "selected_controller.txt"
 DEFAULT_CONTROLLER_NAME = "diffDrive_controller"
+GAZEBO_SIM_PLUGIN = "gz_ros2_control/GazeboSimSystem"
 
 CONTROLLER_SUFFIX_MAP = {
     ("2_wheeled_caster", "diff_2wc"): "2wc_diff",
@@ -40,6 +41,7 @@ class URDFManager:
         self.last_controller_type = None
         self.last_sensors = []
         self.last_tuner_params = {}   # persists across ConfigurationPage Apply clicks
+        self.last_hardware_interface = GAZEBO_SIM_PLUGIN
         self.pending_restore = None   # set by StartSessionPage; consumed by ConfigurationPage
         os.makedirs(self.source_dir, exist_ok=True)
         logger.debug("URDFManager initialized (base_dir=%s, source_dir=%s)", self.base_dir, self.source_dir)
@@ -82,6 +84,10 @@ class URDFManager:
             # 3. Render body template and write to source_dir.
             params_with_controller = params.copy()
             params_with_controller["controller_type"] = controller_type
+            params_with_controller["hardware_plugin"] = self.last_hardware_interface
+            params_with_controller["use_gazebo_sim"] = (
+                "1" if self.last_hardware_interface == GAZEBO_SIM_PLUGIN else "0"
+            )
             mobrob_xacro = render_template(mobrob_file, params_with_controller)
             rendered_path = os.path.join(self.source_dir, f"mobRob_{controller_suffix}.xacro")
             with open(rendered_path, "w") as f:
@@ -104,6 +110,7 @@ class URDFManager:
 
             self._copy_to_install()
             self.generate_controller_yaml(robot_type, controller_type, params)
+            self._write_use_sim_time_yaml()
             return self.urdf_text
 
         except FileNotFoundError as e:
@@ -176,6 +183,20 @@ class URDFManager:
             logger.debug("Wrote image topics to %s: %s", path, topics)
         except Exception as e:
             logger.warning("Failed to write image topics: %s", e)
+
+    def _write_use_sim_time_yaml(self):
+        """Write use_sim_time.yaml based on the current hardware interface."""
+        try:
+            gazebo_config = os.path.join(
+                get_package_share_directory("mobRobURDF_gazebo"), "config"
+            )
+            path = os.path.join(gazebo_config, "use_sim_time.yaml")
+            use_sim = self.last_hardware_interface == GAZEBO_SIM_PLUGIN
+            with open(path, "w") as f:
+                f.write(f"gz:\n  use_sim_time: {'true' if use_sim else 'false'}\n")
+            logger.debug("Updated use_sim_time.yaml: use_sim_time=%s", use_sim)
+        except Exception as e:
+            logger.warning("Failed to update use_sim_time.yaml: %s", e)
 
     def _copy_to_install(self):
         for name in ("mobRob.urdf", "mobRob.urdf.xacro"):

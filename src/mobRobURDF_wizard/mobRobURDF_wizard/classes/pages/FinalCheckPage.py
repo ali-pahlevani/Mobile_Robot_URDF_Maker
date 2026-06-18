@@ -23,14 +23,15 @@ def save_session(path: str, urdf_manager, urdf_text: str):
     from mobRobURDF_wizard.classes.sensor_config import sensor_to_dict
     sensors = [sensor_to_dict(s) for s in (urdf_manager.last_sensors or [])]
     data = {
-        "format":          "mobRobURDF_session",
-        "version":         SESSION_VERSION,
-        "robot_type":      urdf_manager.last_robot_type or "",
-        "controller_type": urdf_manager.last_controller_type or "",
-        "parameters":      dict(urdf_manager.last_params or {}),
-        "sensors":         sensors,
-        "tuner_params":    dict(urdf_manager.last_tuner_params or {}),
-        "urdf_text":       urdf_text,
+        "format":             "mobRobURDF_session",
+        "version":            SESSION_VERSION,
+        "robot_type":         urdf_manager.last_robot_type or "",
+        "controller_type":    urdf_manager.last_controller_type or "",
+        "parameters":         dict(urdf_manager.last_params or {}),
+        "sensors":            sensors,
+        "tuner_params":       dict(urdf_manager.last_tuner_params or {}),
+        "hardware_interface": urdf_manager.last_hardware_interface or "",
+        "urdf_text":          urdf_text,
     }
     os.makedirs(os.path.dirname(path) if os.path.dirname(path) else ".", exist_ok=True)
     with open(path, "w") as f:

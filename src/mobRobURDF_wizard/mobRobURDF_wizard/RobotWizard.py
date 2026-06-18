@@ -156,11 +156,14 @@ class RobotWizard(QWizard):
         if page is None:
             return
 
-        # Configure-parameters page: [ controls | 3D preview ].
+        # Left-panel width: 31% of content area, clamped [320, 460].
         content_w = w - nav_w
         controls_w = max(min(int(content_w * 0.31), 460), 320)
         page.left_widget.setFixedWidth(controls_w)
-        # The OpenGL widget keeps the remaining space (it has layout stretch).
+
+        tuner = getattr(self, "tuner_page", None)
+        if tuner is not None:
+            tuner.left_widget.setFixedWidth(controls_w)
 
     # ── Navigation ─────────────────────────────────────────────────────────
 

@@ -13,6 +13,7 @@ from mobRobURDF_wizard.classes.sensor_config import (
 )
 from mobRobURDF_wizard.utils.utils import get_color
 from mobRobURDF_wizard.utils import presets
+from mobRobURDF_wizard.classes.URDFManager import GAZEBO_SIM_PLUGIN
 
 logger = logging.getLogger(__name__)
 
@@ -185,6 +186,10 @@ class ConfigurationPage(QWizardPage):
         # Restore tuner params so ControllerTunerPage picks them up.
         if tuner_params:
             self.urdf_manager.last_tuner_params = tuner_params
+
+        # Restore hardware interface selection.
+        hw_interface = data.get("hardware_interface", GAZEBO_SIM_PLUGIN)
+        self.urdf_manager.last_hardware_interface = hw_interface or GAZEBO_SIM_PLUGIN
 
         # Generate fresh URDF from restored params (updates 3D preview).
         self.applyChanges()
