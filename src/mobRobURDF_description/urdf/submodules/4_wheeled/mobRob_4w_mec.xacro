@@ -18,10 +18,6 @@
   <xacro:wheel name="rear_left" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${rl_x}" y="${rl_y}" z="${rl_z}" />
   <xacro:wheel name="rear_right" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${rr_x}" y="${rr_y}" z="${rr_z}" />
 
-  <!-- Hardware interface (substituted by the wizard; used by the ros2_control xacro below) -->
-  <xacro:property name="hardware_plugin" value="${hardware_plugin}"/>
-  <xacro:property name="use_gazebo_sim" value="${use_gazebo_sim}"/>
-
   <!-- Include Gazebo Xacro files -->
   <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/control/gazebo_ros2_control_4w_mec.xacro" />
   <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_properties.xacro" />

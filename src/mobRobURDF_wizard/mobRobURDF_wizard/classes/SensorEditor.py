@@ -53,14 +53,23 @@ class SensorCard(QGroupBox):
             edits.append(e)
         return w, edits[0], edits[1], edits[2]
 
-    def _pair_grid_row(self, grid, row, lbl1, val1, lbl2, val2):
-        """Add two label+edit pairs to a 4-column grid row."""
+    def _unit_lbl(self, text):
+        u = QLabel(text)
+        u.setStyleSheet('color: #95A5A6; font-size: 8pt;')
+        return u
+
+    def _pair_grid_row(self, grid, row, lbl1, val1, lbl2, val2, unit1='', unit2=''):
+        """Add two label+edit(+unit) pairs to a 6-column grid row."""
         grid.addWidget(QLabel(lbl1), row, 0)
         e1 = self._edit(val1)
         grid.addWidget(e1, row, 1)
-        grid.addWidget(QLabel(lbl2), row, 2)
+        if unit1:
+            grid.addWidget(self._unit_lbl(unit1), row, 2)
+        grid.addWidget(QLabel(lbl2), row, 3)
         e2 = self._edit(val2)
-        grid.addWidget(e2, row, 3)
+        grid.addWidget(e2, row, 4)
+        if unit2:
+            grid.addWidget(self._unit_lbl(unit2), row, 5)
         return e1, e2
 
     def _separator(self):
@@ -105,7 +114,7 @@ class SensorCard(QGroupBox):
         pos_w, self.xEdit, self.yEdit, self.zEdit = self._triplet(
             0.0, 0.0, 0.3 if self._type == 'lidar' else 0.0, 'x', 'y', 'z')
         pos_row = QHBoxLayout()
-        pos_row.addWidget(QLabel('Pos:'))
+        pos_row.addWidget(QLabel('Pos (m):'))
         pos_row.addWidget(pos_w)
         vbox.addLayout(pos_row)
 
@@ -113,7 +122,7 @@ class SensorCard(QGroupBox):
         rot_w, self.rollEdit, self.pitchEdit, self.yawEdit = self._triplet(
             0.0, 0.0, 0.0, 'R', 'P', 'Y')
         rot_row = QHBoxLayout()
-        rot_row.addWidget(QLabel('RPY:'))
+        rot_row.addWidget(QLabel('RPY (rad):'))
         rot_row.addWidget(rot_w)
         vbox.addLayout(rot_row)
 
@@ -126,6 +135,7 @@ class SensorCard(QGroupBox):
         cm.addWidget(QLabel('Mass:'), 0, 2)
         self.massEdit = self._edit('0.1')
         cm.addWidget(self.massEdit, 0, 3)
+        cm.addWidget(self._unit_lbl('kg'), 0, 4)
         vbox.addLayout(cm)
 
         vbox.addWidget(self._separator())
@@ -141,23 +151,23 @@ class SensorCard(QGroupBox):
         g = QGridLayout()
         g.setSpacing(4)
         g.setColumnStretch(1, 1)
-        g.setColumnStretch(3, 1)
-        self.radiusEdit, self.heightEdit = self._pair_grid_row(g, 0, 'Radius:', '0.1', 'Height:', '0.08')
-        self.samplesEdit, self.rateEdit = self._pair_grid_row(g, 1, 'Samples:', '360', 'Rate:', '10.0')
-        self.minAngEdit, self.maxAngEdit = self._pair_grid_row(g, 2, 'MinAng:', '-3.14159', 'MaxAng:', '3.14159')
-        self.minRngEdit, self.maxRngEdit = self._pair_grid_row(g, 3, 'MinRng:', '0.3', 'MaxRng:', '12.0')
+        g.setColumnStretch(4, 1)
+        self.radiusEdit, self.heightEdit   = self._pair_grid_row(g, 0, 'Radius:',  '0.1',      'Height:',  '0.08',     'm',   'm')
+        self.samplesEdit, self.rateEdit    = self._pair_grid_row(g, 1, 'Samples:', '360',       'Rate:',    '10.0',     '',    'Hz')
+        self.minAngEdit, self.maxAngEdit   = self._pair_grid_row(g, 2, 'MinAng:',  '-3.14159',  'MaxAng:',  '3.14159',  'rad', 'rad')
+        self.minRngEdit, self.maxRngEdit   = self._pair_grid_row(g, 3, 'MinRng:',  '0.3',       'MaxRng:',  '12.0',     'm',   'm')
         vbox.addLayout(g)
 
     def _build_camera_fields(self, vbox):
         g = QGridLayout()
         g.setSpacing(4)
         g.setColumnStretch(1, 1)
-        g.setColumnStretch(3, 1)
-        self.camDepthEdit, self.camWidthEdit = self._pair_grid_row(g, 0, 'Depth:', '0.08', 'Width:', '0.08')
-        self.camHeightEdit, self.camRateEdit = self._pair_grid_row(g, 1, 'Height:', '0.06', 'Rate:', '10.0')
-        self.hFovEdit, self.vFovEdit = self._pair_grid_row(g, 2, 'H-FOV:', '1.089', 'V-FOV:', '0.785')
-        self.imgWEdit, self.imgHEdit = self._pair_grid_row(g, 3, 'ImgW:', '640', 'ImgH:', '480')
-        self.nearEdit, self.farEdit = self._pair_grid_row(g, 4, 'Near:', '0.05', 'Far:', '8.0')
+        g.setColumnStretch(4, 1)
+        self.camDepthEdit, self.camWidthEdit   = self._pair_grid_row(g, 0, 'Depth:',   '0.08',    'Width:',   '0.08',    'm',   'm')
+        self.camHeightEdit, self.camRateEdit   = self._pair_grid_row(g, 1, 'Height:',  '0.06',    'Rate:',    '10.0',    'm',   'Hz')
+        self.hFovEdit, self.vFovEdit           = self._pair_grid_row(g, 2, 'H-FOV:',   '1.089',   'V-FOV:',   '0.785',   'rad', 'rad')
+        self.imgWEdit, self.imgHEdit           = self._pair_grid_row(g, 3, 'ImgW:',    '640',     'ImgH:',    '480',     'px',  'px')
+        self.nearEdit, self.farEdit            = self._pair_grid_row(g, 4, 'Near:',    '0.05',    'Far:',     '8.0',     'm',   'm')
         vbox.addLayout(g)
 
     # ── Data access ───────────────────────────────────────────────────────────

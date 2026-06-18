@@ -124,9 +124,12 @@ class URDFManager:
 
     def _build_full_xacro(self, body_path: str, sensors_path: str) -> str:
         """Wrapper xacro using absolute paths (for in-process URDF generation)."""
+        use_sim = "1" if self.last_hardware_interface == GAZEBO_SIM_PLUGIN else "0"
         return '\n'.join([
             '<?xml version="1.0" ?>',
             '<robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro">',
+            f'  <xacro:property name="hardware_plugin" value="{self.last_hardware_interface}"/>',
+            f'  <xacro:property name="use_gazebo_sim" value="{use_sim}"/>',
             f'  <xacro:include filename="{body_path}"/>',
             f'  <xacro:include filename="{sensors_path}"/>',
             '</robot>',
@@ -144,6 +147,9 @@ class URDFManager:
         for param_name, param_value in self.last_params.items():
             lines.append(f'  <xacro:property name="{param_name}" value="{param_value}"/>')
         lines.append(f'  <xacro:property name="controller_type" value="{self.last_controller_type}"/>')
+        use_sim = "1" if self.last_hardware_interface == GAZEBO_SIM_PLUGIN else "0"
+        lines.append(f'  <xacro:property name="hardware_plugin" value="{self.last_hardware_interface}"/>')
+        lines.append(f'  <xacro:property name="use_gazebo_sim" value="{use_sim}"/>')
 
         submodules_dir = f"submodules/{self.last_robot_type}"
         if self.last_robot_type == "4_wheeled" and self.last_controller_type == "ackermann":

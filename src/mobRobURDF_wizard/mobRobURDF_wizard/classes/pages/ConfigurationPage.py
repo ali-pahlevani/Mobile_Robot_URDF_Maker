@@ -102,9 +102,18 @@ class ConfigurationPage(QWizardPage):
         form.setLabelAlignment(Qt.AlignLeft)
         return box, form
 
-    def _field(self, form, label, placeholder):
+    def _field(self, form, label, placeholder, unit=''):
         edit = QLineEdit(placeholderText=placeholder)
-        form.addRow(label, edit)
+        if unit:
+            row = QHBoxLayout()
+            row.setSpacing(4)
+            row.addWidget(edit)
+            u = QLabel(unit)
+            u.setStyleSheet("color: #95A5A6; font-size: 9pt;")
+            row.addWidget(u)
+            form.addRow(label, row)
+        else:
+            form.addRow(label, edit)
         return edit
 
     # ── Page lifecycle ────────────────────────────────────────────────────
@@ -218,16 +227,16 @@ class ConfigurationPage(QWizardPage):
 
     def add_common_parameters(self):
         chassis_box, chassis_form = self._group("Chassis")
-        self.chassisSizeLineEdit = self._field(chassis_form, "Size (L W H)", "e.g., 1.2 0.8 0.3")
-        self.chassisMassLineEdit = self._field(chassis_form, "Mass", "e.g., 1.0")
+        self.chassisSizeLineEdit = self._field(chassis_form, "Size (L W H)", "e.g., 1.2 0.8 0.3", "m")
+        self.chassisMassLineEdit = self._field(chassis_form, "Mass", "e.g., 1.0", "kg")
         self.chassisMaterialLineEdit = self._field(chassis_form, "Material", "e.g., Gray")
         self.params_layout.addWidget(chassis_box)
 
     def add_wheel_parameters(self, radius_label):
         wheel_box, wheel_form = self._group("Wheels")
-        self.wheelRadiusLineEdit = self._field(wheel_form, radius_label, "e.g., 0.22")
-        self.wheelWidthLineEdit = self._field(wheel_form, "Wheel Width", "e.g., 0.12")
-        self.wheelMassLineEdit = self._field(wheel_form, "Wheel Mass", "e.g., 0.5")
+        self.wheelRadiusLineEdit = self._field(wheel_form, radius_label, "e.g., 0.22", "m")
+        self.wheelWidthLineEdit = self._field(wheel_form, "Wheel Width", "e.g., 0.12", "m")
+        self.wheelMassLineEdit = self._field(wheel_form, "Wheel Mass", "e.g., 0.5", "kg")
         self.wheelMaterialLineEdit = self._field(wheel_form, "Wheel Material", "e.g., Black")
         self.params_layout.addWidget(wheel_box)
 
