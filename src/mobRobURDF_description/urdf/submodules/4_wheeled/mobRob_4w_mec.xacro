@@ -12,11 +12,11 @@
   <!-- Define the robot -->
   <xacro:chassis size="${chassis_size}" mass="${chassis_mass}" material="${chassis_material}" />
 
-  <!-- Wheels -->
-  <xacro:wheel name="front_left" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${fl_x}" y="${fl_y}" z="${fl_z}" />
-  <xacro:wheel name="front_right" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${fr_x}" y="${fr_y}" z="${fr_z}" />
-  <xacro:wheel name="rear_left" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${rl_x}" y="${rl_y}" z="${rl_z}" />
-  <xacro:wheel name="rear_right" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${rr_x}" y="${rr_y}" z="${rr_z}" />
+  <!-- Wheels — sphere collision for reliable mecanum strafing (visual stays a cylinder) -->
+  <xacro:wheel name="front_left" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${fl_x}" y="${fl_y}" z="${fl_z}" collision_geom="sphere" />
+  <xacro:wheel name="front_right" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${fr_x}" y="${fr_y}" z="${fr_z}" collision_geom="sphere" />
+  <xacro:wheel name="rear_left" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${rl_x}" y="${rl_y}" z="${rl_z}" collision_geom="sphere" />
+  <xacro:wheel name="rear_right" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${rr_x}" y="${rr_y}" z="${rr_z}" collision_geom="sphere" />
 
   <!-- Include Gazebo Xacro files -->
   <xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/control/gazebo_ros2_control_4w_mec.xacro" />

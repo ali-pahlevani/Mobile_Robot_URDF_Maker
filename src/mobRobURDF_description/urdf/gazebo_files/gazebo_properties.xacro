@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<robot xmlns:xacro="http://ros.org/wiki/xacro" xmlns:gz="http://gazebosim.org/schema">
 
   <!-- Macro for Gazebo physical properties -->
   <xacro:macro name="gazebo_physical_properties" params="controller_type chassis_size wheel_radius wheel_width">
@@ -145,7 +145,9 @@
          ================================================================ -->
     <xacro:if value="${controller_type == 'mecanum'}">
 
-      <!-- FL and RR: rollers at +45°, fdir1 perpendicular = "1 -1 0" -->
+      <!-- FL and RR: rollers at +45°, grip direction fdir1 = "1 -1 0".
+           fdir1 MUST be expressed in the (non-spinning) base_link frame, otherwise
+           it rotates with the wheel and strafing becomes erratic. -->
       <xacro:macro name="mecanum_wheel_pos45" params="wheel_link wheel_joint">
         <gazebo reference="${wheel_link}">
           <collision>
@@ -153,8 +155,8 @@
               <friction>
                 <ode>
                   <mu>1.0</mu>
-                  <mu2>0.01</mu2>
-                  <fdir1>1 -1 0</fdir1>
+                  <mu2>0.0</mu2>
+                  <fdir1 gz:expressed_in="base_link">1 -1 0</fdir1>
                 </ode>
               </friction>
               <contact>
@@ -176,7 +178,9 @@
         </gazebo>
       </xacro:macro>
 
-      <!-- FR and RL: rollers at -45°, fdir1 perpendicular = "1 1 0" -->
+      <!-- FR and RL: rollers at -45°, grip direction fdir1 = "1 1 0".
+           fdir1 MUST be expressed in the (non-spinning) base_link frame, otherwise
+           it rotates with the wheel and strafing becomes erratic. -->
       <xacro:macro name="mecanum_wheel_neg45" params="wheel_link wheel_joint">
         <gazebo reference="${wheel_link}">
           <collision>
@@ -184,8 +188,8 @@
               <friction>
                 <ode>
                   <mu>1.0</mu>
-                  <mu2>0.01</mu2>
-                  <fdir1>1 1 0</fdir1>
+                  <mu2>0.0</mu2>
+                  <fdir1 gz:expressed_in="base_link">1 1 0</fdir1>
                 </ode>
               </friction>
               <contact>

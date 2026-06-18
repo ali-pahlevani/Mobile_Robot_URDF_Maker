@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro" xmlns:gz="http://gazebosim.org/schema">
   <!-- Xacro parameters -->
   <xacro:property name="chassis_size" value="1.2 0.8 0.3"/>
   <xacro:property name="chassis_mass" value="1.0"/>
@@ -20,9 +20,9 @@
   <xacro:property name="rr_x" value="-0.4533333333333333"/>
   <xacro:property name="rr_y" value="-0.46"/>
   <xacro:property name="rr_z" value="-0.15"/>
-  <xacro:property name="controller_type" value="diff_4w"/>
-  <xacro:property name="hardware_plugin" value="mock_components/GenericSystem"/>
-  <xacro:property name="use_gazebo_sim" value="0"/>
-  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/4_wheeled/mobRob_4w_diff.xacro"/>
+  <xacro:property name="controller_type" value="mecanum"/>
+  <xacro:property name="hardware_plugin" value="gz_ros2_control/GazeboSimSystem"/>
+  <xacro:property name="use_gazebo_sim" value="1"/>
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/4_wheeled/mobRob_4w_mec.xacro"/>
   <xacro:include filename="$(find mobRobURDF_description)/urdf/user_sensors.xacro"/>
 </robot>

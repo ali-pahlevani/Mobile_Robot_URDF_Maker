@@ -127,7 +127,7 @@ class URDFManager:
         use_sim = "1" if self.last_hardware_interface == GAZEBO_SIM_PLUGIN else "0"
         return '\n'.join([
             '<?xml version="1.0" ?>',
-            '<robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro">',
+            '<robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro" xmlns:gz="http://gazebosim.org/schema">',
             f'  <xacro:property name="hardware_plugin" value="{self.last_hardware_interface}"/>',
             f'  <xacro:property name="use_gazebo_sim" value="{use_sim}"/>',
             f'  <xacro:include filename="{body_path}"/>',
@@ -141,7 +141,7 @@ class URDFManager:
 
         lines = [
             '<?xml version="1.0" ?>',
-            '<robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro">',
+            '<robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro" xmlns:gz="http://gazebosim.org/schema">',
             '  <!-- Xacro parameters -->',
         ]
         for param_name, param_value in self.last_params.items():
