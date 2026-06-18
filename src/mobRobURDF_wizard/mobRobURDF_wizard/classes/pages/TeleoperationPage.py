@@ -121,7 +121,7 @@ class TeleoperationPage(QWizardPage):
         self._strafe_mode = False   # True → left/right → linear.y (mecanum only)
         self._launch_start_time = 0.0
 
-        self.setTitle("Teleoperation")
+        self.setTitle("Simulate & Teleop")
         self.setSubTitle(
             "Launch the simulation, then connect and drive the robot with the D-pad "
             "or keyboard (WASD / arrow keys)."
@@ -145,22 +145,30 @@ class TeleoperationPage(QWizardPage):
     # ── UI ─────────────────────────────────────────────────────────────────
 
     def _build_ui(self):
-        root = QHBoxLayout(self)
+        root = QVBoxLayout(self)
         root.setContentsMargins(24, 12, 24, 12)
-        root.setSpacing(24)
-        root.addWidget(self._build_left_panel(), 1)
-        root.addWidget(self._build_right_panel(), 1)
+        root.setSpacing(10)
 
-    # ── Left panel: simulation launch + D-pad + velocity readout ─────────────
+        # Full-width launch section — twice as wide as when it was in the left panel
+        root.addWidget(self._build_launch_section())
 
-    def _build_left_panel(self):
-        box = QGroupBox("Controls")
+        panels = QHBoxLayout()
+        panels.setSpacing(24)
+        panels.addWidget(self._build_left_panel(), 1)
+        panels.addWidget(self._build_right_panel(), 1)
+        root.addLayout(panels, 1)
+
+    # ── Full-width launch section ───────────────────────────────────────────
+
+    def _build_launch_section(self):
+        box = QGroupBox()
+        box.setFlat(True)
         vbox = QVBoxLayout(box)
-        vbox.setSpacing(14)
+        vbox.setContentsMargins(0, 0, 0, 4)
+        vbox.setSpacing(4)
 
-        # ── Simulation launch row ──────────────────────────────────────────
         self._launch_btn = QPushButton("Launch Simulation")
-        self._launch_btn.setMinimumHeight(42)
+        self._launch_btn.setMinimumHeight(48)
         self._launch_btn.setProperty("btnRole", "success")
         self._launch_btn.clicked.connect(self._toggle_simulation)
         vbox.addWidget(self._launch_btn)
@@ -170,6 +178,15 @@ class TeleoperationPage(QWizardPage):
         self._sim_status.setWordWrap(True)
         self._sim_status.setStyleSheet("font-size: 9pt; color: #7F8C8D;")
         vbox.addWidget(self._sim_status)
+
+        return box
+
+    # ── Left panel: D-pad + velocity readout ──────────────────────────────
+
+    def _build_left_panel(self):
+        box = QGroupBox("Controls")
+        vbox = QVBoxLayout(box)
+        vbox.setSpacing(14)
 
         # ── Teleop connection status row ───────────────────────────────────
         status_row = QHBoxLayout()

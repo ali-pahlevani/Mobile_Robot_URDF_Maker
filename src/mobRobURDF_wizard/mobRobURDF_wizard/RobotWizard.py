@@ -26,9 +26,9 @@ except ImportError as e:
     print(f"Error importing modules: {e}")
     sys.exit(1)
 
-_NAV_LABELS = ["Welcome", "Start", "Select Robot Type", "Select Controller",
+_NAV_LABELS = ["Welcome", "Start Project", "Select Robot Type", "Select Controller",
                "Configure Parameters", "Tune Controller", "Final Check",
-               "Teleoperation", "Future Features"]
+               "Simulate & Teleop", "Future Features"]
 
 
 class RobotWizard(QWizard):
