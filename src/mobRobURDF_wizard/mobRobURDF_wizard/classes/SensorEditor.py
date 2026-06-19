@@ -1,9 +1,4 @@
-"""Per-sensor configuration card widget.
-
-SensorCard is a compact QGroupBox that exposes all SensorConfig parameters
-as QLineEdit fields. ConfigurationPage holds a list of these cards inside its
-scrollable left panel.
-"""
+"""SensorCard — compact QGroupBox with QLineEdit fields for every SensorConfig parameter."""
 
 from PyQt5.QtWidgets import (
     QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout,
@@ -23,8 +18,6 @@ class SensorCard(QGroupBox):
         super().__init__(parent)
         self._type = sensor_type
         self._build_ui()
-
-    # ── helpers ──────────────────────────────────────────────────────────────
 
     def _edit(self, value='', width=None):
         e = QLineEdit(str(value))
@@ -78,14 +71,11 @@ class SensorCard(QGroupBox):
         line.setFrameShadow(QFrame.Sunken)
         return line
 
-    # ── UI construction ───────────────────────────────────────────────────────
-
     def _build_ui(self):
         vbox = QVBoxLayout(self)
         vbox.setSpacing(5)
         vbox.setContentsMargins(7, 6, 7, 8)
 
-        # Header: type label + delete button
         hdr = QHBoxLayout()
         icon = 'Lidar' if self._type == 'lidar' else 'Camera'
         hdr_lbl = QLabel(f'<b>{icon}</b>')
@@ -102,7 +92,6 @@ class SensorCard(QGroupBox):
         hdr.addWidget(del_btn)
         vbox.addLayout(hdr)
 
-        # Name
         name_row = QHBoxLayout()
         name_row.addWidget(QLabel('Name:'))
         default_name = 'lidar_1' if self._type == 'lidar' else 'camera_1'
@@ -110,7 +99,6 @@ class SensorCard(QGroupBox):
         name_row.addWidget(self.nameEdit)
         vbox.addLayout(name_row)
 
-        # Position
         pos_w, self.xEdit, self.yEdit, self.zEdit = self._triplet(
             0.0, 0.0, 0.3 if self._type == 'lidar' else 0.0, 'x', 'y', 'z')
         pos_row = QHBoxLayout()
@@ -118,7 +106,6 @@ class SensorCard(QGroupBox):
         pos_row.addWidget(pos_w)
         vbox.addLayout(pos_row)
 
-        # Orientation (RPY)
         rot_w, self.rollEdit, self.pitchEdit, self.yawEdit = self._triplet(
             0.0, 0.0, 0.0, 'R', 'P', 'Y')
         rot_row = QHBoxLayout()
@@ -126,7 +113,6 @@ class SensorCard(QGroupBox):
         rot_row.addWidget(rot_w)
         vbox.addLayout(rot_row)
 
-        # Color + Mass
         cm = QGridLayout()
         cm.setSpacing(4)
         cm.addWidget(QLabel('Color:'), 0, 0)
@@ -169,8 +155,6 @@ class SensorCard(QGroupBox):
         self.imgWEdit, self.imgHEdit           = self._pair_grid_row(g, 3, 'ImgW:',    '640',     'ImgH:',    '480',     'px',  'px')
         self.nearEdit, self.farEdit            = self._pair_grid_row(g, 4, 'Near:',    '0.05',    'Far:',     '8.0',     'm',   'm')
         vbox.addLayout(g)
-
-    # ── Data access ───────────────────────────────────────────────────────────
 
     def _f(self, edit: QLineEdit, default: float) -> float:
         try:
@@ -218,7 +202,7 @@ class SensorCard(QGroupBox):
         return s
 
     def load_sensor_config(self, s: SensorConfig):
-        """Populate all fields from an existing SensorConfig."""
+        """Populate all fields from a SensorConfig (e.g., when loading a preset)."""
         self.nameEdit.setText(s.name)
         self.xEdit.setText(str(s.x))
         self.yEdit.setText(str(s.y))

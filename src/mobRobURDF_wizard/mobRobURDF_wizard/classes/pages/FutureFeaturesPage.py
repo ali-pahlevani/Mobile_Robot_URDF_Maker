@@ -23,7 +23,6 @@ _FEATURES = [
 
 
 def _make_item(image_path: str, title_text: str, badge_text: str, badge_color: str) -> QWidget:
-    """Feature row: image on left (fixed width), title + badge stacked on right (expanding)."""
     item = QWidget()
     item.setObjectName("featureItem")
     item.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -40,7 +39,6 @@ def _make_item(image_path: str, title_text: str, badge_text: str, badge_color: s
     row.setContentsMargins(0, 0, 28, 0)
     row.setSpacing(0)
 
-    # ── Left: image — expands to ~65 % of card width via stretch ──────────
     img = ScaledPixmapLabel(hint=QSize(600, _CARD_H))
     img.setFixedHeight(_CARD_H)
     img.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -52,11 +50,10 @@ def _make_item(image_path: str, title_text: str, badge_text: str, badge_color: s
         img.setStyleSheet(
             "color: #95A5A6; border: none; background: #F2F3F4; border-radius: 10px;"
         )
-    row.addWidget(img, 13)   # image gets 13 parts
+    row.addWidget(img, 13)   # image: 13 parts ≈ 65 %
 
     row.addSpacing(24)
 
-    # ── Right: title on top, badge below — ~35 % of card width ────────────
     text_col = QVBoxLayout()
     text_col.setContentsMargins(0, 0, 0, 0)
     text_col.setSpacing(10)
@@ -83,7 +80,7 @@ def _make_item(image_path: str, title_text: str, badge_text: str, badge_color: s
     text_col.addWidget(badge_lbl, alignment=Qt.AlignHCenter)
 
     text_col.addStretch()
-    row.addLayout(text_col, 7)   # text gets 7 parts → image ≈ 65 %, text ≈ 35 %
+    row.addLayout(text_col, 7)   # text: 7 parts ≈ 35 %
 
     return item
 
@@ -102,7 +99,6 @@ class FutureFeaturesPage(QWizardPage):
         outer.setContentsMargins(20, 14, 20, 16)
         outer.setSpacing(12)
 
-        # ── Page header ────────────────────────────────────────────────────
         header = QLabel("What's next for the URDF Maker")
         header.setAlignment(Qt.AlignCenter)
         header.setStyleSheet("font-size: 16pt; font-weight: bold; color: #2C3E50;")
@@ -115,7 +111,6 @@ class FutureFeaturesPage(QWizardPage):
         sub.setStyleSheet("font-size: 10pt; color: #7F8C8D;")
         outer.addWidget(sub)
 
-        # ── Scrollable expanding card list ─────────────────────────────────
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QScrollArea.NoFrame)

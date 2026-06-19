@@ -1,9 +1,7 @@
-"""Run the Gazebo simulation as a managed child process.
+"""Manages the Gazebo simulation as a child process group.
 
-Launches ``ros2 launch mobRobURDF_launch gazebo_test.launch.py`` in its own
-process group so the whole tree (gz sim, controllers, bridges, RViz) can be
-torn down cleanly with a single signal — gracefully (SIGINT, which ros2 launch
-forwards to its children), escalating to SIGTERM/SIGKILL only if needed.
+Owns the ros2 launch subprocess; tears down the whole tree (gz sim, controllers,
+bridges, RViz) cleanly via SIGINT → SIGTERM → SIGKILL escalation.
 """
 
 import os
@@ -20,7 +18,7 @@ LAUNCH_FILE = "gazebo_test.launch.py"
 
 
 class _OutputReader(QThread):
-    """Reads merged stdout/stderr line-by-line, then reports the exit code."""
+    """Drains merged stdout/stderr line by line and emits the final exit code."""
     line = pyqtSignal(str)
     finished_rc = pyqtSignal(int)
 
@@ -53,7 +51,6 @@ class LaunchManager(QObject):
     def is_running(self):
         return self._proc is not None and self._proc.poll() is None
 
-    # ── Start ────────────────────────────────────────────────────────────
     def start(self):
         if self.is_running():
             return
@@ -65,7 +62,7 @@ class LaunchManager(QObject):
             stderr=subprocess.STDOUT,
             text=True,
             bufsize=1,
-            start_new_session=True,  # own process group for clean teardown
+            start_new_session=True,  # own process group so kill reaches all children
         )
         self._reader = _OutputReader(self._proc)
         self._reader.line.connect(self.output)
@@ -78,7 +75,6 @@ class LaunchManager(QObject):
         self._proc = None
         self.stopped.emit(rc)
 
-    # ── Stop (non-blocking, escalates over time) ─────────────────────────
     def stop(self):
         if not self.is_running():
             return
@@ -97,9 +93,8 @@ class LaunchManager(QObject):
             logger.warning("Simulation still running; sending SIGKILL…")
             self._signal_group(signal.SIGKILL)
 
-    # ── Blocking teardown for application exit ───────────────────────────
     def shutdown(self):
-        """Synchronously stop the simulation — used on window close."""
+        """Blocking teardown — used on window close."""
         if not self.is_running():
             return
         for sig, wait in ((signal.SIGINT, 6), (signal.SIGTERM, 3), (signal.SIGKILL, 2)):
@@ -111,7 +106,6 @@ class LaunchManager(QObject):
                 continue
         self._proc = None
 
-    # ── Helpers ──────────────────────────────────────────────────────────
     def _signal_group(self, sig):
         if self._proc is None:
             return

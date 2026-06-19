@@ -1,13 +1,9 @@
 """Controller Parameter Tuner page.
 
-Exposes every tunable ros2_control parameter for the active controller in a
-clean form. Auto-computed geometry values (wheel_separation, wheelbase, …) are
-displayed read-only so the user can see what was derived from the URDF.
-Velocity / acceleration / steering limits can be set manually or filled in with
-physics-based suggestions via the "Auto-suggest" button.
-
-The page writes its parameters into URDFManager.last_tuner_params so that
-subsequent Apply clicks on the ConfigurationPage always re-apply them.
+Shows auto-computed geometry (wheel separation, wheelbase, …) read-only
+and lets the user set velocity/acceleration/steering limits manually or
+via the Auto-suggest button.  Results go into URDFManager.last_tuner_params
+so re-applying on ConfigurationPage always picks them up.
 """
 
 import os
@@ -27,7 +23,6 @@ from mobRobURDF_wizard.classes.URDFManager import GAZEBO_SIM_PLUGIN
 
 logger = logging.getLogger(__name__)
 
-# Human-readable controller names
 _CTRL_DISPLAY = {
     'diff_4w':   'Differential Drive (4-wheel)',
     'diff_2wc':  'Differential Drive (2-wheel + caster)',
@@ -37,10 +32,8 @@ _CTRL_DISPLAY = {
     'ackermann': 'Ackermann Steering',
 }
 
-# Which controller types have steering limits
 _HAS_STEERING = {'tricycle', 'triSteer', 'ackermann'}
 
-# controller_type → image filename in images/control_types/
 _CTRL_IMAGE = {
     'diff_4w':   'diff_4w.png',
     'diff_2wc':  'diff_2wc.png',
@@ -50,10 +43,10 @@ _CTRL_IMAGE = {
     'ackermann': 'ackermann.png',
 }
 
-# Typical max motor angular velocity (rad/s) used for auto-suggest
+# typical motor max speed used for auto-suggest calculations
 _MOTOR_MAX_RAD_S = 12.0
 
-# Hardware interface preset options: (display label, plugin name or None for custom)
+# (display label, plugin name or None for custom input)
 _HW_PRESETS = [
     ("Gazebo Simulation", GAZEBO_SIM_PLUGIN),
     ("Mock Hardware (testing, no physical robot)", "mock_components/GenericSystem"),
@@ -73,7 +66,6 @@ class ControllerTunerPage(QWizardPage):
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(0)
 
-        # ── Left: scrollable form ─────────────────────────────────────────
         self.left_widget = QWidget()
         self.left_widget.setFixedWidth(360)
         lv = QVBoxLayout(self.left_widget)
@@ -107,7 +99,6 @@ class ControllerTunerPage(QWizardPage):
 
         outer.addWidget(self.left_widget)
 
-        # ── Right: explanatory info panel ────────────────────────────────
         info_widget = QWidget()
         info_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         iv = QVBoxLayout(info_widget)
@@ -143,7 +134,6 @@ class ControllerTunerPage(QWizardPage):
 
         iv.addSpacing(12)
 
-        # ── Controller kinematics image ───────────────────────────────────
         self._ctrl_img_dir = os.path.join(
             get_package_share_directory("mobRobURDF_wizard"),
             "images", "control_types",
@@ -153,8 +143,6 @@ class ControllerTunerPage(QWizardPage):
         iv.addWidget(self._ctrl_img, 1)
 
         outer.addWidget(info_widget, 1)
-
-    # ── Hardware interface helpers ────────────────────────────────────────
 
     def _on_hw_combo_changed(self, idx):
         _, plugin = _HW_PRESETS[idx]
@@ -173,17 +161,14 @@ class ControllerTunerPage(QWizardPage):
         return self._hw_plugin_edit.text().strip() if plugin is None else plugin
 
     def _load_existing_hw_interface(self):
-        """Restore hardware interface combo/field from urdf_manager."""
         plugin = self.urdf_manager.last_hardware_interface
         for i, (_, p) in enumerate(_HW_PRESETS):
             if p == plugin:
                 self._hw_combo.setCurrentIndex(i)
                 return
-        # Not a preset → select Custom
+        # not a known preset — fall back to Custom
         self._hw_combo.setCurrentIndex(len(_HW_PRESETS) - 1)
         self._hw_plugin_edit.setText(plugin or "")
-
-    # ── Form helpers ──────────────────────────────────────────────────────
 
     def _group(self, title):
         box = QGroupBox(title)
@@ -222,8 +207,6 @@ class ControllerTunerPage(QWizardPage):
             if item.widget():
                 item.widget().deleteLater()
 
-    # ── Page lifecycle ────────────────────────────────────────────────────
-
     def initializePage(self):
         ct = self.urdf_manager.last_controller_type or 'diff_4w'
         display = _CTRL_DISPLAY.get(ct, ct)
@@ -249,7 +232,6 @@ class ControllerTunerPage(QWizardPage):
 
         params = self.urdf_manager.last_params
 
-        # ── Hardware Interface ────────────────────────────────────────────
         hw_box, hw_form = self._group("Hardware Interface")
         combo_row = QHBoxLayout()
         combo_row.setSpacing(4)
@@ -276,7 +258,6 @@ class ControllerTunerPage(QWizardPage):
         self._hw_combo.currentIndexChanged.connect(self._on_hw_combo_changed)
         self._form_layout.addWidget(hw_box)
 
-        # ── Auto-computed geometry (read-only) ────────────────────────────
         geo_box, geo_form = self._group("Auto-computed Geometry (from URDF)")
         self._geo_fields = {}
 
@@ -293,8 +274,8 @@ class ControllerTunerPage(QWizardPage):
             W = float(params.get('chassis_size', '1.2 0.8 0.3').split()[1])
             wr = float(params.get('wheel_radius', '0.22'))
             ww = float(params.get('wheel_width', '0.12'))
-            # Must mirror URDFManager.generate_controller_yaml: the controller's
-            # sum_of_robot_center_projection_on_X_Y_axis = |wheel_x| + |wheel_y|.
+            # sum_of_robot_center_projection_on_X_Y_axis = |wheel_x| + |wheel_y|
+            # wheel_x = L/2 - r/1.5, wheel_y = W/2 + w/2 — NOT simply (L+W)/2
             sum_xy = round((L / 2 - wr / 1.5) + (W / 2 + ww / 2), 4)
             self._geo_fields['wheels_radius'] = self._field(geo_form, 'Wheel radius:', wr, 'm', readonly=True)
             self._geo_fields['sum_xy']        = self._field(geo_form, 'Sum of X+Y axes:', sum_xy, 'm', readonly=True)
@@ -313,7 +294,6 @@ class ControllerTunerPage(QWizardPage):
         geo_form.addRow(hint)
         self._form_layout.addWidget(geo_box)
 
-        # ── General settings ──────────────────────────────────────────────
         gen_box, gen_form = self._group("General Settings")
         self._pub_rate   = self._field(gen_form, 'Publish rate:', 50.0, 'Hz')
         self._upd_rate   = self._field(gen_form, 'Update rate:', 50, 'Hz')
@@ -322,7 +302,6 @@ class ControllerTunerPage(QWizardPage):
         self._odom_tf    = self._check(gen_form, 'Enable odom TF:', True)
         self._form_layout.addWidget(gen_box)
 
-        # ── Motion limits ─────────────────────────────────────────────────
         lim_box, lim_form = self._group("Motion Limits")
         self._max_lin_vel  = self._field(lim_form, 'Max linear vel:', 1.5, 'm/s')
         self._max_ang_vel  = self._field(lim_form, 'Max angular vel:', 2.0, 'rad/s')
@@ -330,7 +309,6 @@ class ControllerTunerPage(QWizardPage):
         self._max_ang_acc  = self._field(lim_form, 'Max angular acc:', 1.0, 'rad/s²')
         self._form_layout.addWidget(lim_box)
 
-        # ── Steering limits (steering controllers only) ───────────────────
         self._steer_box = None
         if controller_type in _HAS_STEERING:
             steer_box, steer_form = self._group("Steering Limits")
@@ -342,7 +320,7 @@ class ControllerTunerPage(QWizardPage):
         self._form_layout.addStretch(1)
 
     def _load_existing_tuner_params(self):
-        """Re-populate fields if the user already applied tuner params earlier."""
+        """Restore tuner fields if the user already applied them earlier in this session."""
         p = self.urdf_manager.last_tuner_params
         if not p:
             return
@@ -366,8 +344,6 @@ class ControllerTunerPage(QWizardPage):
         if value is not None and edit is not None:
             edit.setText(str(value))
 
-    # ── Auto-suggest ──────────────────────────────────────────────────────
-
     def _auto_suggest(self):
         ct = self._controller_type
         params = self.urdf_manager.last_params
@@ -385,8 +361,8 @@ class ControllerTunerPage(QWizardPage):
         elif ct == 'mecanum':
             max_ang_vel = round(max_lin_vel / (max(L, W) / 2), 2)
         elif ct in ('tricycle', 'triSteer', 'ackermann'):
-            # Minimum turning radius ≈ wheelbase / tan(max_steer_angle ≈ 45°)
-            min_turn_r = L  # rough approximation
+            # rough approx: min turn radius ≈ wheelbase / tan(45°) ≈ L
+            min_turn_r = L
             max_ang_vel = round(max_lin_vel / min_turn_r, 2)
         else:
             max_ang_vel = 2.0
@@ -405,8 +381,6 @@ class ControllerTunerPage(QWizardPage):
 
         self._status.setText("Limits suggested from wheel radius and motor speed. Adjust as needed.")
         self._status.setStyleSheet("font-size: 9pt; color: #2980B9;")
-
-    # ── Collect & apply ───────────────────────────────────────────────────
 
     def _gather_tuner_params(self):
         def fv(edit, default):

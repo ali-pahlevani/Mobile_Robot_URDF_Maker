@@ -10,7 +10,7 @@ import os
 
 
 def read_selected_controller(description_share):
-    """Read the controller spawner name chosen in the wizard, with a fallback."""
+    """Read selected_controller.txt written by the wizard; falls back to diffDrive_controller."""
     controller_file = os.path.join(description_share, 'urdf', 'selected_controller.txt')
     try:
         with open(controller_file, 'r') as f:
@@ -23,7 +23,7 @@ def read_selected_controller(description_share):
 
 
 def _find_gz_ros2_control_lib_dir():
-    """Return the lib dir of the workspace-built gz_ros2_control if available."""
+    """Returns lib dir of workspace-built gz_ros2_control, or None if not installed."""
     try:
         from ament_index_python.packages import get_package_prefix
         prefix = get_package_prefix('gz_ros2_control')
@@ -36,7 +36,7 @@ def _find_gz_ros2_control_lib_dir():
 
 
 def _bridge_params_path(gazebo_config):
-    """Return generated bridge YAML if it exists, otherwise fall back to static one."""
+    """Use wizard-generated bridge YAML if present, otherwise fall back to the static one."""
     generated = os.path.join(gazebo_config, 'gz_bridge_generated.yaml')
     if os.path.exists(generated):
         return generated
@@ -44,7 +44,7 @@ def _bridge_params_path(gazebo_config):
 
 
 def _camera_image_topics(gazebo_config):
-    """Read the list of camera image topics written by the wizard."""
+    """Read camera image topics from gz_image_topics.txt written by the wizard."""
     topics_file = os.path.join(gazebo_config, 'gz_image_topics.txt')
     try:
         with open(topics_file, 'r') as f:
@@ -150,7 +150,6 @@ def generate_launch_description():
         parameters=[{'use_sim_time': True}]
     )
 
-    # Image bridge: one node handles all camera topics listed by the wizard.
     image_topics = _camera_image_topics(gazebo_config)
     ros_gz_image_bridge = Node(
         package='ros_gz_image',
@@ -168,7 +167,6 @@ def generate_launch_description():
         parameters=[{'use_sim_time': True}]
     )
 
-    # Relay /cmd_vel → the active controller's velocity topic.
     cmd_vel_relay = Node(
         package='mobRobURDF_launch',
         executable='cmd_vel_relay',

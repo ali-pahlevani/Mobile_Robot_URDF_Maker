@@ -7,7 +7,6 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 from OpenGL.GLUT import glutInit
 
-# Custom page classes
 try:
     from mobRobURDF_wizard.classes.pages.WelcomePage import WelcomePage
     from mobRobURDF_wizard.classes.pages.StartSessionPage import StartSessionPage
@@ -49,7 +48,6 @@ class RobotWizard(QWizard):
             logging.error(f"Failed to initialize URDFManager: {e}")
             raise
 
-        # ── Sidebar ────────────────────────────────────────────────
         sidebar = QWidget()
         sidebar.setObjectName("urdfSidebar")
         sidebar.setStyleSheet(f"QWidget#urdfSidebar {{ background-color: {SIDEBAR_BG}; }}")
@@ -81,7 +79,6 @@ class RobotWizard(QWizard):
         sidebar_layout.addWidget(version_label)
         self.setSideWidget(sidebar)
 
-        # ── Pages ──────────────────────────────────────────────────
         try:
             self.addPage(WelcomePage())
             self.start_session_page = StartSessionPage(self.urdf_manager)
@@ -104,10 +101,8 @@ class RobotWizard(QWizard):
         self.currentIdChanged.connect(self.update_navigation)
         self.showMaximized()
 
-    # ── Size management ────────────────────────────────────────────────────
-
     def adjustSize(self):
-        # Suppress automatic resizing so page transitions don't jump the window.
+        # suppress Qt's auto-resize so page transitions don't jump the window
         pass
 
     def showEvent(self, event):
@@ -127,8 +122,6 @@ class RobotWizard(QWizard):
             teleop.shutdown()
         event.accept()
 
-    # ── Wizard button styling ──────────────────────────────────────────────
-
     def _style_wizard_buttons(self):
         buttons = [
             (self.button(QWizard.BackButton), "secondary"),
@@ -144,11 +137,9 @@ class RobotWizard(QWizard):
                 btn.setMinimumWidth(100)
                 btn.setMinimumHeight(36)
 
-    # ── Responsive layout ──────────────────────────────────────────────────
-
     def _apply_responsive_layout(self):
         w = max(self.width(), 1000)
-        # Sidebar nav list: ~17% of width, clamped [200, 260].
+        # sidebar: ~17 % of width, clamped [200, 260]
         nav_w = max(min(int(w * 0.17), 260), 200)
         self.nav_list.setFixedWidth(nav_w)
 
@@ -156,7 +147,7 @@ class RobotWizard(QWizard):
         if page is None:
             return
 
-        # Left-panel width: 31% of content area, clamped [320, 460].
+        # left panel: 31 % of content area, clamped [320, 460]
         content_w = w - nav_w
         controls_w = max(min(int(content_w * 0.31), 460), 320)
         page.left_widget.setFixedWidth(controls_w)
@@ -164,8 +155,6 @@ class RobotWizard(QWizard):
         tuner = getattr(self, "tuner_page", None)
         if tuner is not None:
             tuner.left_widget.setFixedWidth(controls_w)
-
-    # ── Navigation ─────────────────────────────────────────────────────────
 
     def update_navigation(self, page_id):
         if page_id == -1:
@@ -177,7 +166,7 @@ class RobotWizard(QWizard):
     def navigate_to_page(self, item):
         target = _NAV_LABELS.index(item.text())
         current = self.pageIds().index(self.currentId())
-        # Going forward respects page validation; stop at the first incomplete page.
+        # going forward respects page validation — stop at the first incomplete page
         while current < target:
             if self.currentPage().isComplete():
                 self.next()

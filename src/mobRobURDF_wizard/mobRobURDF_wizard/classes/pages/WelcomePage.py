@@ -44,7 +44,7 @@ class WelcomePage(QWizardPage):
         movie = QMovie(gif_path)
         if movie.isValid():
             self._movie = movie
-            # Read the GIF's native resolution so aspect ratio stays correct.
+            # need native resolution to compute scale ratio correctly
             reader = QImageReader(gif_path)
             size = reader.size()
             if size.isValid() and size.width() > 0 and size.height() > 0:

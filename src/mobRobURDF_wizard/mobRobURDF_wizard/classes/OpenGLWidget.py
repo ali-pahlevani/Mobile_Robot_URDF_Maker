@@ -17,14 +17,12 @@ class OpenGLWidget(QGLWidget):
         self.rotation = np.identity(4, dtype=np.float32)
         self.lastPos3D = None
 
-        # Chassis / wheel geometry
         self.L, self.W, self.H = 1.2, 0.8, 0.3
         self.wheel_radius, self.wheel_width = 0.22, 0.12
         self.chassis_color = (0.5, 0.5, 0.5)
         self.wheel_color = (0.0, 0.0, 0.0)
         self.robot_type = "4_wheeled"
 
-        # Sensors: list of SensorConfig objects updated by updateSensors()
         self.sensors = []
 
     def initializeGL(self):
@@ -44,14 +42,12 @@ class OpenGLWidget(QGLWidget):
         glTranslatef(0.0, 0.0, self.zoom)
         glMultMatrixf(self.rotation.T)
 
-        # ── Chassis ──────────────────────────────────────────────────────────
         glPushMatrix()
         glColor3f(*self.chassis_color)
         glScalef(self.L, self.W, self.H)
         glutSolidCube(1.0)
         glPopMatrix()
 
-        # ── Wheels ───────────────────────────────────────────────────────────
         glColor3f(*self.wheel_color)
         if self.robot_type == "4_wheeled":
             wheel_positions = [
@@ -98,27 +94,23 @@ class OpenGLWidget(QGLWidget):
             glutSolidSphere(self.wheel_radius, 20, 20)
             glPopMatrix()
 
-        # ── Sensors ───────────────────────────────────────────────────────────
         for s in self.sensors:
             color = self._sensor_gl_color(s)
             glColor3f(*color)
             glPushMatrix()
             glTranslatef(s.x, s.y, s.z)
-            # Apply RPY: yaw (Z) → pitch (Y) → roll (X), OpenGL convention
+            # RPY applied in OpenGL order: yaw (Z) → pitch (Y) → roll (X)
             glRotatef(math.degrees(s.yaw),   0, 0, 1)
             glRotatef(math.degrees(s.pitch), 0, 1, 0)
             glRotatef(math.degrees(s.roll),  1, 0, 0)
             if s.sensor_type == 'lidar':
-                # glutSolidCylinder draws from z=0 to z=length (not centered).
-                # Translate -length/2 so the cylinder center matches the URDF joint origin.
+                # glutSolidCylinder draws z=0→length, not centered; shift so midpoint matches URDF origin
                 glTranslatef(0, 0, -s.length / 2)
                 glutSolidCylinder(s.radius, s.length, 20, 20)
             else:
                 glScalef(s.cam_depth, s.cam_width, s.cam_height)
                 glutSolidCube(1.0)
             glPopMatrix()
-
-    # ── Color lookup ──────────────────────────────────────────────────────────
 
     _COLOR_MAP = {
         'Gray':  (0.5,  0.5,  0.5),
@@ -131,8 +123,6 @@ class OpenGLWidget(QGLWidget):
 
     def _sensor_gl_color(self, s):
         return self._COLOR_MAP.get(s.color, (0.5, 0.5, 0.5))
-
-    # ── Public API ────────────────────────────────────────────────────────────
 
     def updateRobotModel(self, L, W, H, wheel_radius, wheel_width,
                          chassis_color, wheel_color, robot_type="4_wheeled", caster_radius=None):
@@ -148,11 +138,8 @@ class OpenGLWidget(QGLWidget):
             logging.error("Error updating robot model parameters: %s", e)
 
     def updateSensors(self, sensors: list):
-        """Replace the sensor list and redraw. Called directly from ConfigurationPage."""
         self.sensors = list(sensors)
         self.update()
-
-    # ── Mouse / scroll ────────────────────────────────────────────────────────
 
     def _map_to_sphere(self, x, y):
         width, height = self.width(), self.height()

@@ -72,16 +72,14 @@ class URDFManager:
                 logger.error(self.urdf_text)
                 return self.urdf_text
 
-            # 1. Write user_sensors.xacro to base_dir so $(find ...) includes work.
+            # must live in base_dir so $(find mobRobURDF_description) includes resolve
             sensors_xacro_path = os.path.join(self.base_dir, "user_sensors.xacro")
             with open(sensors_xacro_path, "w") as f:
                 f.write(build_user_sensors_xacro(sensors))
 
-            # 2. Write generated bridge YAML and image topics file.
             self._write_bridge_yaml(sensors)
             self._write_image_topics(sensors)
 
-            # 3. Render body template and write to source_dir.
             params_with_controller = params.copy()
             params_with_controller["controller_type"] = controller_type
             params_with_controller["hardware_plugin"] = self.last_hardware_interface
@@ -93,8 +91,7 @@ class URDFManager:
             with open(rendered_path, "w") as f:
                 f.write(mobrob_xacro)
 
-            # 4. Build a temporary wrapper that includes both body and sensors using
-            #    absolute paths so xacro can resolve them without $(find ...).
+            # wrapper uses absolute paths so xacro doesn't need $(find ...) at gen time
             full_path = os.path.join(self.source_dir, "full_src.xacro")
             with open(full_path, "w") as f:
                 f.write(self._build_full_xacro(rendered_path, sensors_xacro_path))
@@ -102,7 +99,6 @@ class URDFManager:
             self.urdf_text = generate_urdf(full_path)
             logger.debug("URDF generated from %s", full_path)
 
-            # 5. Persist artifacts for launch files.
             with open(os.path.join(self.source_dir, "mobRob.urdf"), "w") as f:
                 f.write(self.urdf_text)
             with open(os.path.join(self.source_dir, "mobRob.urdf.xacro"), "w") as f:
@@ -123,7 +119,7 @@ class URDFManager:
             return self.urdf_text
 
     def _build_full_xacro(self, body_path: str, sensors_path: str) -> str:
-        """Wrapper xacro using absolute paths (for in-process URDF generation)."""
+        """Temporary wrapper xacro using absolute paths — only used at gen time."""
         use_sim = "1" if self.last_hardware_interface == GAZEBO_SIM_PLUGIN else "0"
         return '\n'.join([
             '<?xml version="1.0" ?>',
@@ -136,7 +132,7 @@ class URDFManager:
         ])
 
     def _build_xacro_wrapper(self):
-        """Build mobRob.urdf.xacro that uses $(find ...) paths for launch files."""
+        """Produces the persistent mobRob.urdf.xacro with $(find ...) paths for launch files."""
         controller_suffix = self._controller_suffix(self.last_robot_type, self.last_controller_type)
 
         lines = [
@@ -164,7 +160,7 @@ class URDFManager:
         return "\n".join(lines)
 
     def _write_bridge_yaml(self, sensors: list):
-        """Write gz_bridge_generated.yaml to the gazebo package's config dir."""
+        """Write gz_bridge_generated.yaml to the gazebo config dir."""
         try:
             gazebo_config = os.path.join(
                 get_package_share_directory("mobRobURDF_gazebo"), "config"
@@ -177,7 +173,7 @@ class URDFManager:
             logger.warning("Failed to write bridge YAML: %s", e)
 
     def _write_image_topics(self, sensors: list):
-        """Write gz_image_topics.txt listing camera image topics for ros_gz_image bridge."""
+        """Write gz_image_topics.txt so ros_gz_image bridge knows which topics to bridge."""
         try:
             gazebo_config = os.path.join(
                 get_package_share_directory("mobRobURDF_gazebo"), "config"
@@ -191,7 +187,7 @@ class URDFManager:
             logger.warning("Failed to write image topics: %s", e)
 
     def _write_use_sim_time_yaml(self):
-        """Write use_sim_time.yaml based on the current hardware interface."""
+        """Write use_sim_time.yaml — false when using real hardware, true for Gazebo."""
         try:
             gazebo_config = os.path.join(
                 get_package_share_directory("mobRobURDF_gazebo"), "config"
@@ -282,8 +278,8 @@ class URDFManager:
                 config["diffDrive_controller"]["ros__parameters"]["wheel_separation"] = W + wheel_width
                 config["diffDrive_controller"]["ros__parameters"]["wheel_radius"] = wheel_radius
             elif controller_type == "mecanum":
-                # sum_of_robot_center_projection_on_X_Y_axis = |wheel_x| + |wheel_y|
-                # Wheels are at (L/2 - r/1.5) in X and (W/2 + w/2) in Y from robot center.
+                # sum_of_robot_center_projection_on_X_Y_axis — NOT simply (L+W)/2
+                # wheel_x = L/2 - r/1.5, wheel_y = W/2 + w/2 (actual URDF joint positions)
                 wheel_x = L / 2 - wheel_radius / 1.5
                 wheel_y = W / 2 + wheel_width / 2
                 config["mecDrive_controller"]["ros__parameters"]["kinematics"]["wheels_radius"] = wheel_radius
@@ -306,17 +302,11 @@ class URDFManager:
                 config["ackerSteer_controller"]["ros__parameters"]["front_wheels_radius"] = wheel_radius
                 config["ackerSteer_controller"]["ros__parameters"]["rear_wheels_radius"] = wheel_radius
 
-            # Apply any tuner params that were set from the ControllerTunerPage.
             if self.last_tuner_params:
                 self._apply_tuner_params_to_config(config, controller_type, controller_name)
 
-            # Distro-dependent command interface (idempotent / self-healing):
-            #   Jazzy+  → controllers use TwistStamped; `use_stamped_vel` no
-            #             longer exists, so strip it (an undeclared param can
-            #             block controller loading).
-            #   Humble/Iron → force `use_stamped_vel: false` so the unstamped
-            #             topic (cmd_vel_unstamped / reference_unstamped) the
-            #             relay publishes to actually exists.
+            # Jazzy+: strip use_stamped_vel entirely — undeclared params block controller loading.
+            # Humble/Iron: force use_stamped_vel=false so the *_unstamped topic the relay uses exists.
             ctrl_params = config.get(controller_name, {}).get("ros__parameters")
             if ctrl_params is not None:
                 if uses_stamped_twist():
@@ -333,7 +323,7 @@ class URDFManager:
             logger.error("Failed to update controller YAML %s: %s", yaml_path, str(e))
 
     def _apply_tuner_params_to_config(self, config, controller_type, controller_name):
-        """Write last_tuner_params into the already-loaded YAML config dict."""
+        """Merge last_tuner_params into the already-loaded YAML config dict."""
         p = self.last_tuner_params
         ctrl = config[controller_name]["ros__parameters"]
 
@@ -352,7 +342,6 @@ class URDFManager:
         max_aa = float(p.get("max_angular_acceleration", 0.0))
 
         if controller_type in ("diff_4w", "diff_2wc"):
-            # diff_drive_controller uses linear.x / angular.z nested structure.
             if "linear" not in ctrl:
                 ctrl["linear"] = {}
             if "x" not in ctrl["linear"]:
@@ -385,10 +374,9 @@ class URDFManager:
             ctrl["steering"]["max_position"] = max_sa
             ctrl["steering"]["max_velocity"] = max_sv
 
-        # mecanum controller does not expose velocity limits via standard YAML keys.
+        # mecanum controller has no standard YAML velocity limit keys
 
     def apply_tuner_params(self, robot_type, controller_type, params, tuner_params):
-        """Store tuner params and regenerate the controller YAML immediately."""
         self.last_tuner_params = tuner_params.copy()
         self.generate_controller_yaml(robot_type, controller_type, params)
 

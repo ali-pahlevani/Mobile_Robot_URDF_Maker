@@ -1,9 +1,4 @@
-"""Data model for a single configurable sensor (lidar or camera).
-
-Each SensorConfig instance represents one physical sensor mounted on the robot.
-The module also provides helpers to generate URDF XML fragments and Gazebo bridge
-YAML content from a list of SensorConfig objects.
-"""
+"""SensorConfig dataclass + helpers to generate URDF XML and Gazebo bridge YAML for sensors."""
 
 from dataclasses import dataclass
 
@@ -22,7 +17,7 @@ class SensorConfig:
     sensor_type: str = 'lidar'   # 'lidar' or 'camera'
     name: str = 'lidar_1'
 
-    # Mount pose (relative to chassis link)
+    # pose relative to chassis link
     x: float = 0.0
     y: float = 0.0
     z: float = 0.3
@@ -30,11 +25,10 @@ class SensorConfig:
     pitch: float = 0.0
     yaw: float = 0.0
 
-    # Visual / physics
     color: str = 'Black'
     mass: float = 0.1
 
-    # Lidar geometry + sensor params
+    # lidar geometry + sensor params
     radius: float = 0.1
     length: float = 0.08
     h_samples: int = 360
@@ -44,7 +38,7 @@ class SensorConfig:
     max_range: float = 12.0
     update_rate: float = 10.0
 
-    # Camera geometry + sensor params
+    # camera geometry + sensor params
     cam_depth: float = 0.08
     cam_width: float = 0.08
     cam_height: float = 0.06
@@ -56,8 +50,6 @@ class SensorConfig:
     far_clip: float = 8.0
     cam_update_rate: float = 10.0
 
-
-# ── XML / YAML helpers ────────────────────────────────────────────────────────
 
 def _rgba(color: str) -> str:
     return _COLOR_RGBA.get(color, '1.0 1.0 1.0 1')
@@ -198,7 +190,7 @@ def sensor_urdf_xml(s: SensorConfig) -> str:
 
 
 def build_user_sensors_xacro(sensors: list) -> str:
-    """Return the full content of user_sensors.xacro for the given sensor list."""
+    """Build the full user_sensors.xacro content for this sensor list."""
     body = '\n'.join(sensor_urdf_xml(s) for s in sensors)
     return (
         '<?xml version="1.0"?>\n'
@@ -209,7 +201,7 @@ def build_user_sensors_xacro(sensors: list) -> str:
 
 
 def build_bridge_yaml(sensors: list) -> str:
-    """Build gz_bridge YAML content for clock + all sensors."""
+    """Build gz_bridge YAML for clock + every sensor's topic."""
     lines = [
         '- ros_topic_name: "clock"',
         '  gz_topic_name: "clock"',
@@ -238,12 +230,12 @@ def build_bridge_yaml(sensors: list) -> str:
 
 
 def camera_image_topics(sensors: list) -> list:
-    """Return a list of ROS image topic names for all camera sensors."""
+    """ROS image topic names for all camera sensors in the list."""
     return [f'/{s.name}/image_raw' for s in sensors if s.sensor_type == 'camera']
 
 
 def default_sensors(robot_type: str, chassis_size_str: str = '1.2 0.8 0.3') -> list:
-    """Create one default lidar + one default camera sized to the chassis."""
+    """One default lidar + one default camera, positions derived from chassis size."""
     try:
         parts = chassis_size_str.split()
         L, W, H = float(parts[0]), float(parts[1]), float(parts[2])
@@ -265,7 +257,7 @@ def default_sensors(robot_type: str, chassis_size_str: str = '1.2 0.8 0.3') -> l
 
 
 def sensor_to_dict(s: SensorConfig) -> dict:
-    """Serialize a SensorConfig to a plain dict for preset storage."""
+    """Flatten a SensorConfig to a plain dict for preset/session storage."""
     return {
         'sensor_type': s.sensor_type,
         'name': s.name,
@@ -287,7 +279,6 @@ def sensor_to_dict(s: SensorConfig) -> dict:
 
 
 def sensor_from_dict(d: dict) -> SensorConfig:
-    """Deserialize a SensorConfig from a preset dict."""
     s = SensorConfig()
     for field in s.__dataclass_fields__:
         if field in d:

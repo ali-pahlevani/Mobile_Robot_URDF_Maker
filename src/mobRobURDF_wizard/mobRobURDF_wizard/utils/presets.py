@@ -1,8 +1,4 @@
-"""Save / load wizard configurations (presets).
-
-A preset captures robot type, controller type, chassis/wheel parameters, and
-the full sensor list so a configuration can be reproduced later.
-"""
+"""Save / load wizard presets (robot type, controller, dimensions, sensors)."""
 
 import os
 import logging
@@ -28,7 +24,7 @@ def default_preset_dir():
 
 
 def save_preset(path, robot_type, controller_type, params, sensors=None):
-    """Write a preset YAML. ``sensors`` is a list of sensor dicts (from sensor_to_dict)."""
+    """Write preset YAML; sensors is a list of sensor_to_dict() dicts."""
     data = {
         "format": "mobRobURDF_preset",
         "version": PRESET_VERSION,
@@ -70,6 +66,6 @@ def load_preset(path):
     if not isinstance(sensors, list):
         sensors = []
 
-    # Coerce param values to strings (line edits operate on strings).
+    # line edits always operate on strings
     params = {str(k): str(v) for k, v in params.items()}
     return robot_type, controller_type, params, sensors

@@ -1,11 +1,4 @@
-"""Built-in teleoperation page.
-
-Lets the user drive the robot directly from the wizard using on-screen
-D-pad buttons or keyboard shortcuts (WASD / arrow keys).  Publishes
-geometry_msgs/Twist to /cmd_vel at 50 Hz via an rclpy node running in a
-background daemon thread.  An immediate publish is also triggered on every
-key-press/release and button press/release so latency is minimised.
-"""
+"""Teleoperation page — D-pad + keyboard drive via rclpy publishing Twist to /cmd_vel."""
 
 import time
 import threading
@@ -30,14 +23,12 @@ except ImportError:
     _HAS_RCLPY = False
     logger.warning("rclpy not available — teleop publishing disabled")
 
-# Cardinal key groups
 _FWD_KEYS   = {Qt.Key_W, Qt.Key_Up}
 _BWD_KEYS   = {Qt.Key_S, Qt.Key_Down}
 _LEFT_KEYS  = {Qt.Key_A, Qt.Key_Left}
 _RIGHT_KEYS = {Qt.Key_D, Qt.Key_Right}
 _STOP_KEYS  = {Qt.Key_Space}
 
-# Diagonal key groups
 _FWD_LEFT_KEYS  = {Qt.Key_Q}
 _FWD_RIGHT_KEYS = {Qt.Key_E}
 _BWD_LEFT_KEYS  = {Qt.Key_Z}
@@ -129,13 +120,11 @@ class TeleoperationPage(QWizardPage):
         )
         self.setFocusPolicy(Qt.StrongFocus)
 
-        # 50 Hz publish timer — matches controller update_rate so every
-        # controller cycle receives a fresh setpoint (reduces closed-loop hunting)
+        # 50 Hz matches controller update_rate — each cycle gets a fresh setpoint
         self._timer = QTimer(self)
         self._timer.setInterval(20)
         self._timer.timeout.connect(self._tick)
 
-        # Simulation launch manager
         self._launch_manager = LaunchManager(self)
         self._launch_manager.started.connect(self._on_sim_started)
         self._launch_manager.stopped.connect(self._on_sim_stopped)
@@ -143,14 +132,11 @@ class TeleoperationPage(QWizardPage):
 
         self._build_ui()
 
-    # ── UI ─────────────────────────────────────────────────────────────────
-
     def _build_ui(self):
         root = QVBoxLayout(self)
         root.setContentsMargins(24, 12, 24, 12)
         root.setSpacing(10)
 
-        # Full-width launch section — twice as wide as when it was in the left panel
         root.addWidget(self._build_launch_section())
 
         panels = QHBoxLayout()
@@ -158,8 +144,6 @@ class TeleoperationPage(QWizardPage):
         panels.addWidget(self._build_left_panel(), 1)
         panels.addWidget(self._build_right_panel(), 1)
         root.addLayout(panels, 1)
-
-    # ── Full-width launch section ───────────────────────────────────────────
 
     def _build_launch_section(self):
         box = QGroupBox()
@@ -182,14 +166,11 @@ class TeleoperationPage(QWizardPage):
 
         return box
 
-    # ── Left panel: D-pad + velocity readout ──────────────────────────────
-
     def _build_left_panel(self):
         box = QGroupBox("Controls")
         vbox = QVBoxLayout(box)
         vbox.setSpacing(14)
 
-        # ── Teleop connection status row ───────────────────────────────────
         status_row = QHBoxLayout()
         self._status_dot = QLabel("●")
         self._status_dot.setStyleSheet("font-size: 14pt; color: #E74C3C;")
@@ -200,7 +181,6 @@ class TeleoperationPage(QWizardPage):
         status_row.addStretch()
         vbox.addLayout(status_row)
 
-        # D-pad grid (centered)
         dpad = self._build_dpad()
         center = QHBoxLayout()
         center.addStretch()
@@ -208,7 +188,7 @@ class TeleoperationPage(QWizardPage):
         center.addStretch()
         vbox.addLayout(center)
 
-        # Strafe mode toggle — enabled only for mecanum controller
+        # strafe toggle — only enabled for mecanum
         self._strafe_btn = QPushButton("⇔  Strafe Mode")
         self._strafe_btn.setMinimumHeight(36)
         self._strafe_btn.setCheckable(True)
@@ -223,7 +203,6 @@ class TeleoperationPage(QWizardPage):
         self._strafe_btn.toggled.connect(self._on_strafe_toggled)
         vbox.addWidget(self._strafe_btn)
 
-        # Velocity readout
         self._vel_lbl = QLabel("linear:  0.00 m/s    angular:  0.00 rad/s")
         self._vel_lbl.setAlignment(Qt.AlignCenter)
         self._vel_lbl.setStyleSheet(
@@ -231,7 +210,6 @@ class TeleoperationPage(QWizardPage):
         )
         vbox.addWidget(self._vel_lbl)
 
-        # Connect / Disconnect button
         self._conn_btn = QPushButton("Connect to /cmd_vel")
         self._conn_btn.setMinimumHeight(42)
         self._conn_btn.setProperty("btnRole", "success")
@@ -265,14 +243,12 @@ class TeleoperationPage(QWizardPage):
         self._btn_rgt  = cardinal("►")
         self._btn_stop = cardinal("■", stop=True)
 
-        # Diagonal buttons: Q ↖  E ↗  Z ↙  C ↘
         self._btn_fl = diagonal("Q\n↖")
         self._btn_fr = diagonal("E\n↗")
         self._btn_bl = diagonal("Z\n↙")
         self._btn_br = diagonal("C\n↘")
 
-        # All movement buttons: add/remove their direction tag while held,
-        # then immediately publish so there's no wait for the next timer tick.
+        # held buttons add their tag to _btn_dirs and immediately publish (no wait for timer)
         for b, d in (
             (self._btn_fwd,  "fwd"),
             (self._btn_bwd,  "bwd"),
@@ -288,10 +264,6 @@ class TeleoperationPage(QWizardPage):
 
         self._btn_stop.clicked.connect(self._emergency_stop)
 
-        # 3 × 3 grid:
-        #  [Q↖] [W▲] [E↗]
-        #  [A◄] [■ ] [D►]
-        #  [Z↙] [S▼] [C↘]
         g.addWidget(self._btn_fl,   0, 0)
         g.addWidget(self._btn_fwd,  0, 1)
         g.addWidget(self._btn_fr,   0, 2)
@@ -304,14 +276,11 @@ class TeleoperationPage(QWizardPage):
 
         return w
 
-    # ── Right panel: speed sliders + keyboard reference ────────────────────
-
     def _build_right_panel(self):
         box = QGroupBox("Settings")
         vbox = QVBoxLayout(box)
         vbox.setSpacing(16)
 
-        # Topic field
         topic_row = QHBoxLayout()
         topic_row.addWidget(QLabel("Topic:"))
         self._topic_edit = QLineEdit("/cmd_vel")
@@ -319,19 +288,16 @@ class TeleoperationPage(QWizardPage):
         topic_row.addWidget(self._topic_edit, 1)
         vbox.addLayout(topic_row)
 
-        # Linear speed slider
         vbox.addWidget(self._speed_section(
             "Linear Speed", 1, 40, 5, "m/s",
             attr="_lin_slider", lbl_attr="_lin_lbl",
         ))
 
-        # Angular speed slider
         vbox.addWidget(self._speed_section(
             "Angular Speed", 1, 40, 10, "rad/s",
             attr="_ang_slider", lbl_attr="_ang_lbl",
         ))
 
-        # Keyboard reference card
         vbox.addWidget(self._build_keyboard_ref())
         vbox.addStretch()
         return box
@@ -382,8 +348,6 @@ class TeleoperationPage(QWizardPage):
             g.addWidget(act_lbl, i, 1)
         return grp
 
-    # ── Simulation launch ───────────────────────────────────────────────────
-
     def _toggle_simulation(self):
         if self._launch_manager.is_running():
             self._launch_manager.stop()
@@ -425,8 +389,6 @@ class TeleoperationPage(QWizardPage):
             )
         else:
             self._sim_status.setText("Simulation stopped.")
-
-    # ── Connection lifecycle ────────────────────────────────────────────────
 
     def _toggle_connection(self):
         if self._pub is not None:
@@ -483,13 +445,9 @@ class TeleoperationPage(QWizardPage):
         self._status_lbl.setText(text)
         self._status_lbl.setStyleSheet(f"font-size: 10pt; color: {color};")
 
-    # ── Strafe mode ─────────────────────────────────────────────────────────
-
     def _on_strafe_toggled(self, checked: bool):
         self._strafe_mode = checked
-        self._tick()  # immediately reflect the mode change in the readout
-
-    # ── Velocity publishing ─────────────────────────────────────────────────
+        self._tick()  # update readout immediately
 
     @property
     def _lin(self):
@@ -502,7 +460,6 @@ class TeleoperationPage(QWizardPage):
     def _tick(self):
         linear = angular = lateral = 0.0
 
-        # Map button directions to virtual keys (including diagonal combinations).
         extra: set = set()
         for tag, keys in (
             ("fwd",     {Qt.Key_W}),
@@ -519,21 +476,18 @@ class TeleoperationPage(QWizardPage):
 
         active = self._held_keys | extra
 
-        # Linear.x: any forward key (including diagonals) → positive; backward → negative.
         if active & (_FWD_KEYS | _FWD_LEFT_KEYS | _FWD_RIGHT_KEYS):
             linear = self._lin
         elif active & (_BWD_KEYS | _BWD_LEFT_KEYS | _BWD_RIGHT_KEYS):
             linear = -self._lin
 
         if self._strafe_mode:
-            # Strafe mode (mecanum): left/right → linear.y (sideways); angular stays 0.
-            # Diagonal buttons produce true diagonal translation (linear.x + linear.y).
+            # mecanum strafe: left/right → linear.y; diagonals combine linear.x + linear.y
             if active & (_LEFT_KEYS | _FWD_LEFT_KEYS | _BWD_LEFT_KEYS):
-                lateral = self._lin   # positive Y = left in ROS convention
+                lateral = self._lin   # +Y = left in ROS convention
             elif active & (_RIGHT_KEYS | _FWD_RIGHT_KEYS | _BWD_RIGHT_KEYS):
-                lateral = -self._lin  # negative Y = right
+                lateral = -self._lin
         else:
-            # Normal mode: left/right → angular.z (rotation).
             if active & (_LEFT_KEYS | _FWD_LEFT_KEYS | _BWD_LEFT_KEYS):
                 angular = self._ang
             elif active & (_RIGHT_KEYS | _FWD_RIGHT_KEYS | _BWD_RIGHT_KEYS):
@@ -566,8 +520,6 @@ class TeleoperationPage(QWizardPage):
         self._btn_dirs.clear()
         self._publish(0.0, 0.0, 0.0)
 
-    # ── Keyboard events ─────────────────────────────────────────────────────
-
     def keyPressEvent(self, event):
         if event.isAutoRepeat():
             return
@@ -576,18 +528,15 @@ class TeleoperationPage(QWizardPage):
             self._emergency_stop()
         else:
             self._held_keys.add(key)
-            self._tick()   # publish immediately instead of waiting for next timer fire
+            self._tick()   # publish now, don't wait for the next timer tick
 
     def keyReleaseEvent(self, event):
         if not event.isAutoRepeat():
             self._held_keys.discard(event.key())
-            self._tick()   # send the stop (or reduced) command right away
-
-    # ── Wizard page lifecycle ───────────────────────────────────────────────
+            self._tick()   # send stop/reduced command immediately
 
     def initializePage(self):
         self.setFocus()
-        # Enable strafe toggle only for mecanum controller.
         controller = ""
         try:
             controller = self.wizard().field("controllerType") or ""
@@ -596,13 +545,12 @@ class TeleoperationPage(QWizardPage):
         is_mecanum = (controller == "mecanum")
         self._strafe_btn.setEnabled(is_mecanum)
         if not is_mecanum:
-            # Uncheck without calling _tick (no connection yet on page entry)
+            # blockSignals so uncheck doesn't trigger _tick before we're connected
             self._strafe_btn.blockSignals(True)
             self._strafe_btn.setChecked(False)
             self._strafe_btn.blockSignals(False)
             self._strafe_mode = False
 
-        # Enable/disable simulation launch based on the selected hardware interface.
         hw_plugin = self.urdf_manager.last_hardware_interface
         is_sim = (hw_plugin == GAZEBO_SIM_PLUGIN)
         self._launch_btn.setEnabled(is_sim)
@@ -618,7 +566,6 @@ class TeleoperationPage(QWizardPage):
         self._disconnect()
 
     def shutdown(self):
-        """Called on window close to cleanly stop simulation and teleop."""
         self._disconnect()
         if self._launch_manager.is_running():
             self._launch_manager.stop()

@@ -23,7 +23,7 @@ def uses_stamped_twist(distro=None):
     return d not in _UNSTAMPED_DISTROS
 
 def render_template(template_path, params):
-    """Render a template file with given parameters."""
+    """safe_substitute so unknown $vars in templates don't blow up."""
     try:
         with open(template_path, 'r') as f:
             tmpl = Template(f.read())
@@ -38,7 +38,7 @@ def render_template(template_path, params):
         return f"Error rendering template: {str(e)}"
 
 def generate_urdf(xacro_file):
-    """Generate a URDF from a Xacro file using the xacro command."""
+    """Run xacro on xacro_file and return the resulting URDF string."""
     try:
         result = subprocess.run(['xacro', xacro_file],
                                 stdout=subprocess.PIPE,
@@ -61,7 +61,7 @@ def generate_urdf(xacro_file):
         return error_msg
 
 def get_color(color_name):
-    """Map a color name to an RGB tuple."""
+    """Color name → (R, G, B) float tuple for OpenGL."""
     colors = {
         "Gray": (0.5, 0.5, 0.5),
         "Black": (0.0, 0.0, 0.0),

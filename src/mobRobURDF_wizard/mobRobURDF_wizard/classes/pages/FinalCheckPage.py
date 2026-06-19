@@ -1,4 +1,4 @@
-"""Final Check wizard page — displays the generated URDF for review and manual editing."""
+"""Final Check page — shows generated URDF in an editable text editor before launch."""
 
 import os
 import json
@@ -19,7 +19,7 @@ DEFAULT_SESSION_DIR = os.path.expanduser("~/mobRobURDF_sessions")
 
 
 def save_session(path: str, urdf_manager, urdf_text: str):
-    """Serialise the full wizard state to a JSON session file."""
+    """Write the full wizard state to a JSON .mobsession file."""
     from mobRobURDF_wizard.classes.sensor_config import sensor_to_dict
     sensors = [sensor_to_dict(s) for s in (urdf_manager.last_sensors or [])]
     data = {
@@ -40,7 +40,7 @@ def save_session(path: str, urdf_manager, urdf_text: str):
 
 
 def load_session(path: str) -> dict:
-    """Load a session JSON file. Returns the raw dict; raises ValueError on bad format."""
+    """Load a .mobsession file and return the raw dict; raises ValueError on bad format."""
     with open(path) as f:
         data = json.load(f)
     if not isinstance(data, dict) or data.get("format") != "mobRobURDF_session":
@@ -52,7 +52,7 @@ class FinalCheckPage(QWizardPage):
     def __init__(self, urdf_manager, parent=None):
         super().__init__(parent)
         self.urdf_manager = urdf_manager
-        self._base_text = ""   # last text loaded from generator (used by Revert)
+        self._base_text = ""   # generator output; Revert restores this
 
         self.setTitle("Final Check — Review & Edit Generated URDF")
         self.setSubTitle(
@@ -64,7 +64,6 @@ class FinalCheckPage(QWizardPage):
         layout.setContentsMargins(14, 8, 14, 10)
         layout.setSpacing(8)
 
-        # ── Toolbar row ──────────────────────────────────────────────────────
         toolbar = QHBoxLayout()
         toolbar.setSpacing(8)
 
@@ -85,7 +84,6 @@ class FinalCheckPage(QWizardPage):
         copy_btn.clicked.connect(self._copy)
         toolbar.addWidget(copy_btn)
 
-        # ── Green action buttons ─────────────────────────────────────────────
         save_urdf_btn = QPushButton("Save URDF")
         save_urdf_btn.setMinimumHeight(34)
         save_urdf_btn.setMinimumWidth(110)
@@ -106,7 +104,6 @@ class FinalCheckPage(QWizardPage):
 
         layout.addLayout(toolbar)
 
-        # ── URDF editor ──────────────────────────────────────────────────────
         self._text = QTextEdit()
         self._text.setReadOnly(False)
         self._text.setLineWrapMode(QTextEdit.NoWrap)
@@ -123,18 +120,13 @@ class FinalCheckPage(QWizardPage):
         """)
         layout.addWidget(self._text, 1)
 
-    # ── Wizard page lifecycle ────────────────────────────────────────────────
-
     def initializePage(self):
         urdf = self.urdf_manager.get_urdf_text() or ""
         self._base_text = urdf
         self._text.setPlainText(urdf)
         self._update_status(urdf)
 
-    # ── Actions ──────────────────────────────────────────────────────────────
-
     def _revert(self):
-        """Restore the generated URDF, discarding manual edits."""
         self._text.setPlainText(self._base_text)
         self._update_status(self._base_text)
 

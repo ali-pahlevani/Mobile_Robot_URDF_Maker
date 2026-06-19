@@ -64,7 +64,7 @@ class ControlConfigurationPage(QWizardPage):
         if value and self._robot_for.get(value) == self._robot_type:
             self.set_controller_type(value)
         else:
-            # Clear a stale selection that no longer matches the chosen robot.
+            # stale selection from a different robot type — reset it
             self._controller_type = None
             self.status_label.setText("")
             self.completeChanged.emit()

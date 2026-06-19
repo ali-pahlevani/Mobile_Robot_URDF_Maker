@@ -1,23 +1,9 @@
 #!/usr/bin/env python3
-"""Relay /cmd_vel → the active controller's velocity topic.
+"""Bridges a single /cmd_vel (plain Twist from teleop) to the controller's actual topic.
 
-Different ros2_control controllers expose different topic names *and* message
-types, and the convention changed across ROS 2 distributions:
-
-  Humble / Iron (unstamped Twist):
-    diff_drive_controller   → <name>/cmd_vel_unstamped   (Twist)
-    tricycle_controller     → <name>/cmd_vel             (Twist)
-    steering controllers    → <name>/reference_unstamped (Twist)
-    mecanum_drive_controller→ <name>/reference_unstamped (Twist)
-
-  Jazzy and newer (TwistStamped):
-    diff_drive / tricycle   → <name>/cmd_vel             (TwistStamped)
-    steering / mecanum      → <name>/reference           (TwistStamped)
-
-This node subscribes to /cmd_vel (always plain Twist, as published by teleop
-tools) and republishes each message to whichever topic/type the selected
-controller actually listens on, so users always drive via a single /cmd_vel
-topic regardless of controller type or ROS 2 distribution.
+Humble/Iron controllers use unstamped Twist on *_unstamped topics;
+Jazzy+ use TwistStamped on cmd_vel/reference.  This node hides that
+complexity so the rest of the stack always talks to /cmd_vel.
 """
 
 import rclpy
@@ -26,7 +12,7 @@ from geometry_msgs.msg import Twist, TwistStamped
 
 from mobRobURDF_launch.ros_compat import uses_stamped_twist
 
-# Topic suffix per controller for the TwistStamped (Jazzy+) convention.
+# Jazzy+ topic suffixes (TwistStamped)
 _SUFFIX_STAMPED = {
     'diffDrive_controller':  'cmd_vel',
     'tricycle_controller':   'cmd_vel',
@@ -35,7 +21,7 @@ _SUFFIX_STAMPED = {
     'mecDrive_controller':   'reference',
 }
 
-# Topic suffix per controller for the unstamped Twist (Humble/Iron) convention.
+# Humble/Iron topic suffixes (unstamped Twist)
 _SUFFIX_UNSTAMPED = {
     'diffDrive_controller':  'cmd_vel_unstamped',
     'tricycle_controller':   'cmd_vel',
@@ -70,8 +56,7 @@ class CmdVelRelay(Node):
     def _cb(self, msg: Twist) -> None:
         if self._stamped:
             stamped = TwistStamped()
-            # Stamp with the current (sim) clock — controllers compare this
-            # against cmd_vel_timeout, so a zero stamp would look stale.
+            # zero stamp looks stale to the controller's cmd_vel_timeout check
             stamped.header.stamp = self.get_clock().now().to_msg()
             stamped.twist = msg
             self._pub.publish(stamped)

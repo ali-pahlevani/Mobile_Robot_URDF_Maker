@@ -1,4 +1,4 @@
-"""Start page — choose New Project or Load Saved Session."""
+"""Start page — new project or load a saved session."""
 
 import os
 import logging
@@ -52,10 +52,7 @@ class StartSessionPage(QWizardPage):
         layout.setSpacing(20)
         layout.addStretch(1)
 
-        # ── Detected ROS 2 environment (read-only) ─────────────────────────────
-        # The distro is dictated by the sourced environment, not a user choice;
-        # the app auto-adapts (controller command type, etc.) to it. Shown here
-        # for transparency only.
+        # read-only badge — distro drives command-type auto-selection; shown for transparency
         layout.addWidget(self._build_env_badge())
 
         row = QHBoxLayout()
@@ -89,8 +86,6 @@ class StartSessionPage(QWizardPage):
 
         self._refresh_styles()
 
-    # ── Environment badge ───────────────────────────────────────────────────────
-
     def _build_env_badge(self):
         distro = ros_distro()
         if distro:
@@ -111,8 +106,6 @@ class StartSessionPage(QWizardPage):
             "border-radius: 6px; padding: 6px 10px;"
         )
         return lbl
-
-    # ── Card selection ────────────────────────────────────────────────────────
 
     def _select_new(self):
         self._mode = "new"
@@ -162,8 +155,6 @@ class StartSessionPage(QWizardPage):
             selected=load_sel,
         ))
 
-    # ── Wizard page lifecycle ─────────────────────────────────────────────────
-
     def isComplete(self):
         return True  # always complete — either new or (load + data ready)
 
@@ -173,7 +164,6 @@ class StartSessionPage(QWizardPage):
                 QMessageBox.warning(self, "No session",
                                     "Please load a session file first.")
                 return False
-            # Pass session data to ConfigurationPage via the shared URDFManager slot.
             self.urdf_manager.pending_restore = self._session_data
         else:
             self.urdf_manager.pending_restore = None
@@ -182,7 +172,6 @@ class StartSessionPage(QWizardPage):
     def nextId(self):
         ids = self.wizard().pageIds()
         if self._mode == "load" and self._session_data is not None:
-            # Skip RobotType (idx 2) and ControlConfig (idx 3); go to ConfigurationPage (idx 4).
+            # skip RobotType + ControlConfig when restoring a session
             return ids[4]
-        # Normal flow: go to RobotType selection (idx 2).
         return ids[2]

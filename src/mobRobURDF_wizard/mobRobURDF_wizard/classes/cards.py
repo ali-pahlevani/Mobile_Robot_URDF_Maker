@@ -1,10 +1,4 @@
-"""Card widgets for selection and feature pages.
-
-A card is a white, rounded, bordered panel containing an aspect-fit image, a
-title, an optional badge, and (for selection cards) an action button. Selecting
-a card highlights it (accent border + tinted background); the layout is fully
-responsive because the image uses ScaledPixmapLabel and the card expands.
-"""
+"""Selection and feature card widgets used on the robot-type and future-features pages."""
 
 import os
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QSizePolicy
@@ -69,7 +63,7 @@ class SelectionCard(QWidget):
 
     def set_enabled(self, enabled):
         self.button.setEnabled(enabled)
-        # Dim the whole card when its controller doesn't apply to the robot type.
+        # dim the card when this controller doesn't match the chosen robot type
         self.setStyleSheet(style.card_qss(selected=False))
         self.setGraphicsEffect(None)
         self.setProperty("disabledCard", not enabled)

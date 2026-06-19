@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 class ConfigurationPage(QWizardPage):
     modelUpdated = pyqtSignal(float, float, float, str, str, tuple, tuple, str, object)
 
-    # Preset key -> line-edit attribute (chassis + wheels only; sensors handled separately).
+    # preset key → line-edit attribute (sensors are handled separately)
     _PRESET_FIELDS = [
         ("chassis_size", "chassisSizeLineEdit"),
         ("chassis_mass", "chassisMassLineEdit"),
@@ -37,7 +37,7 @@ class ConfigurationPage(QWizardPage):
         self.urdf_manager = urdf_manager
         self.robot_type = None
         self.controller_type = None
-        self._sensor_cards = []   # list[SensorCard], in insertion order
+        self._sensor_cards = []   # in insertion order
 
         self.default_save_path = os.path.join(
             get_package_share_directory("mobRobURDF_description"), "urdf", "mobRob"
@@ -47,7 +47,6 @@ class ConfigurationPage(QWizardPage):
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
 
-        # ── Left control panel (scrollable) ───────────────────────────────
         self.left_widget = QWidget()
         self.left_widget.setFixedWidth(360)
         left_layout = QVBoxLayout(self.left_widget)
@@ -65,7 +64,6 @@ class ConfigurationPage(QWizardPage):
         self.scroll.setWidget(self._params_container)
         left_layout.addWidget(self.scroll, 1)
 
-        # Preset row
         self.loadPresetButton = WrapButton("Load Preset", "secondary")
         self.loadPresetButton.setMinimumHeight(34)
         self.loadPresetButton.clicked.connect(self.loadPreset)
@@ -84,15 +82,12 @@ class ConfigurationPage(QWizardPage):
         self.saveButton.clicked.connect(self.saveURDF)
         left_layout.addWidget(self.saveButton)
 
-        # ── 3D preview ─────────────────────────────────────────────────────
         self.glWidget = OpenGLWidget()
         self.glWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.modelUpdated.connect(self.glWidget.updateRobotModel)
 
         main_layout.addWidget(self.left_widget)
         main_layout.addWidget(self.glWidget, 1)
-
-    # ── Form helpers ────────────────────────────────────────────────────────
 
     def _group(self, title):
         box = QGroupBox(title)
@@ -116,8 +111,6 @@ class ConfigurationPage(QWizardPage):
             form.addRow(label, edit)
         return edit
 
-    # ── Page lifecycle ────────────────────────────────────────────────────
-
     def initializePage(self):
         pending = getattr(self.urdf_manager, 'pending_restore', None)
         if pending:
@@ -135,7 +128,7 @@ class ConfigurationPage(QWizardPage):
         robot_changed = (new_robot_type != self.robot_type or
                          new_controller_type != self.controller_type)
 
-        # Save current sensor configs before setup_parameters() wipes the card list.
+        # snapshot sensors before setup_parameters() wipes the card list
         saved_sensors = [card.to_sensor_config() for card in self._sensor_cards]
 
         self.robot_type = new_robot_type
@@ -147,16 +140,16 @@ class ConfigurationPage(QWizardPage):
 
         chassis_str = self.chassisSizeLineEdit.text() or "1.2 0.8 0.3"
         if robot_changed or not saved_sensors:
-            # New robot/controller → start fresh with one default lidar + camera.
+            # fresh robot/controller → reset to one default lidar + camera
             self._reset_sensors(default_sensors(self.robot_type, chassis_str))
         else:
-            # Navigated back to same config → restore what the user had.
+            # same config navigated back to — restore what the user had
             self._reset_sensors(saved_sensors)
 
         self.applyChanges()
 
     def _restore_from_session(self, data: dict):
-        """Fully restore wizard state from a session dict (loaded from .mobsession)."""
+        """Restore all wizard state from a session dict (loaded from .mobsession)."""
         robot_type = data.get("robot_type", "4_wheeled")
         controller_type = data.get("controller_type", "diff_4w")
         params = data.get("parameters", {})
@@ -164,7 +157,7 @@ class ConfigurationPage(QWizardPage):
         tuner_params = data.get("tuner_params", {})
         saved_urdf = data.get("urdf_text", "")
 
-        # Sync wizard-level fields so other pages stay consistent.
+        # keep wizard-level fields in sync so sidebar nav stays correct
         try:
             self.setField("robotType", robot_type)
             self.setField("controllerType", controller_type)
@@ -192,23 +185,20 @@ class ConfigurationPage(QWizardPage):
             )
         self._reset_sensors(sensor_configs)
 
-        # Restore tuner params so ControllerTunerPage picks them up.
         if tuner_params:
             self.urdf_manager.last_tuner_params = tuner_params
 
-        # Restore hardware interface selection.
         hw_interface = data.get("hardware_interface", GAZEBO_SIM_PLUGIN)
         self.urdf_manager.last_hardware_interface = hw_interface or GAZEBO_SIM_PLUGIN
 
-        # Generate fresh URDF from restored params (updates 3D preview).
         self.applyChanges()
 
-        # Override with the saved URDF text (may include manual edits from FinalCheckPage).
+        # override with saved URDF text — may contain manual edits from FinalCheckPage
         if saved_urdf:
             self.urdf_manager.urdf_text = saved_urdf
 
     def setup_parameters(self):
-        # Remove all existing form widgets but preserve sensor cards externally.
+        # clear existing form widgets; sensor cards were already snapshotted by the caller
         while self.params_layout.count():
             item = self.params_layout.takeAt(0)
             if item.widget():
@@ -240,10 +230,7 @@ class ConfigurationPage(QWizardPage):
         self.wheelMaterialLineEdit = self._field(wheel_form, "Wheel Material", "e.g., Black")
         self.params_layout.addWidget(wheel_box)
 
-    # ── Sensor panel ──────────────────────────────────────────────────────
-
     def _add_sensor_panel(self):
-        """Add the "Sensors" group with Add-Lidar / Add-Camera buttons."""
         sensor_group = QGroupBox("Sensors")
         vbox = QVBoxLayout(sensor_group)
         vbox.setSpacing(6)
@@ -268,7 +255,6 @@ class ConfigurationPage(QWizardPage):
         if config is not None:
             card.load_sensor_config(config)
         else:
-            # Auto-name using next available index.
             existing = [c for c in self._sensor_cards if c._type == sensor_type]
             idx = len(existing) + 1
             card.nameEdit.setText(f'{sensor_type}_{idx}')
@@ -284,17 +270,13 @@ class ConfigurationPage(QWizardPage):
         card.deleteLater()
 
     def _reset_sensors(self, sensor_configs: list):
-        """Replace all sensor cards with those from sensor_configs."""
         for card in list(self._sensor_cards):
             self._remove_sensor_card(card)
         for sc in sensor_configs:
             self._add_sensor(sc.sensor_type, sc)
 
     def _gather_sensors(self) -> list:
-        """Read all SensorCard widgets and return a list of SensorConfig."""
         return [card.to_sensor_config() for card in self._sensor_cards]
-
-    # ── Validation ──────────────────────────────────────────────────────────
 
     def validate_float(self, value, field_name, default, min_val=0.0):
         try:
@@ -305,8 +287,6 @@ class ConfigurationPage(QWizardPage):
             return default
         except ValueError:
             return default
-
-    # ── Apply ─────────────────────────────────────────────────────────────
 
     def applyChanges(self):
         chassis_size_str = self.chassisSizeLineEdit.text()
@@ -375,7 +355,6 @@ class ConfigurationPage(QWizardPage):
         urdf_text = self.urdf_manager.generate_urdf(
             self.robot_type, self.controller_type, params, sensors
         )
-        # Update chassis + wheels in the 3D preview via signal.
         self.modelUpdated.emit(
             L, W, H,
             str(wheel_radius),
@@ -386,10 +365,7 @@ class ConfigurationPage(QWizardPage):
             caster_radius
         )
 
-        # Update sensors directly — all sensors with their exact positions and colors.
         self.glWidget.updateSensors(sensors)
-
-    # ── Save ──────────────────────────────────────────────────────────────
 
     def saveURDF(self):
         try:
@@ -410,8 +386,6 @@ class ConfigurationPage(QWizardPage):
             except Exception as e:
                 logger.error("Failed to save URDF to %s: %s", filename, str(e))
                 QMessageBox.warning(self, "Save failed", str(e))
-
-    # ── Presets ─────────────────────────────────────────────────────────────
 
     def _gather_params(self):
         params = {}
@@ -466,7 +440,6 @@ class ConfigurationPage(QWizardPage):
             if edit is not None and key in params:
                 edit.setText(params[key])
 
-        # Restore sensor cards from preset.
         sensor_configs = [sensor_from_dict(d) for d in sensor_dicts]
         if not sensor_configs:
             sensor_configs = default_sensors(robot_type, params.get('chassis_size', '1.2 0.8 0.3'))

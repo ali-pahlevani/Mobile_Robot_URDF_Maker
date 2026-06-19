@@ -25,7 +25,6 @@ class WrapButton(QPushButton):
         if role:
             self.setProperty("btnRole", role)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        # Ensure single-line labels always have enough height; wrapped labels need more.
         self.setMinimumHeight(40)
 
     def resizeEvent(self, event):
@@ -84,7 +83,7 @@ class ScaledPixmapLabel(QLabel):
     def __init__(self, hint=QSize(280, 260)):
         super().__init__()
         self._source = None
-        self._hint = hint
+        self._hint = hint   # pinned hint prevents large pixmaps from skewing QWizard layout
         self.setAlignment(Qt.AlignCenter)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setMinimumHeight(80)

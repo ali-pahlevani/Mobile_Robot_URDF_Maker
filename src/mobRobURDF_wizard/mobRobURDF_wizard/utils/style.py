@@ -1,9 +1,4 @@
-"""Central styling for the Mobile Robot URDF Maker wizard.
-
-A single flat-design system applied once on the QApplication, plus the dark
-sidebar stylesheet. Keeping every widget rule here (instead of inline per
-widget) is what gives the app its cohesive, modern, responsive look.
-"""
+"""All colour constants and stylesheets for the wizard — applied once at app startup."""
 
 # ── Palette ──────────────────────────────────────────────────────────────────
 BG_PAGE = "#F4F6F9"    # light page background
