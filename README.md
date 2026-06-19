@@ -6,9 +6,16 @@
 
 **Mobile Robot URDF Maker** is a ROS 2 desktop application that walks you through building a mobile-robot description step by step: pick a chassis type, choose a `ros2_control` controller, set dimensions, add as many lidars and cameras as you like, tune the controller, and then **simulate and drive the robot in Gazebo — all from inside the wizard.** The result is a clean `.urdf` **and** `.urdf.xacro` pair plus matching controller configuration, ready to drop into your own stack.
 
-- **Target platform:** ROS 2 **Humble** (Ubuntu 22.04)
+- **Supported platforms:** ROS 2 **Humble** (Ubuntu 22.04) and ROS 2 **Jazzy** (Ubuntu 24.04) — the **same codebase** auto-adapts to whichever you build/source.
 - **Simulator:** **Gazebo Harmonic** (`gz sim` 8) via `gz_ros2_control`
 - **GUI:** PyQt5 with a live OpenGL 3D preview
+
+> **One codebase, both distros.** The app detects `$ROS_DISTRO` at runtime and
+> adjusts the parts that differ between distributions — chiefly the controller
+> command interface (Humble/Iron use unstamped `Twist`; Jazzy+ use
+> `TwistStamped`). The detected environment is shown on the **Start Project**
+> page. You don't pick a distro in the app; it follows the environment you
+> sourced.
 
 ---
 
@@ -176,22 +183,46 @@ cd Mobile_Robot_URDF_Maker
 
 **2. Install Gazebo Harmonic and the Harmonic-built `ros_gz` stack**
 
-On ROS 2 Humble the default `ros_gz` packages target *Fortress*; this project uses
-*Harmonic*, so install:
+<details open>
+<summary><b>ROS 2 Humble (Ubuntu 22.04)</b></summary>
+
+On Humble the default `ros_gz` packages target *Fortress*, while this project uses
+*Harmonic*, so install the Harmonic variant. The workspace also **vendors**
+`gz_ros2_control` (built for Harmonic) to shadow the Fortress apt build — keep it.
 
 ```bash
 sudo apt update
 sudo apt install gz-harmonic
 sudo apt install ros-humble-ros-gzharmonic ros-humble-gz-ros2-control
 ```
+</details>
+
+<details>
+<summary><b>ROS 2 Jazzy (Ubuntu 24.04)</b></summary>
+
+On Jazzy, `ros_gz` already targets *Harmonic*, so the apt packages are all you need —
+**and the vendored `gz_ros2_control` must be excluded from the build** (the apt one is
+already Harmonic):
+
+```bash
+sudo apt update
+sudo apt install ros-jazzy-ros-gz ros-jazzy-gz-ros2-control
+
+# Exclude the Humble-pinned vendored plugin from the build:
+touch src/gz_ros2_control/COLCON_IGNORE
+```
+</details>
 
 **3. Install ROS and Python dependencies**
 
 ```bash
 rosdep install --from-paths src --ignore-src -r -y
-sudo apt install python3-pyqt5 python3-pyqt5.qtopengl
-pip install PyOpenGL PyOpenGL_accelerate ruamel.yaml
+sudo apt install python3-pyqt5 python3-pyqt5.qtopengl python3-opengl python3-ruamel.yaml
 ```
+
+> All Python deps (`python3-opengl`, `python3-ruamel.yaml`) are declared in
+> `package.xml`, so `rosdep install` already covers them. On Ubuntu 24.04 avoid bare
+> `pip install` (PEP 668); use the apt packages above, or a virtualenv if you must pip.
 
 **4. Build and source**
 

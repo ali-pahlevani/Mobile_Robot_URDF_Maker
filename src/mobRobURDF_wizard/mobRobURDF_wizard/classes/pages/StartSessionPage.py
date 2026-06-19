@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 
 from mobRobURDF_wizard.classes.pages.FinalCheckPage import load_session, DEFAULT_SESSION_DIR
+from mobRobURDF_wizard.utils.utils import ros_distro, uses_stamped_twist
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,12 @@ class StartSessionPage(QWizardPage):
         layout.setSpacing(20)
         layout.addStretch(1)
 
+        # ── Detected ROS 2 environment (read-only) ─────────────────────────────
+        # The distro is dictated by the sourced environment, not a user choice;
+        # the app auto-adapts (controller command type, etc.) to it. Shown here
+        # for transparency only.
+        layout.addWidget(self._build_env_badge())
+
         row = QHBoxLayout()
         row.setSpacing(32)
 
@@ -81,6 +88,29 @@ class StartSessionPage(QWizardPage):
         layout.addStretch(1)
 
         self._refresh_styles()
+
+    # ── Environment badge ───────────────────────────────────────────────────────
+
+    def _build_env_badge(self):
+        distro = ros_distro()
+        if distro:
+            cmd_style = "TwistStamped" if uses_stamped_twist() else "Twist"
+            text = (f"Detected environment:  ROS 2 {distro.capitalize()}   "
+                    f"·   command interface: {cmd_style}")
+            color = "#1E8449"
+        else:
+            text = ("ROS 2 environment not detected — source your ROS 2 setup "
+                    "before launching for full functionality.")
+            color = "#B9770E"
+        lbl = QLabel(text)
+        lbl.setAlignment(Qt.AlignCenter)
+        lbl.setWordWrap(True)
+        lbl.setStyleSheet(
+            f"font-size: 10pt; font-weight: bold; color: {color}; "
+            "background: #F4F6F7; border: 1px solid #D5DBDB; "
+            "border-radius: 6px; padding: 6px 10px;"
+        )
+        return lbl
 
     # ── Card selection ────────────────────────────────────────────────────────
 

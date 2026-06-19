@@ -1,8 +1,26 @@
+import os
 import subprocess
 from string import Template
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Distributions whose ros2_controllers still use the unstamped Twist interface
+# (cmd_vel_unstamped / reference_unstamped). Jazzy and newer use TwistStamped.
+_UNSTAMPED_DISTROS = {"humble", "iron"}
+
+
+def ros_distro():
+    """Return the active ROS 2 distribution name (lower-case), or ''."""
+    return os.environ.get("ROS_DISTRO", "").lower()
+
+
+def uses_stamped_twist(distro=None):
+    """True if the active distro's controllers expect TwistStamped (Jazzy+)."""
+    d = distro if distro is not None else ros_distro()
+    if not d:
+        return False
+    return d not in _UNSTAMPED_DISTROS
 
 def render_template(template_path, params):
     """Render a template file with given parameters."""

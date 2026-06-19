@@ -5,6 +5,7 @@ from launch.actions import SetEnvironmentVariable
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from mobRobURDF_launch.ros_compat import uses_stamped_twist
 import os
 
 
@@ -66,8 +67,10 @@ def generate_launch_description():
 
     controller_name = read_selected_controller(description_share)
 
-    # Ensure the workspace-built gz_ros2_control (Harmonic) shadows the apt Fortress version.
-    plugin_lib_dir = _find_gz_ros2_control_lib_dir()
+    # On Humble/Iron the apt gz_ros2_control targets Fortress, so the
+    # workspace-built Harmonic plugin must shadow it. On Jazzy+ the apt plugin
+    # is already Harmonic and on the default path, so the shim is skipped.
+    plugin_lib_dir = None if uses_stamped_twist() else _find_gz_ros2_control_lib_dir()
     gz_plugin_path_actions = []
     if plugin_lib_dir:
         existing = os.environ.get('GZ_SIM_SYSTEM_PLUGIN_PATH', '')

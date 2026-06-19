@@ -4,7 +4,7 @@ import random
 import string
 import logging
 import shutil
-from mobRobURDF_wizard.utils.utils import render_template, generate_urdf
+from mobRobURDF_wizard.utils.utils import render_template, generate_urdf, uses_stamped_twist
 from mobRobURDF_wizard.classes.sensor_config import (
     build_user_sensors_xacro, build_bridge_yaml, camera_image_topics,
 )
@@ -309,6 +309,20 @@ class URDFManager:
             # Apply any tuner params that were set from the ControllerTunerPage.
             if self.last_tuner_params:
                 self._apply_tuner_params_to_config(config, controller_type, controller_name)
+
+            # Distro-dependent command interface (idempotent / self-healing):
+            #   Jazzy+  → controllers use TwistStamped; `use_stamped_vel` no
+            #             longer exists, so strip it (an undeclared param can
+            #             block controller loading).
+            #   Humble/Iron → force `use_stamped_vel: false` so the unstamped
+            #             topic (cmd_vel_unstamped / reference_unstamped) the
+            #             relay publishes to actually exists.
+            ctrl_params = config.get(controller_name, {}).get("ros__parameters")
+            if ctrl_params is not None:
+                if uses_stamped_twist():
+                    ctrl_params.pop("use_stamped_vel", None)
+                else:
+                    ctrl_params["use_stamped_vel"] = False
 
             with open(yaml_path, "w") as f:
                 yaml.dump(config, f)
