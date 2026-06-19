@@ -168,7 +168,7 @@ automatically.
 | `mobRobURDF_gazebo` | Gazebo worlds, bridge config and `use_sim_time` settings. |
 | `mobRobURDF_launch` | Launch files (Gazebo test, URDF test) + the `cmd_vel_relay` node. |
 | `mobRobURDF_navigation` | Nav2 / SLAM configs and maps (used by upcoming features). |
-| `gz_ros2_control` | Vendored `gz_ros2_control` plugin (Harmonic), built in-workspace. |
+| `gz_ros2_control` | Vendored [`gz_ros2_control`](https://github.com/ros-controls/gz_ros2_control) plugin (Harmonic), built in-workspace. Included unmodified under its original [Apache 2.0 licence](src/gz_ros2_control/LICENSE) to provide Gazebo Harmonic support on ROS 2 Humble (the apt package there targets Fortress). On Jazzy, add `COLCON_IGNORE` — the apt package is already Harmonic. |
 
 ---
 
