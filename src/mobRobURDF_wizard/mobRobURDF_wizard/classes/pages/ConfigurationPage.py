@@ -38,6 +38,8 @@ class ConfigurationPage(QWizardPage):
         self.robot_type = None
         self.controller_type = None
         self._sensor_cards = []   # in insertion order
+        self.setSubTitle("Set chassis and wheel dimensions, add sensors, then click "
+                         "Apply and Preview to generate the URDF and update the 3D view.")
 
         self.default_save_path = os.path.join(
             get_package_share_directory("mobRobURDF_description"), "urdf", "mobRob"

@@ -61,6 +61,8 @@ class ControllerTunerPage(QWizardPage):
         super().__init__(parent)
         self.urdf_manager = urdf_manager
         self.setTitle("Tune Controller Parameters")
+        self.setSubTitle("Review the auto-computed geometry, pick a hardware interface, and set "
+                         "velocity and steering limits. Use Auto-suggest for physics-based starting values.")
 
         outer = QHBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)

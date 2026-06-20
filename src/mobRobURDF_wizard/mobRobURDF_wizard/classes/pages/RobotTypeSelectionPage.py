@@ -22,6 +22,8 @@ class RobotTypeSelectionPage(QWizardPage):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setTitle("Select Robot Type")
+        self.setSubTitle("Choose the base kinematic type for your robot. "
+                         "This determines which controllers are available in the next step.")
         self.registerField("robotType*", self, property="robotType", changedSignal=self.robotTypeChanged)
         self._robot_type = None
 
@@ -30,11 +32,6 @@ class RobotTypeSelectionPage(QWizardPage):
         root = QVBoxLayout(self)
         root.setContentsMargins(30, 20, 30, 20)
         root.setSpacing(16)
-
-        header = QLabel("Choose the base kinematic type for your robot")
-        header.setAlignment(Qt.AlignCenter)
-        header.setStyleSheet("font-size: 13pt; color: #7F8C8D;")
-        root.addWidget(header)
 
         cards_row = QHBoxLayout()
         cards_row.setSpacing(20)

@@ -25,6 +25,8 @@ class ControlConfigurationPage(QWizardPage):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setTitle("Select Controller Type")
+        self.setSubTitle("Only controllers compatible with your chosen robot type are enabled. "
+                         "Greyed-out options require a different chassis.")
         self.registerField("controllerType*", self, property="controllerType", changedSignal=self.controllerTypeChanged)
         self._controller_type = None
         self._robot_type = None
@@ -34,11 +36,6 @@ class ControlConfigurationPage(QWizardPage):
         root = QVBoxLayout(self)
         root.setContentsMargins(30, 16, 30, 16)
         root.setSpacing(14)
-
-        header = QLabel("Pick a controller compatible with your robot type")
-        header.setAlignment(Qt.AlignCenter)
-        header.setStyleSheet("font-size: 13pt; color: #7F8C8D;")
-        root.addWidget(header)
 
         grid = QGridLayout()
         grid.setSpacing(18)
