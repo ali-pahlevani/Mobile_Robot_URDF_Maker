@@ -32,6 +32,20 @@ diffDrive_controller:
 
     pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
+    open_loop: false
+    cmd_vel_timeout: 0.5
+    linear:
+      x:
+        max_velocity: 2.64
+        min_velocity: -2.64
+        max_acceleration: 1.06
+        max_deceleration: 1.06
+    angular:
+      z:
+        max_velocity: 5.74
+        min_velocity: -5.74
+        max_acceleration: 2.87
+        max_deceleration: 2.87
 
     #position_feedback: false
     #open_loop: true

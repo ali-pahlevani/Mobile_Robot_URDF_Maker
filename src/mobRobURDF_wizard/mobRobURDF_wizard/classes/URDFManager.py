@@ -332,7 +332,12 @@ class URDFManager:
         ctrl["open_loop"]      = bool(p.get("open_loop", False))
 
         if "cmd_vel_timeout" in p:
-            ctrl["cmd_vel_timeout"] = float(p["cmd_vel_timeout"])
+            # TricycleController reads cmd_vel_timeout as int milliseconds (e.g. 0.5 s -> 500);
+            # every other controller takes it as a float in seconds.
+            if controller_type == "tricycle":
+                ctrl["cmd_vel_timeout"] = int(round(float(p["cmd_vel_timeout"]) * 1000))
+            else:
+                ctrl["cmd_vel_timeout"] = float(p["cmd_vel_timeout"])
 
         config["controller_manager"]["ros__parameters"]["update_rate"] = int(p.get("update_rate", 50))
 
