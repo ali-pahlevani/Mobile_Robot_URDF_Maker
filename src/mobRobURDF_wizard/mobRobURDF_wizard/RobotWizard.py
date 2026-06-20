@@ -37,7 +37,7 @@ class RobotWizard(QWizard):
             Qt.Window | Qt.WindowMinimizeButtonHint |
             Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint
         )
-        self.setWindowTitle("Mobile Robot URDF Maker")
+        self.setWindowTitle("Mobile Robot URDF Maker (V4)")
         self.setWizardStyle(QWizard.ModernStyle)
         self.resize(1600, 860)
         self.setMinimumSize(1000, 600)
@@ -73,7 +73,7 @@ class RobotWizard(QWizard):
         self.nav_list.itemClicked.connect(self.navigate_to_page)
         sidebar_layout.addWidget(self.nav_list, 1)
 
-        version_label = QLabel("v4")
+        version_label = QLabel("V4")
         version_label.setAlignment(Qt.AlignCenter)
         version_label.setStyleSheet(SIDEBAR_FOOTER_QSS)
         sidebar_layout.addWidget(version_label)
