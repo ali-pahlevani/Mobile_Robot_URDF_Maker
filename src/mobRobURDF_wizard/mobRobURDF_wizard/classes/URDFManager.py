@@ -369,11 +369,18 @@ class URDFManager:
             max_sa = float(p.get("max_steering_angle", 0.785))
             max_sv = float(p.get("max_steering_velocity", 1.0))
 
+            # TricycleController limits the traction WHEEL's angular rate (rad/s²), not the
+            # robot body, so divide the tuner's m/s² value by the wheel radius — that makes
+            # the configured limit actually match the m/s² the user typed.
+            wheel_radius = float(ctrl.get("wheel_radius", 0.22)) or 0.22
+
             if "traction" not in ctrl:
                 ctrl["traction"] = {}
-            ctrl["traction"]["max_acceleration"] = max_la
-            ctrl["traction"]["max_deceleration"] = max_la
+            ctrl["traction"]["max_acceleration"] = round(max_la / wheel_radius, 3)
+            ctrl["traction"]["max_deceleration"] = round(max_la / wheel_radius, 3)
 
+            # steering.max_position (rad) and max_velocity (rad/s) act directly on the
+            # steering joint, so they already match their labels — no conversion needed.
             if "steering" not in ctrl:
                 ctrl["steering"] = {}
             ctrl["steering"]["max_position"] = max_sa
