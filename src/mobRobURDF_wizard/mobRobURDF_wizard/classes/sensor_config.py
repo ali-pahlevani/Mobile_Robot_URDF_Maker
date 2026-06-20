@@ -32,7 +32,7 @@ class SensorConfig:
     radius: float = 0.1
     length: float = 0.08
     h_samples: int = 360
-    h_min_angle: float = -3.14159
+    h_min_angle: float = -1.57079
     h_max_angle: float = 3.14159
     min_range: float = 0.3
     max_range: float = 12.0
@@ -251,6 +251,7 @@ def default_sensors(robot_type: str, chassis_size_str: str = '1.2 0.8 0.3') -> l
     lidar_2 = SensorConfig(
         sensor_type='lidar', name='lidar_2',
         x=-0.47, y=-0.27, z=round(H / 2 + 0.04, 4),
+        yaw=3.14,
         color='Red', mass=0.1,
         radius=0.1, length=0.08,
     )
@@ -263,6 +264,7 @@ def default_sensors(robot_type: str, chassis_size_str: str = '1.2 0.8 0.3') -> l
     camera_2 = SensorConfig(
         sensor_type='camera', name='camera_2',
         x=-round(L / 2 + 0.04, 4), y=0.0, z=0.11,
+        yaw=3.14,
         color='Blue', mass=0.1,
         cam_depth=0.08, cam_width=0.18, cam_height=0.06,
     )
