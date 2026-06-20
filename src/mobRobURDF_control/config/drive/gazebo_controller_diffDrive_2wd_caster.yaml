@@ -42,10 +42,10 @@ diffDrive_controller:
         max_deceleration: 1.06
     angular:
       z:
-        max_velocity: 5.74
-        min_velocity: -5.74
-        max_acceleration: 2.87
-        max_deceleration: 2.87
+        max_velocity: 2.2
+        min_velocity: -2.2
+        max_acceleration: 1.1
+        max_deceleration: 1.1
 
     #position_feedback: false
     #open_loop: true

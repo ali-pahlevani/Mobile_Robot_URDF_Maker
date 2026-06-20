@@ -230,7 +230,7 @@ class ConfigurationPage(QWizardPage):
         chassis_box, chassis_form = self._group("Chassis")
         self.chassisSizeLineEdit = self._field(chassis_form, "Size (L W H)", "e.g., 1.2 0.8 0.3", "m")
         self.chassisMassLineEdit = self._field(chassis_form, "Mass", "e.g., 1.0", "kg")
-        self.chassisMaterialCombo = self._material_combo(chassis_form, "Material", "Gray")
+        self.chassisMaterialCombo = self._material_combo(chassis_form, "Material", "Brown")
         self.params_layout.addWidget(chassis_box)
 
     def add_wheel_parameters(self, radius_label):
@@ -238,7 +238,7 @@ class ConfigurationPage(QWizardPage):
         self.wheelRadiusLineEdit = self._field(wheel_form, radius_label, "e.g., 0.22", "m")
         self.wheelWidthLineEdit = self._field(wheel_form, "Wheel Width", "e.g., 0.12", "m")
         self.wheelMassLineEdit = self._field(wheel_form, "Wheel Mass", "e.g., 0.5", "kg")
-        self.wheelMaterialCombo = self._material_combo(wheel_form, "Wheel Material", "Black")
+        self.wheelMaterialCombo = self._material_combo(wheel_form, "Wheel Material", "Dark Gray")
         self.params_layout.addWidget(wheel_box)
 
     def _add_sensor_panel(self):

@@ -242,18 +242,31 @@ def default_sensors(robot_type: str, chassis_size_str: str = '1.2 0.8 0.3') -> l
     except Exception:
         L, W, H = 1.2, 0.8, 0.3
 
-    lidar = SensorConfig(
+    lidar_1 = SensorConfig(
         sensor_type='lidar', name='lidar_1',
-        x=0.0, y=0.0, z=round(H / 2 + 0.04, 4),
-        color='Black', mass=0.1,
+        x=0.47, y=0.27, z=round(H / 2 + 0.04, 4),
+        color='Red', mass=0.1,
         radius=0.1, length=0.08,
     )
-    camera = SensorConfig(
-        sensor_type='camera', name='camera_1',
-        x=round(L / 2 + 0.04, 4), y=0.0, z=0.0,
-        color='Blue', mass=0.1,
+    lidar_2 = SensorConfig(
+        sensor_type='lidar', name='lidar_2',
+        x=-0.47, y=-0.27, z=round(H / 2 + 0.04, 4),
+        color='Red', mass=0.1,
+        radius=0.1, length=0.08,
     )
-    return [lidar, camera]
+    camera_1 = SensorConfig(
+        sensor_type='camera', name='camera_1',
+        x=round(L / 2 + 0.04, 4), y=0.0, z=0.11,
+        color='Blue', mass=0.1,
+        cam_depth=0.08, cam_width=0.18, cam_height=0.06,
+    )
+    camera_2 = SensorConfig(
+        sensor_type='camera', name='camera_2',
+        x=-round(L / 2 + 0.04, 4), y=0.0, z=0.11,
+        color='Blue', mass=0.1,
+        cam_depth=0.08, cam_width=0.18, cam_height=0.06,
+    )
+    return [lidar_1, lidar_2, camera_1, camera_2]
 
 
 def sensor_to_dict(s: SensorConfig) -> dict:

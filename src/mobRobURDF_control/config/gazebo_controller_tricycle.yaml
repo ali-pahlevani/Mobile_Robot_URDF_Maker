@@ -30,8 +30,8 @@ tricycle_controller:
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
     cmd_vel_timeout: 500
     traction:
-      max_acceleration: 1.06
-      max_deceleration: 1.06
+      max_acceleration: 4.818
+      max_deceleration: 4.818
     steering:
       max_position: 0.785
       max_velocity: 1.0
