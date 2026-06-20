@@ -28,13 +28,6 @@ tricycle_controller:
 
     pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
-    cmd_vel_timeout: 0.5
-    traction:
-      max_acceleration: 1.06
-      max_deceleration: 1.06
-    steering:
-      max_position: 0.785
-      max_velocity: 1.0
     #odom_only_twist: true
     #publish_ackermann_command: true
     #traction:
