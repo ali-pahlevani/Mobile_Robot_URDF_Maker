@@ -60,16 +60,39 @@ def generate_urdf(xacro_file):
         logger.error(error_msg)
         return error_msg
 
+# All supported material names — must stay in sync with material_macros.xacro
+MATERIAL_NAMES = [
+    "Gray", "Silver", "Dark Gray", "Black", "White",
+    "Red", "Maroon", "Orange", "Yellow",
+    "Green", "Lime", "Teal", "Cyan",
+    "Blue", "Navy", "Purple",
+    "Pink", "Brown",
+]
+
+_COLOR_MAP = {
+    "Gray":      (0.50, 0.50, 0.50),
+    "Silver":    (0.75, 0.75, 0.75),
+    "Dark Gray": (0.25, 0.25, 0.25),
+    "Black":     (0.00, 0.00, 0.00),
+    "White":     (1.00, 1.00, 1.00),
+    "Red":       (1.00, 0.00, 0.00),
+    "Maroon":    (0.50, 0.00, 0.00),
+    "Orange":    (1.00, 0.50, 0.00),
+    "Yellow":    (1.00, 1.00, 0.00),
+    "Green":     (0.00, 0.80, 0.00),
+    "Lime":      (0.50, 1.00, 0.00),
+    "Teal":      (0.00, 0.50, 0.50),
+    "Cyan":      (0.00, 1.00, 1.00),
+    "Blue":      (0.00, 0.00, 1.00),
+    "Navy":      (0.00, 0.00, 0.50),
+    "Purple":    (0.50, 0.00, 0.50),
+    "Pink":      (1.00, 0.40, 0.70),
+    "Brown":     (0.60, 0.30, 0.10),
+}
+
+
 def get_color(color_name):
     """Color name → (R, G, B) float tuple for OpenGL."""
-    colors = {
-        "Gray": (0.5, 0.5, 0.5),
-        "Black": (0.0, 0.0, 0.0),
-        "Red": (1.0, 0.0, 0.0),
-        "Blue": (0.0, 0.0, 1.0),
-        "Green": (0.0, 1.0, 0.0),
-        "White": (1.0, 1.0, 1.0),
-    }
-    color = colors.get(color_name.capitalize(), (0.5, 0.5, 0.5))
+    color = _COLOR_MAP.get(color_name, _COLOR_MAP.get(color_name.capitalize(), (0.5, 0.5, 0.5)))
     logger.debug("Color mapped: %s -> %s", color_name, color)
     return color

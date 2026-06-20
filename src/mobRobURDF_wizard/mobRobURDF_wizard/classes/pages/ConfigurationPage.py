@@ -1,7 +1,7 @@
 import os
 import logging
 from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QHBoxLayout, QFormLayout, QGroupBox,
-                             QLabel, QLineEdit, QFileDialog, QWidget, QScrollArea,
+                             QLabel, QLineEdit, QComboBox, QFileDialog, QWidget, QScrollArea,
                              QMessageBox, QSizePolicy, QPushButton)
 from PyQt5.QtCore import pyqtSignal, Qt
 from ament_index_python.packages import get_package_share_directory
@@ -11,7 +11,7 @@ from mobRobURDF_wizard.classes.SensorEditor import SensorCard
 from mobRobURDF_wizard.classes.sensor_config import (
     SensorConfig, default_sensors, sensor_to_dict, sensor_from_dict,
 )
-from mobRobURDF_wizard.utils.utils import get_color
+from mobRobURDF_wizard.utils.utils import get_color, MATERIAL_NAMES
 from mobRobURDF_wizard.utils import presets
 from mobRobURDF_wizard.classes.URDFManager import GAZEBO_SIM_PLUGIN
 
@@ -21,15 +21,13 @@ logger = logging.getLogger(__name__)
 class ConfigurationPage(QWizardPage):
     modelUpdated = pyqtSignal(float, float, float, str, str, tuple, tuple, str, object)
 
-    # preset key → line-edit attribute (sensors are handled separately)
+    # preset key → line-edit attribute (sensors and material combos handled separately)
     _PRESET_FIELDS = [
         ("chassis_size", "chassisSizeLineEdit"),
         ("chassis_mass", "chassisMassLineEdit"),
-        ("chassis_material", "chassisMaterialLineEdit"),
         ("wheel_radius", "wheelRadiusLineEdit"),
         ("wheel_width", "wheelWidthLineEdit"),
         ("wheel_mass", "wheelMassLineEdit"),
-        ("wheel_material", "wheelMaterialLineEdit"),
     ]
 
     def __init__(self, urdf_manager, parent=None):
@@ -113,6 +111,13 @@ class ConfigurationPage(QWizardPage):
             form.addRow(label, edit)
         return edit
 
+    def _material_combo(self, form, label, default):
+        combo = QComboBox()
+        combo.addItems(MATERIAL_NAMES)
+        combo.setCurrentText(default)
+        form.addRow(label, combo)
+        return combo
+
     def initializePage(self):
         pending = getattr(self.urdf_manager, 'pending_restore', None)
         if pending:
@@ -179,6 +184,10 @@ class ConfigurationPage(QWizardPage):
             edit = getattr(self, attr, None)
             if edit is not None and key in params:
                 edit.setText(params[key])
+        if "chassis_material" in params:
+            self.chassisMaterialCombo.setCurrentText(params["chassis_material"])
+        if "wheel_material" in params and hasattr(self, "wheelMaterialCombo"):
+            self.wheelMaterialCombo.setCurrentText(params["wheel_material"])
 
         sensor_configs = [sensor_from_dict(d) for d in sensor_dicts]
         if not sensor_configs:
@@ -221,7 +230,7 @@ class ConfigurationPage(QWizardPage):
         chassis_box, chassis_form = self._group("Chassis")
         self.chassisSizeLineEdit = self._field(chassis_form, "Size (L W H)", "e.g., 1.2 0.8 0.3", "m")
         self.chassisMassLineEdit = self._field(chassis_form, "Mass", "e.g., 1.0", "kg")
-        self.chassisMaterialLineEdit = self._field(chassis_form, "Material", "e.g., Gray")
+        self.chassisMaterialCombo = self._material_combo(chassis_form, "Material", "Gray")
         self.params_layout.addWidget(chassis_box)
 
     def add_wheel_parameters(self, radius_label):
@@ -229,7 +238,7 @@ class ConfigurationPage(QWizardPage):
         self.wheelRadiusLineEdit = self._field(wheel_form, radius_label, "e.g., 0.22", "m")
         self.wheelWidthLineEdit = self._field(wheel_form, "Wheel Width", "e.g., 0.12", "m")
         self.wheelMassLineEdit = self._field(wheel_form, "Wheel Mass", "e.g., 0.5", "kg")
-        self.wheelMaterialLineEdit = self._field(wheel_form, "Wheel Material", "e.g., Black")
+        self.wheelMaterialCombo = self._material_combo(wheel_form, "Wheel Material", "Black")
         self.params_layout.addWidget(wheel_box)
 
     def _add_sensor_panel(self):
@@ -304,14 +313,14 @@ class ConfigurationPage(QWizardPage):
         params = {
             "chassis_size": chassis_size_str,
             "chassis_mass": self.chassisMassLineEdit.text() or "1.0",
-            "chassis_material": self.chassisMaterialLineEdit.text() or "Gray",
+            "chassis_material": self.chassisMaterialCombo.currentText() or "Gray",
         }
 
         if self.robot_type in ["4_wheeled", "3_wheeled", "2_wheeled_caster"]:
             params["wheel_radius"] = str(wheel_radius)
             params["wheel_width"] = str(wheel_width)
             params["wheel_mass"] = self.wheelMassLineEdit.text() or "0.5"
-            params["wheel_material"] = self.wheelMaterialLineEdit.text() or "Black"
+            params["wheel_material"] = self.wheelMaterialCombo.currentText() or "Black"
 
         if self.robot_type == "2_wheeled_caster":
             params["caster_radius"] = params["wheel_radius"]
@@ -395,6 +404,9 @@ class ConfigurationPage(QWizardPage):
             edit = getattr(self, attr, None)
             if edit is not None:
                 params[key] = edit.text()
+        params["chassis_material"] = self.chassisMaterialCombo.currentText()
+        if hasattr(self, "wheelMaterialCombo"):
+            params["wheel_material"] = self.wheelMaterialCombo.currentText()
         return params
 
     def savePreset(self):
@@ -441,6 +453,10 @@ class ConfigurationPage(QWizardPage):
             edit = getattr(self, attr, None)
             if edit is not None and key in params:
                 edit.setText(params[key])
+        if "chassis_material" in params:
+            self.chassisMaterialCombo.setCurrentText(params["chassis_material"])
+        if "wheel_material" in params and hasattr(self, "wheelMaterialCombo"):
+            self.wheelMaterialCombo.setCurrentText(params["wheel_material"])
 
         sensor_configs = [sensor_from_dict(d) for d in sensor_dicts]
         if not sensor_configs:

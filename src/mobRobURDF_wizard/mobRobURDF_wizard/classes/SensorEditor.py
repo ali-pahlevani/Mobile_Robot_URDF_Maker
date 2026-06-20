@@ -2,11 +2,12 @@
 
 from PyQt5.QtWidgets import (
     QGroupBox, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QPushButton, QFrame, QWidget,
+    QLabel, QLineEdit, QComboBox, QPushButton, QFrame, QWidget,
 )
 from PyQt5.QtCore import pyqtSignal, Qt
 
 from mobRobURDF_wizard.classes.sensor_config import SensorConfig
+from mobRobURDF_wizard.utils.utils import MATERIAL_NAMES
 
 
 class SensorCard(QGroupBox):
@@ -116,7 +117,9 @@ class SensorCard(QGroupBox):
         cm = QGridLayout()
         cm.setSpacing(4)
         cm.addWidget(QLabel('Color:'), 0, 0)
-        self.colorEdit = self._edit('Black' if self._type == 'lidar' else 'Blue')
+        self.colorEdit = QComboBox()
+        self.colorEdit.addItems(MATERIAL_NAMES)
+        self.colorEdit.setCurrentText('Black' if self._type == 'lidar' else 'Blue')
         cm.addWidget(self.colorEdit, 0, 1)
         cm.addWidget(QLabel('Mass:'), 0, 2)
         self.massEdit = self._edit('0.1')
@@ -176,7 +179,7 @@ class SensorCard(QGroupBox):
         s.roll = self._f(self.rollEdit, 0.0)
         s.pitch = self._f(self.pitchEdit, 0.0)
         s.yaw = self._f(self.yawEdit, 0.0)
-        s.color = self.colorEdit.text().strip() or ('Black' if self._type == 'lidar' else 'Blue')
+        s.color = self.colorEdit.currentText() or ('Black' if self._type == 'lidar' else 'Blue')
         s.mass = self._f(self.massEdit, 0.1)
 
         if self._type == 'lidar':
@@ -210,7 +213,7 @@ class SensorCard(QGroupBox):
         self.rollEdit.setText(str(s.roll))
         self.pitchEdit.setText(str(s.pitch))
         self.yawEdit.setText(str(s.yaw))
-        self.colorEdit.setText(s.color)
+        self.colorEdit.setCurrentText(s.color)
         self.massEdit.setText(str(s.mass))
 
         if self._type == 'lidar':
