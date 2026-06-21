@@ -15,10 +15,10 @@ _CARD_H = 160   # card height
 
 # (title, image_basename, badge_text, badge_color)
 _FEATURES = [
-    ("More Robot Models and Kinematics", "gazebo.png",    "In Progress", "#E67E22"),
+    ("More Robot Models and Kinematics", "models.png",    "In Progress", "#E67E22"),
     ("SLAM",                             "slam.png",       "In Progress", "#E67E22"),
     ("Navigation",                       "navigation.png", "Planned",     "#2980B9"),
-    ("Fleet Management",                 "control.png",    "Planned",     "#2980B9"),
+    ("Fleet Management",                 "fleet.png",    "Planned",     "#2980B9"),
 ]
 
 
