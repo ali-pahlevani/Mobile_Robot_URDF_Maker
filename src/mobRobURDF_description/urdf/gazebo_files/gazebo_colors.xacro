@@ -28,7 +28,7 @@
   <xacro:macro name="gazebo_visual_colors"
                params="controller_type chassis_material wheel_material">
 
-    <xacro:gz_link_color link_name="chassis" color="${chassis_material}"/>
+    <xacro:gz_link_color link_name="base_link" color="${chassis_material}"/>
 
     <!-- 4-wheeled robots: diff_4w, mecanum, ackermann -->
     <xacro:if value="${controller_type in ('diff_4w', 'mecanum', 'ackermann')}">

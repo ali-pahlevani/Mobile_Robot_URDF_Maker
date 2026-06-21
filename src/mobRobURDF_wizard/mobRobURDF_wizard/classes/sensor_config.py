@@ -17,7 +17,7 @@ class SensorConfig:
     sensor_type: str = 'lidar'   # 'lidar' or 'camera'
     name: str = 'lidar_1'
 
-    # pose relative to chassis link
+    # pose relative to base_link (chassis body)
     x: float = 0.0
     y: float = 0.0
     z: float = 0.3
@@ -87,7 +87,7 @@ def lidar_urdf_xml(s: SensorConfig) -> str:
     </inertial>
   </link>
   <joint name="{s.name}_joint" type="fixed">
-    <parent link="chassis"/>
+    <parent link="base_link"/>
     <child link="{s.name}"/>
     <origin xyz="{s.x} {s.y} {s.z}" rpy="{s.roll} {s.pitch} {s.yaw}"/>
   </joint>
@@ -142,7 +142,7 @@ def camera_urdf_xml(s: SensorConfig) -> str:
     </inertial>
   </link>
   <joint name="{s.name}_joint" type="fixed">
-    <parent link="chassis"/>
+    <parent link="base_link"/>
     <child link="{s.name}"/>
     <origin xyz="{s.x} {s.y} {s.z}" rpy="{s.roll} {s.pitch} {s.yaw}"/>
   </joint>

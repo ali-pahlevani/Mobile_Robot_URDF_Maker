@@ -14,7 +14,7 @@ mecDrive_controller:
 
     publish_rate: 50.0
 
-    base_frame_id: base_link
+    base_frame_id: base_footprint
     odom_frame_id: odom
     enable_odom_tf: true
 

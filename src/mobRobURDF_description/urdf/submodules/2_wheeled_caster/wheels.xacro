@@ -27,7 +27,7 @@
       </collision>
     </link>
     <joint name="${name}_joint" type="continuous">
-      <parent link="chassis" />
+      <parent link="base_link" />
       <child link="${name}_wheel" />
       <origin xyz="${x} ${y} ${z}" rpy="0 0 0" />
       <axis xyz="0 1 0" />
@@ -93,7 +93,7 @@
     </link>
 
     <joint name="free-rotating_x_joint" type="continuous">
-      <parent link="chassis" />
+      <parent link="base_link" />
       <child link="free-rotating_x_link" />
       <origin xyz="${x} ${y} ${z}" rpy="0 0 0" />
       <axis xyz="1 0 0" />

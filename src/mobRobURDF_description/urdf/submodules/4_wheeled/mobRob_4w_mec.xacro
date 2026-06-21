@@ -10,7 +10,7 @@
   <xacro:define_materials/>
 
   <!-- Define the robot -->
-  <xacro:chassis size="${chassis_size}" mass="${chassis_mass}" material="${chassis_material}" />
+  <xacro:chassis size="${chassis_size}" mass="${chassis_mass}" material="${chassis_material}" wheel_radius="${wheel_radius}" />
 
   <!-- Wheels — sphere collision for reliable mecanum strafing (visual stays a cylinder) -->
   <xacro:wheel name="front_left" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${fl_x}" y="${fl_y}" z="${fl_z}" collision_geom="sphere" />

@@ -10,7 +10,7 @@
   <xacro:define_materials/>
 
   <!-- Define the robot -->
-  <xacro:chassis size="${chassis_size}" mass="${chassis_mass}" material="${chassis_material}" />
+  <xacro:chassis size="${chassis_size}" mass="${chassis_mass}" material="${chassis_material}" wheel_radius="${wheel_radius}" />
 
   <!-- Wheels -->
   <xacro:wheel name="left" radius="${wheel_radius}" width="${wheel_width}" mass="${wheel_mass}" material="${wheel_material}" x="${l_x}" y="${l_y}" z="${l_z}" />

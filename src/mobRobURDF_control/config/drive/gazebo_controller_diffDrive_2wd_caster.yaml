@@ -14,7 +14,7 @@ diffDrive_controller:
 
     publish_rate: 50.0
 
-    base_frame_id: base_link
+    base_frame_id: base_footprint
     odom_frame_id: odom
     enable_odom_tf: true
 
@@ -36,16 +36,16 @@ diffDrive_controller:
     cmd_vel_timeout: 0.5
     linear:
       x:
-        max_velocity: 2.64
-        min_velocity: -2.64
-        max_acceleration: 1.06
-        max_deceleration: 1.06
+        max_velocity: 5.0
+        min_velocity: -5.0
+        max_acceleration: 4.0
+        max_deceleration: 4.0
     angular:
       z:
-        max_velocity: 2.2
-        min_velocity: -2.2
-        max_acceleration: 1.1
-        max_deceleration: 1.1
+        max_velocity: 5.0
+        min_velocity: -5.0
+        max_acceleration: 3.0
+        max_deceleration: 3.0
 
     #position_feedback: false
     #open_loop: true

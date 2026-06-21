@@ -14,7 +14,7 @@ triSteer_controller:
 
     publish_rate: 50.0
 
-    base_frame_id: base_link
+    base_frame_id: base_footprint
     odom_frame_id: odom
     enable_odom_tf: true
 
@@ -36,11 +36,11 @@ triSteer_controller:
     open_loop: false
     cmd_vel_timeout: 0.5
     traction:
-      max_acceleration: 1.06
-      max_deceleration: 1.06
+      max_acceleration: 18.182
+      max_deceleration: 18.182
     steering:
       max_position: 0.785
-      max_velocity: 1.0
+      max_velocity: 3.0
 joint_state_broadcaster:
   ros__parameters:
     joints:

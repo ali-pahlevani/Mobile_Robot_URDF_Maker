@@ -9,8 +9,8 @@
     <xacro:property name="wheel_radius" value="${float(wheel_radius)}"/>
     <xacro:property name="wheel_width" value="${float(wheel_width)}"/>
 
-    <!-- Base link (never touches ground, no friction needed) -->
-    <gazebo reference="base_link">
+    <!-- Base footprint (massless ground-projection frame, never touches ground, no friction needed) -->
+    <gazebo reference="base_footprint">
       <collision>
         <surface>
           <friction>
@@ -34,8 +34,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>1.0</mu>
-                  <mu2>1.0</mu2>
+                  <mu>3.0</mu>
+                  <mu2>3.0</mu2>
                 </ode>
               </friction>
               <contact>
@@ -104,8 +104,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>1.5</mu>
-                  <mu2>0.3</mu2>
+                  <mu>3.0</mu>
+                  <mu2>0.5</mu2>
                   <fdir1>1 0 0</fdir1>
                 </ode>
               </friction>
@@ -137,8 +137,10 @@
          mecanum: 4-wheeled mecanum drive
          Mecanum rollers are at ±45° — simulate with anisotropic friction:
            fdir1 = high-friction direction (perpendicular to roller axis)
-           mu    = high (1.0)  — grips in fdir1 direction
-           mu2   = very low (0.01) — roller slips freely along the other axis
+           mu    = 1.0  — grips in fdir1 direction (do NOT crank this up:
+                          the anisotropic mecanum contact is numerically
+                          delicate and high mu makes forward/back drift & slide)
+           mu2   = 0.0 — roller slips freely along the other axis
          X-pattern roller layout (matching mecanum_drive_controller kinematics):
            FL + RR: roller axis "1 1 0"  → fdir1 = "1 -1 0"
            FR + RL: roller axis "1 -1 0" → fdir1 = "1 1 0"
@@ -146,7 +148,7 @@
     <xacro:if value="${controller_type == 'mecanum'}">
 
       <!-- FL and RR: rollers at +45°, grip direction fdir1 = "1 -1 0".
-           fdir1 MUST be expressed in the (non-spinning) base_link frame, otherwise
+           fdir1 MUST be expressed in the (non-spinning) base_footprint frame, otherwise
            it rotates with the wheel and strafing becomes erratic. -->
       <xacro:macro name="mecanum_wheel_pos45" params="wheel_link wheel_joint">
         <gazebo reference="${wheel_link}">
@@ -156,7 +158,7 @@
                 <ode>
                   <mu>1.0</mu>
                   <mu2>0.0</mu2>
-                  <fdir1 gz:expressed_in="base_link">1 -1 0</fdir1>
+                  <fdir1 gz:expressed_in="base_footprint">1 -1 0</fdir1>
                 </ode>
               </friction>
               <contact>
@@ -179,7 +181,7 @@
       </xacro:macro>
 
       <!-- FR and RL: rollers at -45°, grip direction fdir1 = "1 1 0".
-           fdir1 MUST be expressed in the (non-spinning) base_link frame, otherwise
+           fdir1 MUST be expressed in the (non-spinning) base_footprint frame, otherwise
            it rotates with the wheel and strafing becomes erratic. -->
       <xacro:macro name="mecanum_wheel_neg45" params="wheel_link wheel_joint">
         <gazebo reference="${wheel_link}">
@@ -189,7 +191,7 @@
                 <ode>
                   <mu>1.0</mu>
                   <mu2>0.0</mu2>
-                  <fdir1 gz:expressed_in="base_link">1 1 0</fdir1>
+                  <fdir1 gz:expressed_in="base_footprint">1 1 0</fdir1>
                 </ode>
               </friction>
               <contact>
@@ -227,8 +229,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>1.0</mu>
-                <mu2>1.0</mu2>
+                <mu>3.0</mu>
+                <mu2>3.0</mu2>
               </ode>
             </friction>
             <contact>
@@ -259,8 +261,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>1.0</mu>
-                  <mu2>1.0</mu2>
+                  <mu>3.0</mu>
+                  <mu2>3.0</mu2>
                 </ode>
               </friction>
               <contact>
@@ -295,8 +297,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>1.0</mu>
-                <mu2>1.0</mu2>
+                <mu>3.0</mu>
+                <mu2>3.0</mu2>
               </ode>
             </friction>
             <contact>
@@ -327,8 +329,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>1.0</mu>
-                  <mu2>1.0</mu2>
+                  <mu>3.0</mu>
+                  <mu2>3.0</mu2>
                 </ode>
               </friction>
               <contact>
@@ -364,8 +366,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>1.0</mu>
-                  <mu2>1.0</mu2>
+                  <mu>3.0</mu>
+                  <mu2>3.0</mu2>
                 </ode>
               </friction>
               <contact>
@@ -404,8 +406,8 @@
             <surface>
               <friction>
                 <ode>
-                  <mu>1.0</mu>
-                  <mu2>1.0</mu2>
+                  <mu>3.0</mu>
+                  <mu2>3.0</mu2>
                 </ode>
               </friction>
               <contact>

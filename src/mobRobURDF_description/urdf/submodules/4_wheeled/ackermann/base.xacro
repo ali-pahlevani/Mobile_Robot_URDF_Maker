@@ -3,17 +3,18 @@
   <!-- Include the inertial_macros.xacro file -->
   <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/inertial_macros.xacro" />
 
-  <!-- Base Link -->
-  <link name="base_link"></link>
+  <!-- Base Footprint (ground-projected origin; massless, sits where the wheels touch the ground) -->
+  <link name="base_footprint"></link>
 
   <!-- Chassis Macro -->
-  <xacro:macro name="chassis" params="size mass material x_steer y_steer z_steer">
+  <xacro:macro name="chassis" params="size mass material wheel_radius x_steer y_steer z_steer">
     <xacro:property name="size_list" value="${list(map(float, size.split()))}" />
     <xacro:property name="l" value="${size_list[0]}" />
     <xacro:property name="w" value="${size_list[1]}" />
     <xacro:property name="h" value="${size_list[2]}" />
 
-    <link name="chassis">
+    <!-- Base Link (physical robot body / chassis) -->
+    <link name="base_link">
       <inertial>
         <mass value="${mass}" />
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -34,11 +35,13 @@
       </collision>
     </link>
 
-    <!-- Fixed Joint between base_link and chassis -->
-    <joint name="base_to_chassis" type="fixed">
-      <parent link="base_link" />
-      <child link="chassis" />
-      <origin xyz="0 0 ${h/2}" rpy="0 0 0" />
+    <!-- Fixed Joint between base_footprint and base_link.
+         Raised by h/2 + wheel_radius so base_footprint lands exactly at the
+         ground contact point (wheel centres sit at z = wheel_radius). -->
+    <joint name="base_footprint_to_base_link" type="fixed">
+      <parent link="base_footprint" />
+      <child link="base_link" />
+      <origin xyz="0 0 ${h/2 + float(wheel_radius)}" rpy="0 0 0" />
     </joint>
 
     <!-- Front Steering Link (Left) for 4-Wheeled Robot (when ackermann control is chosen) -->
@@ -53,7 +56,7 @@
 
     <!-- Revolute Joint for Steering (z-axis rotation | Left) -->
     <joint name="chassis_to_front_left_steering" type="revolute">
-      <parent link="chassis" />
+      <parent link="base_link" />
       <child link="front_left_steering_link" />
       <origin xyz="${x_steer} ${y_steer} ${z_steer}" rpy="0 0 0" /> <!-- Position at front wheel base -->
       <axis xyz="0 0 1" /> <!-- Rotation around z-axis for steering -->
@@ -72,7 +75,7 @@
 
     <!-- Revolute Joint for Steering (z-axis rotation | Right) -->
     <joint name="chassis_to_front_right_steering" type="revolute">
-      <parent link="chassis" />
+      <parent link="base_link" />
       <child link="front_right_steering_link" />
       <origin xyz="${x_steer} -${y_steer} ${z_steer}" rpy="0 0 0" /> <!-- Position at front wheel base -->
       <axis xyz="0 0 1" /> <!-- Rotation around z-axis for steering -->
