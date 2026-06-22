@@ -14,15 +14,15 @@ diffDrive_controller:
 
     publish_rate: 50.0
 
-    base_frame_id: base_link
+    base_frame_id: base_footprint
     odom_frame_id: odom
     enable_odom_tf: true
 
     left_wheel_names: ["front_left_joint", "rear_left_joint"]
     right_wheel_names: ["front_right_joint", "rear_right_joint"]
 
-    wheel_separation: 0.92
-    wheel_radius: 0.22
+    wheel_separation: 0.92 # 0.92
+    wheel_radius: 0.22 # 0.22
 
     use_stamped_vel: false
 
@@ -34,7 +34,7 @@ diffDrive_controller:
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
 
     #position_feedback: false
-    #open_loop: true
+    open_loop: false
 
     #cmd_vel_timeout: 0.5 # seconds
     #publish_limited_velocity: true
@@ -59,6 +59,19 @@ diffDrive_controller:
     #angular.z.max_jerk: 1.0
     #angular.z.min_jerk: -1.0
 
+    cmd_vel_timeout: 0.5
+    linear:
+      x:
+        max_velocity: 1.5
+        min_velocity: -1.5
+        max_acceleration: 0.5
+        max_deceleration: 0.5
+    angular:
+      z:
+        max_velocity: 2.0
+        min_velocity: -2.0
+        max_acceleration: 1.0
+        max_deceleration: 1.0
 joint_state_broadcaster:
   ros__parameters:
     joints:

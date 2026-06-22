@@ -1,0 +1,81 @@
+name: gz_ros2_control CI - Humble
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ humble ]
+  push:
+    branches: [ humble ]
+  schedule:
+    # Run every morning to detect flakiness and broken dependencies
+    - cron: '33 5 * * MON-FRI'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - gz-version: fortress
+            ros-repo-packages: ""
+            upstream-repos: ""
+          - gz-version: fortress
+            ros-repo-packages: "-testing"
+            upstream-repos: ""
+          - gz-version: harmonic
+            ros-repo-packages: ""
+            upstream-repos: ""
+          - gz-version: harmonic
+            ros-repo-packages: "-testing"
+            upstream-repos: ""
+          - gz-version: fortress
+            ros-repo-packages: "-testing"
+            upstream-repos: "gz_ros2_control.humble.repos"
+          - gz-version: harmonic
+            ros-repo-packages: "-testing"
+            upstream-repos: "gz_ros2_control.humble.repos"
+    env:
+      GZ_VERSION: ${{ matrix.gz-version }}
+    container:
+      image: ghcr.io/ros-controls/ros:humble-ubuntu${{ matrix.ros-repo-packages }}
+    steps:
+    - name: Checkout code
+      if: github.event_name != 'schedule'
+      uses: actions/checkout@v6
+    - name: Checkout code for scheduled workflow
+      if: github.event_name == 'schedule'
+      uses: actions/checkout@v6
+      with:
+        ref: humble
+    - name: Checkout ros2_control framework for semi-binary builds
+      if: ${{ matrix.upstream-repos != '' }}
+      run: vcs import --input ${{ matrix.upstream-repos }}
+    - name: Setup colcon workspace
+      id: configure
+      shell: bash
+      run: |
+        if [ "$GZ_VERSION" == "harmonic" ]; then
+          # https://gazebosim.org/docs/harmonic/install_ubuntu/#binary-installation-on-ubuntu
+          wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+          apt-get update && apt-get install --no-install-recommends -qq -y gz-harmonic ros-humble-ros-gzharmonic ros-humble-ros-gzharmonic-bridge ros-humble-ros-gzharmonic-sim
+          export GZ_DEPS_ROSDEP="ros_gz ros_gz_bridge ros_gz_sim"
+          # https://github.com/osrf/osrf-rosdep#installing-rosdep-rules-to-resolve-gazebo-harmonic-libraries
+          wget https://raw.githubusercontent.com/osrf/osrf-rosdep/master/gz/00-gazebo.list -O /etc/ros/rosdep/sources.list.d/00-gazebo.list
+        else
+          apt-get update
+        fi
+        rosdep update --rosdistro humble
+        rosdep install --from-paths ./ -i -y --rosdistro humble --skip-keys="${GZ_DEPS_ROSDEP}"
+    - name: Build project
+      id: build
+      run: |
+        . /opt/ros/humble/local_setup.sh
+        colcon build --packages-up-to gz_ros2_control_demos gz_ros2_control_tests
+    - name: Run tests
+      id: test
+      run: |
+        . /opt/ros/humble/local_setup.sh
+        colcon test --event-handlers console_direct+ --packages-select gz_ros2_control gz_ros2_control_demos gz_ros2_control_tests
+        colcon test-result

@@ -15,6 +15,16 @@
   <depend>std_msgs</depend>
   <depend>xacro</depend>
 
+  <!-- ros2_control controllers + Gazebo Harmonic (gz-sim) integration -->
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>joint_state_broadcaster</exec_depend>
+  <exec_depend>diff_drive_controller</exec_depend>
+  <exec_depend>tricycle_controller</exec_depend>
+  <exec_depend>ackermann_steering_controller</exec_depend>
+  <exec_depend>tricycle_steering_controller</exec_depend>
+  <exec_depend>mecanum_drive_controller</exec_depend>
+  <exec_depend>gz_ros2_control</exec_depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>

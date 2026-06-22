@@ -4,173 +4,227 @@ import random
 import string
 import logging
 import shutil
-import yaml
-import re
-from mobRobURDF_wizard.utils.utils import render_template, generate_urdf
+from mobRobURDF_wizard.utils.utils import render_template, generate_urdf, uses_stamped_twist
+from mobRobURDF_wizard.classes.sensor_config import (
+    build_user_sensors_xacro, build_bridge_yaml, camera_image_topics,
+)
 from ament_index_python.packages import get_package_share_directory
 from ruamel.yaml import YAML
-from ruamel.yaml.compat import StringIO
+
+logger = logging.getLogger(__name__)
+
+SELECTED_CONTROLLER_FILE = "selected_controller.txt"
+DEFAULT_CONTROLLER_NAME = "diffDrive_controller"
+GAZEBO_SIM_PLUGIN = "gz_ros2_control/GazeboSimSystem"
+
+CONTROLLER_SUFFIX_MAP = {
+    ("2_wheeled_caster", "diff_2wc"): "2wc_diff",
+    ("3_wheeled", "tricycle"): "3w_tricycle",
+    ("3_wheeled", "triSteer"): "3w_triSteer",
+    ("4_wheeled", "diff_4w"): "4w_diff",
+    ("4_wheeled", "mecanum"): "4w_mec",
+    ("4_wheeled", "ackermann"): "4w_acker",
+}
+
 
 class URDFManager:
     def __init__(self):
-        # Use install directory for base_dir (ROS convention)
         self.base_dir = os.path.join(get_package_share_directory("mobRobURDF_description"), "urdf")
-        # Use a unique temporary directory for source_dir
-        self.source_dir = os.path.join(tempfile.gettempdir(), f"mobRobURDF_temp_{''.join(random.choices(string.ascii_lowercase, k=8))}")
+        self.source_dir = os.path.join(
+            tempfile.gettempdir(),
+            f"mobRobURDF_temp_{''.join(random.choices(string.ascii_lowercase, k=8))}",
+        )
         self.urdf_text = ""
         self.control_config_dir = os.path.join(get_package_share_directory("mobRobURDF_control"), "config")
-        self.launch_dir = os.path.join(get_package_share_directory("mobRobURDF_launch"), "launch")
-        self.last_params = {}  # Store last used parameters
+        self.last_params = {}
         self.last_robot_type = None
         self.last_controller_type = None
-        self._install_copied = False  # Track if files were copied to install directory
+        self.last_sensors = []
+        self.last_tuner_params = {}   # persists across ConfigurationPage Apply clicks
+        self.last_hardware_interface = GAZEBO_SIM_PLUGIN
+        self.pending_restore = None   # set by StartSessionPage; consumed by ConfigurationPage
         os.makedirs(self.source_dir, exist_ok=True)
-        #logging.debug(f"URDFManager initialized with base_dir: {self.base_dir}, source_dir: {self.source_dir}, control_config_dir: {self.control_config_dir}, launch_dir: {self.launch_dir}")
+        logger.debug("URDFManager initialized (base_dir=%s, source_dir=%s)", self.base_dir, self.source_dir)
 
-    def generate_urdf(self, robot_type, controller_type, params):
+    def _controller_suffix(self, robot_type, controller_type):
+        return CONTROLLER_SUFFIX_MAP.get((robot_type, controller_type), "4w_diff")
+
+    def generate_urdf(self, robot_type, controller_type, params, sensors=None):
+        sensors = sensors or []
         try:
-            self.last_params = params.copy()  # Store parameters for save_urdf
+            self.last_params = params.copy()
             self.last_robot_type = robot_type
             self.last_controller_type = controller_type
+            self.last_sensors = sensors
 
             submodules_dir = os.path.join(self.base_dir, "submodules", robot_type)
             if robot_type == "4_wheeled" and controller_type == "ackermann":
                 submodules_dir = os.path.join(submodules_dir, "ackermann")
-            macros_dir = os.path.join(self.base_dir, "macros")
-            gazebo_dir = os.path.join(self.base_dir, "gazebo_files")
-            control_dir = os.path.join(gazebo_dir, "control")
-            #logging.debug(f"Generating URDF for {robot_type} with {controller_type} in {submodules_dir}")
 
-            controller_map = {
-                ("2_wheeled_caster", "diff_2wc"): "2wc_diff",
-                ("3_wheeled", "tricycle"): "3w_tricycle",
-                ("3_wheeled", "triSteer"): "3w_triSteer",
-                ("4_wheeled", "diff_4w"): "4w_diff",
-                ("4_wheeled", "mecanum"): "4w_mec",
-                ("4_wheeled", "ackermann"): "4w_acker",
-            }
-            controller_suffix = controller_map.get((robot_type, controller_type), "4w_diff")
-
-            base_file = os.path.join(submodules_dir, "base.xacro")
-            wheels_file = os.path.join(submodules_dir, "wheels.xacro")
-            sensors_file = os.path.join(submodules_dir, "sensors.xacro")
+            controller_suffix = self._controller_suffix(robot_type, controller_type)
             mobrob_file = os.path.join(submodules_dir, f"mobRob_{controller_suffix}.xacro")
-            inertial_file = os.path.join(macros_dir, "inertial_macros.xacro")
-            material_file = os.path.join(macros_dir, "material_macros.xacro")
-            gazebo_sensors_file = os.path.join(gazebo_dir, "gazebo_sensors.xacro")
-            gazebo_control_file = os.path.join(control_dir, f"gazebo_ros2_control_{controller_suffix}.xacro")
 
-            #logging.debug(f"Checking for mobrob_file: {mobrob_file}")
             if not os.path.exists(mobrob_file):
-                self.urdf_text = f"Error: mobRob_{controller_suffix}.xacro not found for {robot_type} with {controller_type} in {submodules_dir}"
-                #logging.error(self.urdf_text)
+                self.urdf_text = (
+                    f"Error: mobRob_{controller_suffix}.xacro not found for "
+                    f"{robot_type} with {controller_type} in {submodules_dir}"
+                )
+                logger.error(self.urdf_text)
                 return self.urdf_text
 
-            # Add controller_type to params
+            # must live in base_dir so $(find mobRobURDF_description) includes resolve
+            sensors_xacro_path = os.path.join(self.base_dir, "user_sensors.xacro")
+            with open(sensors_xacro_path, "w") as f:
+                f.write(build_user_sensors_xacro(sensors))
+
+            self._write_bridge_yaml(sensors)
+            self._write_image_topics(sensors)
+
             params_with_controller = params.copy()
-            params_with_controller['controller_type'] = controller_type
-
-            base_xacro = render_template(base_file, params_with_controller)
-            wheels_xacro = render_template(wheels_file, params_with_controller)
-            sensors_xacro = render_template(sensors_file, params_with_controller)
-            inertial_xacro = render_template(inertial_file, params_with_controller)
-            mobrob_xacro = render_template(mobrob_file, params_with_controller)
-            gazebo_sensors_xacro = render_template(gazebo_sensors_file, params_with_controller)
-            material_xacro = render_template(material_file, params_with_controller)
-            gazebo_control_xacro = render_template(gazebo_control_file, params_with_controller)
-
-            # Insert gazebo_physical_properties macro call before </robot>
-            gazebo_macro = (
-                '<xacro:include filename="$(find mobRobURDF_description)/urdf/gazebo_files/gazebo_properties.xacro"/>\n'
-                '<xacro:gazebo_physical_properties\n'
-                f'  controller_type="{controller_type}"\n'
-                f'  chassis_size="{params.get("chassis_size", "1.2 0.8 0.3")}"\n'
-                f'  wheel_radius="{params.get("wheel_radius", "0.22")}"\n'
-                f'  wheel_width="{params.get("wheel_width", "0.12")}"\n'
-                '/>\n'
+            params_with_controller["controller_type"] = controller_type
+            params_with_controller["hardware_plugin"] = self.last_hardware_interface
+            params_with_controller["use_gazebo_sim"] = (
+                "1" if self.last_hardware_interface == GAZEBO_SIM_PLUGIN else "0"
             )
-            # Find the last </robot> and insert before it
-            mobrob_xacro_lines = mobrob_xacro.splitlines()
-            for i, line in enumerate(mobrob_xacro_lines):
-                if '</robot>' in line:
-                    mobrob_xacro_lines.insert(i, gazebo_macro)
-                    break
-            mobrob_xacro = '\n'.join(mobrob_xacro_lines)
-
-            work_dir = os.path.join(self.base_dir, "temp", robot_type, controller_type)
-            os.makedirs(work_dir, exist_ok=True)
-            #logging.debug(f"Created temporary directory: {work_dir}")
-
-            with open(os.path.join(work_dir, "base.xacro"), 'w') as f:
-                f.write(base_xacro)
-            with open(os.path.join(work_dir, "wheels.xacro"), 'w') as f:
-                f.write(wheels_xacro)
-            with open(os.path.join(work_dir, "sensors.xacro"), 'w') as f:
-                f.write(sensors_xacro)
-            with open(os.path.join(work_dir, "inertial_macros.xacro"), 'w') as f:
-                f.write(inertial_xacro)
-            with open(os.path.join(work_dir, "material_macros.xacro"), 'w') as f:
-                f.write(material_xacro)
-            with open(os.path.join(work_dir, "gazebo_sensors.xacro"), 'w') as f:
-                f.write(gazebo_sensors_xacro)
-            with open(os.path.join(work_dir, f"gazebo_ros2_control_{controller_suffix}.xacro"), 'w') as f:
-                f.write(gazebo_control_xacro)
-            mobrob_path = os.path.join(work_dir, f"mobRob_{controller_suffix}.xacro")
-            with open(mobrob_path, 'w') as f:
+            mobrob_xacro = render_template(mobrob_file, params_with_controller)
+            rendered_path = os.path.join(self.source_dir, f"mobRob_{controller_suffix}.xacro")
+            with open(rendered_path, "w") as f:
                 f.write(mobrob_xacro)
 
-            self.urdf_text = generate_urdf(mobrob_path)
-            #logging.debug("URDF generated successfully")
+            # wrapper uses absolute paths so xacro doesn't need $(find ...) at gen time
+            full_path = os.path.join(self.source_dir, "full_src.xacro")
+            with open(full_path, "w") as f:
+                f.write(self._build_full_xacro(rendered_path, sensors_xacro_path))
 
-            unified_urdf_path = os.path.join(self.source_dir, "mobRob.urdf")
-            os.makedirs(self.source_dir, exist_ok=True)
-            with open(unified_urdf_path, 'w') as f:
+            self.urdf_text = generate_urdf(full_path)
+            logger.debug("URDF generated from %s", full_path)
+
+            with open(os.path.join(self.source_dir, "mobRob.urdf"), "w") as f:
                 f.write(self.urdf_text)
-            #logging.debug(f"Unified URDF saved to: {unified_urdf_path}")
+            with open(os.path.join(self.source_dir, "mobRob.urdf.xacro"), "w") as f:
+                f.write(self._build_xacro_wrapper())
 
-            # Copy to install directory
-            if not self._install_copied:
-                self._copy_to_install()
-                self._install_copied = True
-
+            self._copy_to_install()
             self.generate_controller_yaml(robot_type, controller_type, params)
-
-            shutil.rmtree(work_dir)
-            #logging.debug(f"Cleaned up temporary directory: {work_dir}")
-
+            self._write_use_sim_time_yaml()
             return self.urdf_text
+
         except FileNotFoundError as e:
             self.urdf_text = f"Error: File not found during URDF generation for {robot_type} with {controller_type}: {str(e)}"
-            #logging.error(self.urdf_text)
+            logger.error(self.urdf_text)
             return self.urdf_text
         except Exception as e:
             self.urdf_text = f"Error generating URDF for {robot_type} with {controller_type}: {str(e)}"
-            #logging.error(self.urdf_text)
+            logger.error(self.urdf_text)
             return self.urdf_text
 
-    def _copy_to_install(self):
-        source_urdf_xacro = os.path.join(self.source_dir, "mobRob.urdf.xacro")
-        dest_urdf_xacro = os.path.join(self.base_dir, "mobRob.urdf.xacro")
-        source_urdf = os.path.join(self.source_dir, "mobRob.urdf")
-        dest_urdf = os.path.join(self.base_dir, "mobRob.urdf")
+    def _build_full_xacro(self, body_path: str, sensors_path: str) -> str:
+        """Temporary wrapper xacro using absolute paths — only used at gen time."""
+        use_sim = "1" if self.last_hardware_interface == GAZEBO_SIM_PLUGIN else "0"
+        return '\n'.join([
+            '<?xml version="1.0" ?>',
+            '<robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro" xmlns:gz="http://gazebosim.org/schema">',
+            f'  <xacro:property name="hardware_plugin" value="{self.last_hardware_interface}"/>',
+            f'  <xacro:property name="use_gazebo_sim" value="{use_sim}"/>',
+            f'  <xacro:include filename="{body_path}"/>',
+            f'  <xacro:include filename="{sensors_path}"/>',
+            '</robot>',
+        ])
 
+    def _build_xacro_wrapper(self):
+        """Produces the persistent mobRob.urdf.xacro with $(find ...) paths for launch files."""
+        controller_suffix = self._controller_suffix(self.last_robot_type, self.last_controller_type)
+
+        lines = [
+            '<?xml version="1.0" ?>',
+            '<robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro" xmlns:gz="http://gazebosim.org/schema">',
+            '  <!-- Xacro parameters -->',
+        ]
+        for param_name, param_value in self.last_params.items():
+            lines.append(f'  <xacro:property name="{param_name}" value="{param_value}"/>')
+        lines.append(f'  <xacro:property name="controller_type" value="{self.last_controller_type}"/>')
+        use_sim = "1" if self.last_hardware_interface == GAZEBO_SIM_PLUGIN else "0"
+        lines.append(f'  <xacro:property name="hardware_plugin" value="{self.last_hardware_interface}"/>')
+        lines.append(f'  <xacro:property name="use_gazebo_sim" value="{use_sim}"/>')
+
+        submodules_dir = f"submodules/{self.last_robot_type}"
+        if self.last_robot_type == "4_wheeled" and self.last_controller_type == "ackermann":
+            submodules_dir += "/ackermann"
+        lines.append(
+            f'  <xacro:include filename="$(find mobRobURDF_description)/urdf/{submodules_dir}/mobRob_{controller_suffix}.xacro"/>'
+        )
+        lines.append(
+            '  <xacro:include filename="$(find mobRobURDF_description)/urdf/user_sensors.xacro"/>'
+        )
+        lines.append("</robot>")
+        return "\n".join(lines)
+
+    def _write_bridge_yaml(self, sensors: list):
+        """Write gz_bridge_generated.yaml to the gazebo config dir."""
         try:
-            if os.path.exists(source_urdf_xacro):
-                if os.path.exists(dest_urdf_xacro) and os.path.samefile(source_urdf_xacro, dest_urdf_xacro):
-                    logging.debug(f"Skipped copying URDF.xacro: source {source_urdf_xacro} and destination {dest_urdf_xacro} are the same")
-                else:
-                    shutil.copy2(source_urdf_xacro, dest_urdf_xacro)
-                    #logging.debug(f"Copied URDF.xacro to {dest_urdf_xacro}")
-            if os.path.exists(source_urdf):
-                if os.path.exists(dest_urdf) and os.path.samefile(source_urdf, dest_urdf):
-                    logging.debug(f"Skipped copying URDF: source {source_urdf} and destination {dest_urdf} are the same")
-                else:
-                    shutil.copy2(source_urdf, dest_urdf)
-                    #logging.debug(f"Copied URDF to {dest_urdf}")
+            gazebo_config = os.path.join(
+                get_package_share_directory("mobRobURDF_gazebo"), "config"
+            )
+            path = os.path.join(gazebo_config, "gz_bridge_generated.yaml")
+            with open(path, "w") as f:
+                f.write(build_bridge_yaml(sensors))
+            logger.debug("Wrote generated bridge YAML to %s", path)
         except Exception as e:
-            logging.warning(f"Failed to copy files to install directory: {str(e)}")
+            logger.warning("Failed to write bridge YAML: %s", e)
+
+    def _write_image_topics(self, sensors: list):
+        """Write gz_image_topics.txt so ros_gz_image bridge knows which topics to bridge."""
+        try:
+            gazebo_config = os.path.join(
+                get_package_share_directory("mobRobURDF_gazebo"), "config"
+            )
+            topics = camera_image_topics(sensors)
+            path = os.path.join(gazebo_config, "gz_image_topics.txt")
+            with open(path, "w") as f:
+                f.write('\n'.join(topics) + ('\n' if topics else ''))
+            logger.debug("Wrote image topics to %s: %s", path, topics)
+        except Exception as e:
+            logger.warning("Failed to write image topics: %s", e)
+
+    def _write_use_sim_time_yaml(self):
+        """Write use_sim_time.yaml — false when using real hardware, true for Gazebo."""
+        try:
+            gazebo_config = os.path.join(
+                get_package_share_directory("mobRobURDF_gazebo"), "config"
+            )
+            path = os.path.join(gazebo_config, "use_sim_time.yaml")
+            use_sim = self.last_hardware_interface == GAZEBO_SIM_PLUGIN
+            with open(path, "w") as f:
+                f.write(f"gz:\n  use_sim_time: {'true' if use_sim else 'false'}\n")
+            logger.debug("Updated use_sim_time.yaml: use_sim_time=%s", use_sim)
+        except Exception as e:
+            logger.warning("Failed to update use_sim_time.yaml: %s", e)
+
+    def _copy_to_install(self):
+        for name in ("mobRob.urdf", "mobRob.urdf.xacro"):
+            source = os.path.join(self.source_dir, name)
+            dest = os.path.join(self.base_dir, name)
+            try:
+                if not os.path.exists(source):
+                    continue
+                if os.path.exists(dest) and os.path.samefile(source, dest):
+                    continue
+                shutil.copy2(source, dest)
+                logger.debug("Copied %s to %s", name, dest)
+            except Exception as e:
+                logger.warning("Failed to copy %s to install directory: %s", name, str(e))
+
+    def _write_selected_controller(self, controller_name):
+        path = os.path.join(self.base_dir, SELECTED_CONTROLLER_FILE)
+        try:
+            with open(path, "w") as f:
+                f.write(controller_name + "\n")
+            logger.debug("Wrote selected controller '%s' to %s", controller_name, path)
+        except Exception as e:
+            logger.warning("Failed to write selected controller file %s: %s", path, str(e))
 
     def generate_controller_yaml(self, robot_type, controller_type, params):
+        yaml_path = None
         try:
             controller_map = {
                 "diff_2wc": "gazebo_controller_diffDrive_2wd_caster.yaml",
@@ -191,14 +245,18 @@ class URDFManager:
             yaml_file = controller_map.get(controller_type)
             controller_name = controller_name_map.get(controller_type)
             if not yaml_file or not controller_name:
-                #logging.error(f"No YAML file or controller name mapped for controller_type: {controller_type}")
+                logger.error("No YAML file or controller name mapped for controller_type: %s", controller_type)
                 return
 
-            # Determine subdirectory based on controller type
-            subdir = "drive" if controller_type in ["diff_2wc", "diff_4w", "mecanum"] else "steer" if controller_type in ["ackermann", "triSteer"] else ""
+            if controller_type in ("diff_2wc", "diff_4w", "mecanum"):
+                subdir = "drive"
+            elif controller_type in ("ackermann", "triSteer"):
+                subdir = "steer"
+            else:
+                subdir = ""
             yaml_path = os.path.join(self.control_config_dir, subdir, yaml_file)
             if not os.path.exists(yaml_path):
-                #logging.error(f"Controller YAML file not found: {yaml_path}")
+                logger.error("Controller YAML file not found: %s", yaml_path)
                 return
 
             yaml = YAML()
@@ -207,24 +265,25 @@ class URDFManager:
             yaml.width = 4096
             yaml.indent(mapping=2, sequence=4, offset=2)
 
-            with open(yaml_path, 'r') as f:
+            with open(yaml_path, "r") as f:
                 config = yaml.load(f)
 
-            # Extract parameters from params
-            L = float(params.get("chassis_size", "1.2 0.8 0.3").split()[0])  # Length
-            W = float(params.get("chassis_size", "1.2 0.8 0.3").split()[1])  # Width
+            chassis = params.get("chassis_size", "1.2 0.8 0.3").split()
+            L = float(chassis[0])
+            W = float(chassis[1])
             wheel_radius = float(params.get("wheel_radius", "0.22"))
             wheel_width = float(params.get("wheel_width", "0.12"))
 
-            if controller_type == "diff_2wc":
-                config["diffDrive_controller"]["ros__parameters"]["wheel_separation"] = W + wheel_width
-                config["diffDrive_controller"]["ros__parameters"]["wheel_radius"] = wheel_radius
-            elif controller_type == "diff_4w":
+            if controller_type in ("diff_2wc", "diff_4w"):
                 config["diffDrive_controller"]["ros__parameters"]["wheel_separation"] = W + wheel_width
                 config["diffDrive_controller"]["ros__parameters"]["wheel_radius"] = wheel_radius
             elif controller_type == "mecanum":
+                # sum_of_robot_center_projection_on_X_Y_axis — NOT simply (L+W)/2
+                # wheel_x = L/2 - r/1.5, wheel_y = W/2 + w/2 (actual URDF joint positions)
+                wheel_x = L / 2 - wheel_radius / 1.5
+                wheel_y = W / 2 + wheel_width / 2
                 config["mecDrive_controller"]["ros__parameters"]["kinematics"]["wheels_radius"] = wheel_radius
-                config["mecDrive_controller"]["ros__parameters"]["kinematics"]["sum_of_robot_center_projection_on_X_Y_axis"] = L + W
+                config["mecDrive_controller"]["ros__parameters"]["kinematics"]["sum_of_robot_center_projection_on_X_Y_axis"] = wheel_x + wheel_y
             elif controller_type == "tricycle":
                 config["tricycle_controller"]["ros__parameters"]["wheel_radius"] = wheel_radius
                 config["tricycle_controller"]["ros__parameters"]["wheelbase"] = L
@@ -243,123 +302,124 @@ class URDFManager:
                 config["ackerSteer_controller"]["ros__parameters"]["front_wheels_radius"] = wheel_radius
                 config["ackerSteer_controller"]["ros__parameters"]["rear_wheels_radius"] = wheel_radius
 
-            with open(yaml_path, 'w') as f:
+            if self.last_tuner_params:
+                self._apply_tuner_params_to_config(config, controller_type, controller_name)
+
+            # Jazzy+: strip use_stamped_vel entirely — undeclared params block controller loading.
+            # Humble/Iron: force use_stamped_vel=false so the *_unstamped topic the relay uses exists.
+            ctrl_params = config.get(controller_name, {}).get("ros__parameters")
+            if ctrl_params is not None:
+                if uses_stamped_twist():
+                    ctrl_params.pop("use_stamped_vel", None)
+                else:
+                    ctrl_params["use_stamped_vel"] = False
+
+            with open(yaml_path, "w") as f:
                 yaml.dump(config, f)
-            #logging.debug(f"Updated controller YAML: {yaml_path}")
+            logger.debug("Updated controller YAML: %s", yaml_path)
 
-            self.update_launch_file(controller_name)
+            self._write_selected_controller(controller_name)
         except Exception as e:
-            logging.error(f"Failed to update controller YAML {yaml_path}: {str(e)}")
+            logger.error("Failed to update controller YAML %s: %s", yaml_path, str(e))
 
-    def update_launch_file(self, controller_name):
-        try:
-            # Define source and install launch file paths
-            source_launch_file = os.path.join(os.path.expanduser("~"), "Mobile_Robot_URDF_Maker", "src", "mobRobURDF_launch", "launch", "gazebo_test.launch.py")
-            install_launch_file = os.path.join(self.launch_dir, "gazebo_test.launch.py")
-            launch_files = [source_launch_file, install_launch_file]
+    def _apply_tuner_params_to_config(self, config, controller_type, controller_name):
+        """Merge last_tuner_params into the already-loaded YAML config dict."""
+        p = self.last_tuner_params
+        ctrl = config[controller_name]["ros__parameters"]
 
-            for launch_file_path in launch_files:
-                if not os.path.exists(launch_file_path):
-                    #logging.error(f"Launch file not found: {launch_file_path}")
-                    continue
+        ctrl["publish_rate"]   = float(p.get("publish_rate", 50.0))
+        ctrl["enable_odom_tf"] = bool(p.get("enable_odom_tf", True))
+        ctrl["open_loop"]      = bool(p.get("open_loop", False))
 
-                with open(launch_file_path, 'r') as f:
-                    content = f.read()
+        if "cmd_vel_timeout" in p:
+            # TricycleController reads cmd_vel_timeout as int milliseconds (e.g. 0.5 s -> 500);
+            # every other controller takes it as a float in seconds.
+            if controller_type == "tricycle":
+                ctrl["cmd_vel_timeout"] = int(round(float(p["cmd_vel_timeout"]) * 1000))
+            else:
+                ctrl["cmd_vel_timeout"] = float(p["cmd_vel_timeout"])
 
-                # Regex to match arguments=["<controller_name>"] in controllers node
-                pattern = r'(controllers\s*=\s*Node\([^)]*arguments\s*=\s*\["[^"]*"\][^)]*\))'
-                match = re.search(pattern, content, re.DOTALL)
-                if not match:
-                    #logging.error(f"Could not find controllers node in {launch_file_path}")
-                    continue
+        config["controller_manager"]["ros__parameters"]["update_rate"] = int(p.get("update_rate", 50))
 
-                controllers_block = match.group(1)
-                arg_match = re.search(r'arguments\s*=\s*\["([^"]*)"\]', controllers_block)
-                if not arg_match:
-                    #logging.error(f"Could not parse arguments in {launch_file_path}")
-                    continue
+        max_lv = float(p.get("max_linear_velocity", 0.0))
+        max_av = float(p.get("max_angular_velocity", 0.0))
+        max_la = float(p.get("max_linear_acceleration", 0.0))
+        max_aa = float(p.get("max_angular_acceleration", 0.0))
 
-                old_controller = arg_match.group(1)
-                new_controllers_block = re.sub(
-                    r'arguments\s*=\s*\["[^"]*"\]',
-                    f'arguments=["{controller_name}"]',
-                    controllers_block
-                )
-                new_content = content.replace(controllers_block, new_controllers_block)
+        if controller_type in ("diff_4w", "diff_2wc"):
+            if "linear" not in ctrl:
+                ctrl["linear"] = {}
+            if "x" not in ctrl["linear"]:
+                ctrl["linear"]["x"] = {}
+            ctrl["linear"]["x"]["max_velocity"]    = max_lv
+            ctrl["linear"]["x"]["min_velocity"]    = -max_lv
+            ctrl["linear"]["x"]["max_acceleration"] = max_la
+            ctrl["linear"]["x"]["max_deceleration"] = max_la
 
-                with open(launch_file_path, 'w') as f:
-                    f.write(new_content)
-                #logging.debug(f"Updated launch file: {launch_file_path} with controller: {controller_name}")
+            if "angular" not in ctrl:
+                ctrl["angular"] = {}
+            if "z" not in ctrl["angular"]:
+                ctrl["angular"]["z"] = {}
+            ctrl["angular"]["z"]["max_velocity"]    = max_av
+            ctrl["angular"]["z"]["min_velocity"]    = -max_av
+            ctrl["angular"]["z"]["max_acceleration"] = max_aa
+            ctrl["angular"]["z"]["max_deceleration"] = max_aa
 
-        except Exception as e:
-            logging.error(f"Failed to update launch file {launch_file_path}: {str(e)}")
+        elif controller_type in ("tricycle", "triSteer", "ackermann"):
+            max_sa = float(p.get("max_steering_angle", 0.785))
+            max_sv = float(p.get("max_steering_velocity", 1.0))
+
+            # TricycleController limits the traction WHEEL's angular rate (rad/s²), not the
+            # robot body, so divide the tuner's m/s² value by the wheel radius — that makes
+            # the configured limit actually match the m/s² the user typed.
+            wheel_radius = float(ctrl.get("wheel_radius", 0.22)) or 0.22
+
+            if "traction" not in ctrl:
+                ctrl["traction"] = {}
+            ctrl["traction"]["max_acceleration"] = round(max_la / wheel_radius, 3)
+            ctrl["traction"]["max_deceleration"] = round(max_la / wheel_radius, 3)
+
+            # steering.max_position (rad) and max_velocity (rad/s) act directly on the
+            # steering joint, so they already match their labels — no conversion needed.
+            if "steering" not in ctrl:
+                ctrl["steering"] = {}
+            ctrl["steering"]["max_position"] = max_sa
+            ctrl["steering"]["max_velocity"] = max_sv
+
+        # mecanum controller has no standard YAML velocity limit keys
+
+    def apply_tuner_params(self, robot_type, controller_type, params, tuner_params):
+        self.last_tuner_params = tuner_params.copy()
+        self.generate_controller_yaml(robot_type, controller_type, params)
 
     def save_urdf(self, filename):
         if not self.last_params or not self.last_robot_type or not self.last_controller_type:
-            #logging.warning("No URDF parameters available to save")
+            logger.warning("No URDF parameters available to save")
             return
 
         try:
-            # Ensure directory exists
             os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-            # Save static URDF
+            if filename.endswith(".urdf.xacro"):
+                base = filename[: -len(".urdf.xacro")]
+            elif filename.endswith(".urdf"):
+                base = filename[: -len(".urdf")]
+            else:
+                base = filename
+            static_filename = base + ".urdf"
+            xacro_filename = base + ".urdf.xacro"
+
             if self.urdf_text:
-                static_filename = filename if filename.endswith(".urdf") else filename + ".urdf"
-                with open(static_filename, 'w') as f:
+                with open(static_filename, "w") as f:
                     f.write(self.urdf_text)
-                logging.debug(f"Static URDF saved to: {static_filename}")
+                logger.debug("Static URDF saved to: %s", static_filename)
 
-                # Copy static URDF to install directory
-                if not self._install_copied:
-                    self._copy_to_install()
-                    self._install_copied = True
-
-            # Determine controller suffix
-            controller_map = {
-                ("2_wheeled_caster", "diff_2wc"): "2wc_diff",
-                ("3_wheeled", "tricycle"): "3w_tricycle",
-                ("3_wheeled", "triSteer"): "3w_triSteer",
-                ("4_wheeled", "diff_4w"): "4w_diff",
-                ("4_wheeled", "mecanum"): "4w_mec",
-                ("4_wheeled", "ackermann"): "4w_acker",
-            }
-            controller_suffix = controller_map.get((self.last_robot_type, self.last_controller_type), "4w_diff")
-
-            # Generate xacro filename
-            xacro_filename = filename if filename.endswith(".urdf.xacro") else filename.rsplit(".", 1)[0] + ".urdf.xacro" if "." in filename else filename + ".urdf.xacro"
-
-            # Generate xacro content
-            xacro_content = [
-                '<?xml version="1.0" ?>',
-                '<robot name="mobRob" xmlns:xacro="http://ros.org/wiki/xacro">',
-                '  <!-- Xacro parameters -->',
-            ]
-
-            # Add all parameters as xacro properties
-            for param_name, param_value in self.last_params.items():
-                xacro_content.append(f'  <xacro:property name="{param_name}" value="{param_value}"/>')
-            xacro_content.append(f'  <xacro:property name="controller_type" value="{self.last_controller_type}"/>')
-
-            # Include the appropriate mobRob xacro file
-            submodules_dir = f"submodules/{self.last_robot_type}"
-            if self.last_robot_type == "4_wheeled" and self.last_controller_type == "ackermann":
-                submodules_dir += "/ackermann"
-            xacro_content.append(f'  <xacro:include filename="$(find mobRobURDF_description)/urdf/{submodules_dir}/mobRob_{controller_suffix}.xacro"/>')
-            xacro_content.append('</robot>')
-
-            # Save xacro file in source directory
-            with open(xacro_filename, 'w') as f:
-                f.write('\n'.join(xacro_content))
-            logging.debug(f"Xacro URDF saved to: {xacro_filename}")
-
-            # Copy xacro to install directory
-            if not self._install_copied:
-                self._copy_to_install()
-                self._install_copied = True
+            with open(xacro_filename, "w") as f:
+                f.write(self._build_xacro_wrapper())
+            logger.debug("Xacro URDF saved to: %s", xacro_filename)
 
         except Exception as e:
-            logging.error(f"Failed to save URDF files: {str(e)}")
+            logger.error("Failed to save URDF files: %s", str(e))
 
     def get_urdf_text(self):
         return self.urdf_text

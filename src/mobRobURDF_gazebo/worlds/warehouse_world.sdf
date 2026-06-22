@@ -2,7 +2,7 @@
   <world name='world_demo'>
     <gravity>0 0 -9.8</gravity>
     <physics type='ode'>
-      <max_step_size>0.01</max_step_size>
+      <max_step_size>0.005</max_step_size>
       <real_time_factor>1</real_time_factor>
       <max_contacts>10</max_contacts>
       <real_time_update_rate>1000</real_time_update_rate>
@@ -14,7 +14,7 @@
     <plugin name='ignition::gazebo::systems::Sensors' filename='ignition-gazebo-sensors-system'>
       <render_engine>ogre2</render_engine>
     </plugin>
-    <gui fullscreen='false'>
+    <gui fullscreen='true'>
       <plugin name='3D View' filename='GzScene3D'>
         <ignition-gui>
           <title>3D View</title>
@@ -131,15 +131,30 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>1 1</size>
+              <size>100 100</size>
             </plane>
           </geometry>
           <surface>
             <friction>
-              <ode/>
+              <ode>
+                <mu>0.8</mu>
+                <mu2>0.8</mu2>
+              </ode>
             </friction>
-            <bounce/>
-            <contact/>
+            <bounce>
+              <restitution_coefficient>0.0</restitution_coefficient>
+              <threshold>1e6</threshold>
+            </bounce>
+            <contact>
+              <ode>
+                <soft_cfm>0.0</soft_cfm>
+                <soft_erp>0.2</soft_erp>
+                <kp>1e10</kp>
+                <kd>1</kd>
+                <max_vel>0.01</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
           </surface>
         </collision>
         <pose>0 0 0 0 -0 0</pose>

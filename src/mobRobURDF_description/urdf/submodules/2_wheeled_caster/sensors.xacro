@@ -27,7 +27,7 @@
       </collision>
     </link>
     <joint name="lidar_joint" type="fixed">
-      <parent link="chassis" />
+      <parent link="base_link" />
       <child link="lidar" />
       <origin xyz="0 0 ${z}" rpy="0 0 0" />
     </joint>
@@ -64,7 +64,7 @@
       </collision>
     </link>
     <joint name="camera_joint" type="fixed">
-      <parent link="chassis" />
+      <parent link="base_link" />
       <child link="camera" />
       <origin xyz="${x} 0 0" rpy="0 0 0" />
     </joint>

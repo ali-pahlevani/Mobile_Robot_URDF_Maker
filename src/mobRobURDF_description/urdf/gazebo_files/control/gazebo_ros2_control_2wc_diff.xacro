@@ -3,7 +3,7 @@
 
     <ros2_control name="GazeboSystem" type="system">
         <hardware>
-            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+            <plugin>${hardware_plugin}</plugin>
         </hardware>
 
         <joint name="left_joint">
@@ -24,22 +24,19 @@
             <state_interface name="position"/>
         </joint>
 
-        <!-- - - - Not-motorized - - - -->
+        <!-- - - - Not-motorized (passive joints: state interfaces only) - - - -->
 
         <joint name="front_caster_joint">
-            <command_interface name="velocity"></command_interface>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
         </joint>
 
         <joint name="free-rotating_x_joint">
-            <command_interface name="velocity"></command_interface>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
         </joint>
 
         <joint name="free-rotating_y_joint">
-            <command_interface name="velocity"></command_interface>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
         </joint>
@@ -48,10 +45,12 @@
 
     </ros2_control>
 
-    <gazebo>
-        <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="libgz_ros2_control-system.so">
-            <parameters>$(find mobRobURDF_control)/config/drive/gazebo_controller_diffDrive_2wd_caster.yaml</parameters>
-        </plugin>
-    </gazebo>
+    <xacro:if value="${use_gazebo_sim}">
+        <gazebo>
+            <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="libgz_ros2_control-system.so">
+                <parameters>$(find mobRobURDF_control)/config/drive/gazebo_controller_diffDrive_2wd_caster.yaml</parameters>
+            </plugin>
+        </gazebo>
+    </xacro:if>
     
 </robot>

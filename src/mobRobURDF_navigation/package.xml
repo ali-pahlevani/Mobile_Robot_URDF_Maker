@@ -1,0 +1,48 @@
+<package format="3">
+  <name>mobRobURDF_navigation</name>
+  <version>0.0.1</version>
+  <description>Package for containing slam/localization/navigation config files</description>
+
+  <maintainer email="a.pahlevani1998@gmail.com">Ali Pahlevani</maintainer>
+  <license>MIT</license>
+
+  <!-- Build dependencies -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Core dependencies -->
+  <depend>ament_index_cpp</depend>
+  <depend>rclcpp</depend>
+  <depend>rclpy</depend>
+  <depend>xacro</depend>
+
+  <!-- Nav2 and SLAM dependencies -->
+  <depend>nav2_common</depend>
+  <depend>nav2_util</depend>
+  <depend>nav2_msgs</depend>
+  <depend>nav2_core</depend>
+  <depend>nav2_bt_navigator</depend>
+  <depend>nav2_lifecycle_manager</depend>
+
+  <!-- Costmap and localization dependencies -->
+  <depend>nav2_costmap_2d</depend>
+  <depend>nav2_planner</depend>
+  <depend>nav2_controller</depend>
+  <depend>nav2_map_server</depend>
+  <depend>nav2_amcl</depend>
+  <!-- nav2_recoveries was renamed to nav2_behaviors (Humble onward) -->
+  <depend>nav2_behaviors</depend>
+
+  <!-- Sensor and TF dependencies -->
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>laser_geometry</depend>
+  <depend>nav_msgs</depend>
+
+  <!-- Config dependencies -->
+  <depend>yaml_cpp_vendor</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -14,7 +14,7 @@ mecDrive_controller:
 
     publish_rate: 50.0
 
-    base_frame_id: base_link
+    base_frame_id: base_footprint
     odom_frame_id: odom
     enable_odom_tf: true
 
@@ -28,13 +28,15 @@ mecDrive_controller:
     kinematics:
       base_frame_offset: {x: 0.0, y: 0.0, theta: 0.0}
       wheels_radius: 0.22
-      sum_of_robot_center_projection_on_X_Y_axis: 2.0
+      sum_of_robot_center_projection_on_X_Y_axis: 0.9133333333333333
 
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
     pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
 
     use_stamped_vel: false
 
+    open_loop: false
+    cmd_vel_timeout: 0.5
 joint_state_broadcaster:
   ros__parameters:
     joints:

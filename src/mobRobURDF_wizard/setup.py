@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import os
 from glob import glob
 
@@ -7,7 +7,9 @@ package_name = 'mobRobURDF_wizard'
 setup(
     name=package_name,
     version='0.0.0',
-    packages=[package_name],
+    # Include sub-packages (classes, classes.pages, utils) so the wizard also
+    # works with a non-symlink install, not only `colcon build --symlink-install`.
+    packages=find_packages(exclude=['test']),
     data_files=[
         (os.path.join('share', 'ament_index', 'resource_index', 'packages'), [os.path.join('resource', package_name)]),
         (os.path.join('share', package_name), ['package.xml']),

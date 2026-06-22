@@ -14,7 +14,7 @@ tricycle_controller:
 
     publish_rate: 50.0
 
-    base_frame_id: base_link
+    base_frame_id: base_footprint
     odom_frame_id: odom
     enable_odom_tf: true
 
@@ -28,6 +28,13 @@ tricycle_controller:
 
     pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
+    cmd_vel_timeout: 500
+    traction:
+      max_acceleration: 2.273
+      max_deceleration: 2.273
+    steering:
+      max_position: 0.785
+      max_velocity: 1.0
     #odom_only_twist: true
     #publish_ackermann_command: true
     #traction:

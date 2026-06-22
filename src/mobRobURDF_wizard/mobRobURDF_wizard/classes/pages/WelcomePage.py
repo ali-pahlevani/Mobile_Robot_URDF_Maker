@@ -1,65 +1,81 @@
 import os
 import logging
-from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QLabel)
+from PyQt5.QtWidgets import QWizardPage, QVBoxLayout, QLabel, QSizePolicy
+from PyQt5.QtGui import QMovie, QImageReader
+from PyQt5.QtCore import Qt, QSize
 from ament_index_python.packages import get_package_share_directory
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QMovie, QFont
 
-# Welcome Page
+logger = logging.getLogger(__name__)
+
+
 class WelcomePage(QWizardPage):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setTitle("")
+        self._movie = None
+        self._gif_w, self._gif_h = 880, 520  # fallback native size
 
-        # Title label
-        title_label = QLabel("Welcome to the 'Mobile Robot URDF Maker' Wizard!")
-        title_label.setStyleSheet("""
-            font-size: 28pt;          /* Larger font size */
-            font-weight: bold;        /* Bold text */
-            color: #DC143C;           /* Dark gray color */
-        """)
-        title_label.setFont(QFont("Segoe UI", 28, QFont.Bold))
-        title_label.setAlignment(Qt.AlignCenter)  # Center horizontally
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(40, 30, 40, 20)
+        layout.setSpacing(12)
 
-        # GIF label: No fixed size, adapts to window
-        self.gif_label = QLabel(self)
-        
+        title = QLabel("Welcome to the Mobile Robot URDF Maker")
+        title.setAlignment(Qt.AlignCenter)
+        title.setWordWrap(True)
+        title.setStyleSheet("font-size: 22pt; font-weight: bold; color: #2C3E50;")
+        layout.addWidget(title)
+
+        subtitle = QLabel("Build a ready-to-simulate URDF for your mobile robot — "
+                          "visually, step by step.")
+        subtitle.setAlignment(Qt.AlignCenter)
+        subtitle.setWordWrap(True)
+        subtitle.setStyleSheet("font-size: 12pt; color: #7F8C8D;")
+        layout.addWidget(subtitle)
+
+        layout.addSpacing(8)
+
         self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images")
         gif_path = os.path.join(self.image_dir, "welcome.gif")
-        #logging.debug(f"Attempting to load GIF from: {gif_path}")
 
-        self.movie = QMovie(gif_path)
-        if self.movie.isValid():
-            self.gif_label.setMovie(self.movie)
-            self.movie.start()
-            self.gif_label.setAlignment(Qt.AlignCenter)  # Center GIF horizontally
-            self.gif_label.setScaledContents(True)  # Allow scaling with widget size
-            #logging.debug("GIF loaded and animation started")
+        self._gif_label = QLabel()
+        self._gif_label.setAlignment(Qt.AlignCenter)
+        self._gif_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        movie = QMovie(gif_path)
+        if movie.isValid():
+            self._movie = movie
+            # need native resolution to compute scale ratio correctly
+            reader = QImageReader(gif_path)
+            size = reader.size()
+            if size.isValid() and size.width() > 0 and size.height() > 0:
+                self._gif_w, self._gif_h = size.width(), size.height()
+            self._gif_label.setMovie(movie)
+            movie.start()
         else:
-            self.gif_label.setText("Welcome GIF not found")
-            self.gif_label.setAlignment(Qt.AlignCenter)
-            #logging.warning(f"Failed to load welcome.gif from {gif_path}")
+            self._gif_label.setText("(Welcome animation not found)")
+            self._gif_label.setStyleSheet("color: #95A5A6; font-size: 12pt;")
+            logger.warning("Failed to load welcome.gif from %s", gif_path)
+        layout.addWidget(self._gif_label, 1)
 
-        # Layout: Stack title and GIF vertically, centered
-        layout = QVBoxLayout()
-        layout.addStretch(1)  # Push content toward the middle
-        layout.addWidget(title_label, alignment=Qt.AlignHCenter)  # Center title horizontally
-        layout.addWidget(self.gif_label, alignment=Qt.AlignHCenter)  # Center GIF horizontally
-        layout.addStretch(1)  # Balance with stretch below to center vertically
-
-        # Page background styling
-        self.setStyleSheet("background-color: #F0F4F8;")  # Light blue-gray background
-
-        self.setLayout(layout)
+        footer = QLabel("Press  Next  to get started →")
+        footer.setAlignment(Qt.AlignCenter)
+        footer.setStyleSheet("font-size: 10pt; color: #95A5A6;")
+        layout.addWidget(footer)
 
     def resizeEvent(self, event):
-        """Adjust GIF size dynamically when the window is resized."""
         super().resizeEvent(event)
-        if self.movie.isValid():
-            # Scale GIF to fit the full smaller dimension of the window
-            max_size = int(min(self.width(), self.height()) * 1.6)  # Use 160% of smaller dimension
-            original_size = self.movie.currentPixmap().size()  # Get size of current frame
-            scaled_size = original_size.scaled(max_size, max_size, Qt.KeepAspectRatio)
-            self.movie.setScaledSize(scaled_size)
-            self.gif_label.adjustSize()
-        #logging.debug(f"Window resized to {self.width()}x{self.height()}, GIF adjusted")
+        self._rescale_gif()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        self._rescale_gif()
+
+    def _rescale_gif(self):
+        if not self._movie:
+            return
+        w, h = self._gif_label.width(), self._gif_label.height()
+        if w < 10 or h < 10:
+            return
+        ratio = min(w / self._gif_w, h / self._gif_h)
+        self._movie.setScaledSize(QSize(max(int(self._gif_w * ratio), 100),
+                                        max(int(self._gif_h * ratio), 60)))

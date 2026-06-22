@@ -3,7 +3,7 @@
 
     <ros2_control name="GazeboSystem" type="system">
         <hardware>
-            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+            <plugin>${hardware_plugin}</plugin>
         </hardware>
 
         <joint name="front_left_joint">
@@ -46,10 +46,18 @@
 
     </ros2_control>
 
-    <gazebo>
-        <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="libgz_ros2_control-system.so">
-            <parameters>$(find mobRobURDF_control)/config/drive/gazebo_controller_mecDrive.yaml</parameters>
-        </plugin>
-    </gazebo>
+    <xacro:if value="${use_gazebo_sim}">
+        <gazebo>
+            <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="libgz_ros2_control-system.so">
+                <parameters>$(find mobRobURDF_control)/config/drive/gazebo_controller_mecDrive.yaml</parameters>
+                <ros>
+                    <!-- mecanum_drive_controller publishes to ~/tf_odometry and ~/odometry,
+                         not to /tf and /odom. Remap to the standard global topics. -->
+                    <remapping>/mecDrive_controller/tf_odometry:=/tf</remapping>
+                    <remapping>/mecDrive_controller/odometry:=/odom</remapping>
+                </ros>
+            </plugin>
+        </gazebo>
+    </xacro:if>
     
 </robot>

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<robot xmlns:xacro="http://ros.org/wiki/xacro" xmlns:gz="http://gazebosim.org/schema">
 
   <!-- Macro for Gazebo physical properties -->
   <xacro:macro name="gazebo_physical_properties" params="controller_type chassis_size wheel_radius wheel_width">
@@ -9,47 +9,42 @@
     <xacro:property name="wheel_radius" value="${float(wheel_radius)}"/>
     <xacro:property name="wheel_width" value="${float(wheel_width)}"/>
 
-    <!-- Base link properties (common for all controllers) -->
-    <gazebo reference="base_link">
+    <!-- Base footprint (massless ground-projection frame, never touches ground, no friction needed) -->
+    <gazebo reference="base_footprint">
       <collision>
         <surface>
           <friction>
             <ode>
-              <mu>0.8</mu>
-              <mu2>0.8</mu2>
+              <mu>0.0</mu>
+              <mu2>0.0</mu2>
             </ode>
           </friction>
-          <contact>
-            <kp>1e6</kp>
-            <kd>1.0</kd>
-            <max_vel>0.1</max_vel>
-            <min_depth>0.001</min_depth>
-          </contact>
-          <bounce>
-            <restitution_coefficient>0.0</restitution_coefficient>
-          </bounce>
         </surface>
       </collision>
     </gazebo>
 
-    <!-- diff_2wc: 2-wheeled with caster -->
+    <!-- ================================================================
+         diff_2wc: 2-wheeled differential with caster
+         ================================================================ -->
     <xacro:if value="${controller_type == 'diff_2wc'}">
-      <!-- Drive wheels -->
-      <xacro:macro name="drive_wheel_properties" params="wheel_link wheel_joint">
+
+      <xacro:macro name="drive_wheel_2wc" params="wheel_link wheel_joint">
         <gazebo reference="${wheel_link}">
           <collision>
             <surface>
               <friction>
                 <ode>
-                  <mu>1.0</mu>
-                  <mu2>1.0</mu2>
+                  <mu>3.0</mu>
+                  <mu2>3.0</mu2>
                 </ode>
               </friction>
               <contact>
-                <kp>1e6</kp>
-                <kd>1.0</kd>
-                <max_vel>0.1</max_vel>
-                <min_depth>0.001</min_depth>
+                <ode>
+                  <kp>1000000.0</kp>
+                  <kd>100.0</kd>
+                  <max_vel>0.1</max_vel>
+                  <min_depth>0.001</min_depth>
+                </ode>
               </contact>
               <bounce>
                 <restitution_coefficient>0.0</restitution_coefficient>
@@ -61,28 +56,27 @@
           <damping>0.1</damping>
         </gazebo>
       </xacro:macro>
-      <xacro:drive_wheel_properties wheel_link="left_wheel" wheel_joint="left_joint"/>
-      <xacro:drive_wheel_properties wheel_link="right_wheel" wheel_joint="right_joint"/>
+      <xacro:drive_wheel_2wc wheel_link="left_wheel"  wheel_joint="left_joint"/>
+      <xacro:drive_wheel_2wc wheel_link="right_wheel" wheel_joint="right_joint"/>
 
-      <!-- Caster -->
-      <gazebo reference="front_caster">
+      <!-- Caster: very low friction so it swivels freely -->
+      <gazebo reference="front_caster_wheel">
         <collision>
           <surface>
             <friction>
               <ode>
-                <mu>0.1</mu>
-                <mu2>0.1</mu2>
+                <mu>0.01</mu>
+                <mu2>0.01</mu2>
               </ode>
             </friction>
             <contact>
-              <kp>1e6</kp>
-              <kd>1.0</kd>
-              <max_vel>0.1</max_vel>
-              <min_depth>0.001</min_depth>
+              <ode>
+                <kp>1000000.0</kp>
+                <kd>100.0</kd>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
             </contact>
-            <bounce>
-              <restitution_coefficient>0.0</restitution_coefficient>
-            </bounce>
           </surface>
         </collision>
       </gazebo>
@@ -97,23 +91,31 @@
       </gazebo>
     </xacro:if>
 
-    <!-- diff_4w: 4-wheeled differential -->
+    <!-- ================================================================
+         diff_4w: 4-wheeled skid-steering differential
+         Skid-steer kinematics require anisotropic friction:
+           fdir1=1 0 0  → μ  applies to rolling direction (high)
+                        → μ2 applies to lateral direction (lower, allows skid-turn)
+         ================================================================ -->
     <xacro:if value="${controller_type == 'diff_4w'}">
-      <xacro:macro name="drive_wheel_properties" params="wheel_link wheel_joint">
+      <xacro:macro name="skid_wheel" params="wheel_link wheel_joint">
         <gazebo reference="${wheel_link}">
           <collision>
             <surface>
               <friction>
                 <ode>
-                  <mu>1.0</mu>
-                  <mu2>1.0</mu2>
+                  <mu>3.0</mu>
+                  <mu2>0.5</mu2>
+                  <fdir1>1 0 0</fdir1>
                 </ode>
               </friction>
               <contact>
-                <kp>1e6</kp>
-                <kd>1.0</kd>
-                <max_vel>0.1</max_vel>
-                <min_depth>0.001</min_depth>
+                <ode>
+                  <kp>1000000.0</kp>
+                  <kd>100.0</kd>
+                  <max_vel>0.1</max_vel>
+                  <min_depth>0.001</min_depth>
+                </ode>
               </contact>
               <bounce>
                 <restitution_coefficient>0.0</restitution_coefficient>
@@ -125,29 +127,47 @@
           <damping>0.1</damping>
         </gazebo>
       </xacro:macro>
-      <xacro:drive_wheel_properties wheel_link="front_left_wheel" wheel_joint="front_left_joint"/>
-      <xacro:drive_wheel_properties wheel_link="front_right_wheel" wheel_joint="front_right_joint"/>
-      <xacro:drive_wheel_properties wheel_link="rear_left_wheel" wheel_joint="rear_left_joint"/>
-      <xacro:drive_wheel_properties wheel_link="rear_right_wheel" wheel_joint="rear_right_joint"/>
+      <xacro:skid_wheel wheel_link="front_left_wheel"  wheel_joint="front_left_joint"/>
+      <xacro:skid_wheel wheel_link="front_right_wheel" wheel_joint="front_right_joint"/>
+      <xacro:skid_wheel wheel_link="rear_left_wheel"   wheel_joint="rear_left_joint"/>
+      <xacro:skid_wheel wheel_link="rear_right_wheel"  wheel_joint="rear_right_joint"/>
     </xacro:if>
 
-    <!-- mecanum: 4-wheeled mecanum -->
+    <!-- ================================================================
+         mecanum: 4-wheeled mecanum drive
+         Mecanum rollers are at ±45° — simulate with anisotropic friction:
+           fdir1 = high-friction direction (perpendicular to roller axis)
+           mu    = 1.0  — grips in fdir1 direction (do NOT crank this up:
+                          the anisotropic mecanum contact is numerically
+                          delicate and high mu makes forward/back drift & slide)
+           mu2   = 0.0 — roller slips freely along the other axis
+         X-pattern roller layout (matching mecanum_drive_controller kinematics):
+           FL + RR: roller axis "1 1 0"  → fdir1 = "1 -1 0"
+           FR + RL: roller axis "1 -1 0" → fdir1 = "1 1 0"
+         ================================================================ -->
     <xacro:if value="${controller_type == 'mecanum'}">
-      <xacro:macro name="mecanum_wheel_properties" params="wheel_link wheel_joint">
+
+      <!-- FL and RR: rollers at +45°, grip direction fdir1 = "1 -1 0".
+           fdir1 MUST be expressed in the (non-spinning) base_footprint frame, otherwise
+           it rotates with the wheel and strafing becomes erratic. -->
+      <xacro:macro name="mecanum_wheel_pos45" params="wheel_link wheel_joint">
         <gazebo reference="${wheel_link}">
           <collision>
             <surface>
               <friction>
                 <ode>
-                  <mu>1.2</mu>
-                  <mu2>1.2</mu2>
+                  <mu>1.0</mu>
+                  <mu2>0.0</mu2>
+                  <fdir1 gz:expressed_in="base_footprint">1 -1 0</fdir1>
                 </ode>
               </friction>
               <contact>
-                <kp>1e6</kp>
-                <kd>1.0</kd>
-                <max_vel>0.1</max_vel>
-                <min_depth>0.001</min_depth>
+                <ode>
+                  <kp>1000000.0</kp>
+                  <kd>100.0</kd>
+                  <max_vel>0.1</max_vel>
+                  <min_depth>0.001</min_depth>
+                </ode>
               </contact>
               <bounce>
                 <restitution_coefficient>0.0</restitution_coefficient>
@@ -156,32 +176,70 @@
           </collision>
         </gazebo>
         <gazebo reference="${wheel_joint}">
-          <damping>0.15</damping>
+          <damping>0.05</damping>
         </gazebo>
       </xacro:macro>
-      <xacro:mecanum_wheel_properties wheel_link="front_left_wheel" wheel_joint="front_left_joint"/>
-      <xacro:mecanum_wheel_properties wheel_link="front_right_wheel" wheel_joint="front_right_joint"/>
-      <xacro:mecanum_wheel_properties wheel_link="rear_left_wheel" wheel_joint="rear_left_joint"/>
-      <xacro:mecanum_wheel_properties wheel_link="rear_right_wheel" wheel_joint="rear_right_joint"/>
+
+      <!-- FR and RL: rollers at -45°, grip direction fdir1 = "1 1 0".
+           fdir1 MUST be expressed in the (non-spinning) base_footprint frame, otherwise
+           it rotates with the wheel and strafing becomes erratic. -->
+      <xacro:macro name="mecanum_wheel_neg45" params="wheel_link wheel_joint">
+        <gazebo reference="${wheel_link}">
+          <collision>
+            <surface>
+              <friction>
+                <ode>
+                  <mu>1.0</mu>
+                  <mu2>0.0</mu2>
+                  <fdir1 gz:expressed_in="base_footprint">1 1 0</fdir1>
+                </ode>
+              </friction>
+              <contact>
+                <ode>
+                  <kp>1000000.0</kp>
+                  <kd>100.0</kd>
+                  <max_vel>0.1</max_vel>
+                  <min_depth>0.001</min_depth>
+                </ode>
+              </contact>
+              <bounce>
+                <restitution_coefficient>0.0</restitution_coefficient>
+              </bounce>
+            </surface>
+          </collision>
+        </gazebo>
+        <gazebo reference="${wheel_joint}">
+          <damping>0.05</damping>
+        </gazebo>
+      </xacro:macro>
+
+      <xacro:mecanum_wheel_pos45 wheel_link="front_left_wheel"  wheel_joint="front_left_joint"/>
+      <xacro:mecanum_wheel_neg45 wheel_link="front_right_wheel" wheel_joint="front_right_joint"/>
+      <xacro:mecanum_wheel_neg45 wheel_link="rear_left_wheel"   wheel_joint="rear_left_joint"/>
+      <xacro:mecanum_wheel_pos45 wheel_link="rear_right_wheel"  wheel_joint="rear_right_joint"/>
     </xacro:if>
 
-    <!-- tricycle: 3-wheeled tricycle -->
+    <!-- ================================================================
+         tricycle: 3-wheeled tricycle (front wheel drives + steers)
+         ================================================================ -->
     <xacro:if value="${controller_type == 'tricycle'}">
-      <!-- Traction wheel -->
+
       <gazebo reference="front_wheel">
         <collision>
           <surface>
             <friction>
               <ode>
-                <mu>1.0</mu>
-                <mu2>1.0</mu2>
+                <mu>3.0</mu>
+                <mu2>3.0</mu2>
               </ode>
             </friction>
             <contact>
-              <kp>1e6</kp>
-              <kd>1.0</kd>
-              <max_vel>0.1</max_vel>
-              <min_depth>0.001</min_depth>
+              <ode>
+                <kp>1000000.0</kp>
+                <kd>100.0</kd>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
             </contact>
             <bounce>
               <restitution_coefficient>0.0</restitution_coefficient>
@@ -192,29 +250,28 @@
       <gazebo reference="front_joint">
         <damping>0.1</damping>
       </gazebo>
-
-      <!-- Steering joint -->
       <gazebo reference="chassis_to_front_steering">
         <damping>0.01</damping>
         <friction>0.3</friction>
       </gazebo>
 
-      <!-- Rear wheels -->
-      <xacro:macro name="rear_wheel_properties" params="wheel_link wheel_joint">
+      <xacro:macro name="tricycle_rear_wheel" params="wheel_link wheel_joint">
         <gazebo reference="${wheel_link}">
           <collision>
             <surface>
               <friction>
                 <ode>
-                  <mu>0.8</mu>
-                  <mu2>0.8</mu2>
+                  <mu>3.0</mu>
+                  <mu2>3.0</mu2>
                 </ode>
               </friction>
               <contact>
-                <kp>1e6</kp>
-                <kd>1.0</kd>
-                <max_vel>0.1</max_vel>
-                <min_depth>0.001</min_depth>
+                <ode>
+                  <kp>1000000.0</kp>
+                  <kd>100.0</kd>
+                  <max_vel>0.1</max_vel>
+                  <min_depth>0.001</min_depth>
+                </ode>
               </contact>
               <bounce>
                 <restitution_coefficient>0.0</restitution_coefficient>
@@ -226,27 +283,31 @@
           <damping>0.05</damping>
         </gazebo>
       </xacro:macro>
-      <xacro:rear_wheel_properties wheel_link="rear_left_wheel" wheel_joint="rear_left_joint"/>
-      <xacro:rear_wheel_properties wheel_link="rear_right_wheel" wheel_joint="rear_right_joint"/>
+      <xacro:tricycle_rear_wheel wheel_link="rear_left_wheel"  wheel_joint="rear_left_joint"/>
+      <xacro:tricycle_rear_wheel wheel_link="rear_right_wheel" wheel_joint="rear_right_joint"/>
     </xacro:if>
 
-    <!-- triSteer: 3-wheeled tricycle steering -->
+    <!-- ================================================================
+         triSteer: 3-wheeled tricycle steering
+         ================================================================ -->
     <xacro:if value="${controller_type == 'triSteer'}">
-      <!-- Traction wheel -->
+
       <gazebo reference="front_wheel">
         <collision>
           <surface>
             <friction>
               <ode>
-                <mu>1.0</mu>
-                <mu2>1.0</mu2>
+                <mu>3.0</mu>
+                <mu2>3.0</mu2>
               </ode>
             </friction>
             <contact>
-              <kp>1e6</kp>
-              <kd>1.0</kd>
-              <max_vel>0.1</max_vel>
-              <min_depth>0.001</min_depth>
+              <ode>
+                <kp>1000000.0</kp>
+                <kd>100.0</kd>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
             </contact>
             <bounce>
               <restitution_coefficient>0.0</restitution_coefficient>
@@ -257,29 +318,28 @@
       <gazebo reference="front_joint">
         <damping>0.1</damping>
       </gazebo>
-
-      <!-- Steering joint -->
       <gazebo reference="chassis_to_front_steering">
         <damping>0.02</damping>
         <friction>0.3</friction>
       </gazebo>
 
-      <!-- Rear wheels -->
-      <xacro:macro name="rear_wheel_properties" params="wheel_link wheel_joint">
+      <xacro:macro name="triSteer_rear_wheel" params="wheel_link wheel_joint">
         <gazebo reference="${wheel_link}">
           <collision>
             <surface>
               <friction>
                 <ode>
-                  <mu>0.8</mu>
-                  <mu2>0.8</mu2>
+                  <mu>3.0</mu>
+                  <mu2>3.0</mu2>
                 </ode>
               </friction>
               <contact>
-                <kp>1e6</kp>
-                <kd>1.0</kd>
-                <max_vel>0.1</max_vel>
-                <min_depth>0.001</min_depth>
+                <ode>
+                  <kp>1000000.0</kp>
+                  <kd>100.0</kd>
+                  <max_vel>0.1</max_vel>
+                  <min_depth>0.001</min_depth>
+                </ode>
               </contact>
               <bounce>
                 <restitution_coefficient>0.0</restitution_coefficient>
@@ -291,28 +351,32 @@
           <damping>0.05</damping>
         </gazebo>
       </xacro:macro>
-      <xacro:rear_wheel_properties wheel_link="rear_left_wheel" wheel_joint="rear_left_joint"/>
-      <xacro:rear_wheel_properties wheel_link="rear_right_wheel" wheel_joint="rear_right_joint"/>
+      <xacro:triSteer_rear_wheel wheel_link="rear_left_wheel"  wheel_joint="rear_left_joint"/>
+      <xacro:triSteer_rear_wheel wheel_link="rear_right_wheel" wheel_joint="rear_right_joint"/>
     </xacro:if>
 
-    <!-- ackermann: 4-wheeled Ackermann -->
+    <!-- ================================================================
+         ackermann: 4-wheeled Ackermann steering
+         ================================================================ -->
     <xacro:if value="${controller_type == 'ackermann'}">
-      <!-- Traction wheels -->
-      <xacro:macro name="traction_wheel_properties" params="wheel_link wheel_joint">
+
+      <xacro:macro name="acker_traction_wheel" params="wheel_link wheel_joint">
         <gazebo reference="${wheel_link}">
           <collision>
             <surface>
               <friction>
                 <ode>
-                  <mu>1.0</mu>
-                  <mu2>1.0</mu2>
+                  <mu>3.0</mu>
+                  <mu2>3.0</mu2>
                 </ode>
               </friction>
               <contact>
-                <kp>1e6</kp>
-                <kd>1.0</kd>
-                <max_vel>0.1</max_vel>
-                <min_depth>0.001</min_depth>
+                <ode>
+                  <kp>1000000.0</kp>
+                  <kd>100.0</kd>
+                  <max_vel>0.1</max_vel>
+                  <min_depth>0.001</min_depth>
+                </ode>
               </contact>
               <bounce>
                 <restitution_coefficient>0.0</restitution_coefficient>
@@ -324,10 +388,9 @@
           <damping>0.1</damping>
         </gazebo>
       </xacro:macro>
-      <xacro:traction_wheel_properties wheel_link="rear_left_wheel" wheel_joint="rear_left_joint"/>
-      <xacro:traction_wheel_properties wheel_link="rear_right_wheel" wheel_joint="rear_right_joint"/>
+      <xacro:acker_traction_wheel wheel_link="rear_left_wheel"  wheel_joint="rear_left_joint"/>
+      <xacro:acker_traction_wheel wheel_link="rear_right_wheel" wheel_joint="rear_right_joint"/>
 
-      <!-- Steering joints -->
       <gazebo reference="chassis_to_front_left_steering">
         <damping>0.01</damping>
         <friction>0.3</friction>
@@ -337,22 +400,23 @@
         <friction>0.3</friction>
       </gazebo>
 
-      <!-- Front wheels -->
-      <xacro:macro name="front_wheel_properties" params="wheel_link wheel_joint">
+      <xacro:macro name="acker_front_wheel" params="wheel_link wheel_joint">
         <gazebo reference="${wheel_link}">
           <collision>
             <surface>
               <friction>
                 <ode>
-                  <mu>0.8</mu>
-                  <mu2>0.8</mu2>
+                  <mu>3.0</mu>
+                  <mu2>3.0</mu2>
                 </ode>
               </friction>
               <contact>
-                <kp>1e6</kp>
-                <kd>1.0</kd>
-                <max_vel>0.1</max_vel>
-                <min_depth>0.001</min_depth>
+                <ode>
+                  <kp>1000000.0</kp>
+                  <kd>100.0</kd>
+                  <max_vel>0.1</max_vel>
+                  <min_depth>0.001</min_depth>
+                </ode>
               </contact>
               <bounce>
                 <restitution_coefficient>0.0</restitution_coefficient>
@@ -364,9 +428,10 @@
           <damping>0.05</damping>
         </gazebo>
       </xacro:macro>
-      <xacro:front_wheel_properties wheel_link="front_left_wheel" wheel_joint="front_left_joint"/>
-      <xacro:front_wheel_properties wheel_link="front_right_wheel" wheel_joint="front_right_joint"/>
+      <xacro:acker_front_wheel wheel_link="front_left_wheel"  wheel_joint="front_left_joint"/>
+      <xacro:acker_front_wheel wheel_link="front_right_wheel" wheel_joint="front_right_joint"/>
     </xacro:if>
+
   </xacro:macro>
 
 </robot>

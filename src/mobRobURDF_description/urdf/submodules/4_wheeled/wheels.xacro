@@ -4,7 +4,11 @@
   <xacro:include filename="$(find mobRobURDF_description)/urdf/macros/inertial_macros.xacro" />
 
   <!-- Wheel Macro -->
-  <xacro:macro name="wheel" params="name radius width mass material x y z">
+  <!-- collision_geom: "cylinder" (default) or "sphere". A spherical collision
+       gives a single stable contact point, which the mecanum friction model
+       (anisotropic fdir1) needs to strafe reliably. The visual stays a cylinder
+       so the wheel still looks normal. -->
+  <xacro:macro name="wheel" params="name radius width mass material x y z collision_geom:=cylinder">
     <link name="${name}_wheel">
       <inertial>
         <mass value="${mass}" />
@@ -22,12 +26,17 @@
       <collision>
         <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
         <geometry>
-          <cylinder radius="${radius}" length="${width}" />
+          <xacro:if value="${collision_geom == 'sphere'}">
+            <sphere radius="${radius}" />
+          </xacro:if>
+          <xacro:unless value="${collision_geom == 'sphere'}">
+            <cylinder radius="${radius}" length="${width}" />
+          </xacro:unless>
         </geometry>
       </collision>
     </link>
     <joint name="${name}_joint" type="continuous">
-      <parent link="chassis" />
+      <parent link="base_link" />
       <child link="${name}_wheel" />
       <origin xyz="${x} ${y} ${z}" rpy="0 0 0" />
       <axis xyz="0 1 0" />

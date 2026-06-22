@@ -1,0 +1,7 @@
+image: map_3.pgm
+mode: trinary
+resolution: 0.1
+origin: [-16.4, -26, 0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.25

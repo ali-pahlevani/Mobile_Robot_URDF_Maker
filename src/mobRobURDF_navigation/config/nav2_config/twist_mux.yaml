@@ -1,0 +1,12 @@
+twist_mux:
+  ros__parameters:
+    topics:
+      navigation:
+        topic: cmd_vel #cmd_vel_nav
+        timeout: 0.5
+        priority: 50
+      #teleop_keyboard:
+      #  topic: cmd_vel_key
+      #  timeout: 0.5
+      #  priority: 150
+

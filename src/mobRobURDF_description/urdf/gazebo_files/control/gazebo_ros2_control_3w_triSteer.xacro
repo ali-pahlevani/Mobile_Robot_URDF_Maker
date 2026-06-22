@@ -3,7 +3,7 @@
 
     <ros2_control name="GazeboSystem" type="system">
         <hardware>
-            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+            <plugin>${hardware_plugin}</plugin>
         </hardware>
 
         <joint name="rear_left_joint">
@@ -33,10 +33,9 @@
             <state_interface name="position"/>
         </joint>
 
-        <!-- - - - Not-motorized - - - -->
+        <!-- Passive front wheel: state interfaces only — no command so gz rolls it freely -->
 
         <joint name="front_joint">
-            <command_interface name="velocity"></command_interface>
             <state_interface name="velocity"/>
             <state_interface name="position"/>
         </joint>
@@ -45,10 +44,18 @@
 
     </ros2_control>
 
-    <gazebo>
-        <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="libgz_ros2_control-system.so">
-            <parameters>$(find mobRobURDF_control)/config/steer/gazebo_controller_triSteer.yaml</parameters>
-        </plugin>
-    </gazebo>
+    <xacro:if value="${use_gazebo_sim}">
+        <gazebo>
+            <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="libgz_ros2_control-system.so">
+                <parameters>$(find mobRobURDF_control)/config/steer/gazebo_controller_triSteer.yaml</parameters>
+                <ros>
+                    <!-- tricycle_steering_controller publishes to ~/tf_odometry and ~/odometry,
+                         not to /tf and /odom. Remap to the standard global topics. -->
+                    <remapping>/triSteer_controller/tf_odometry:=/tf</remapping>
+                    <remapping>/triSteer_controller/odometry:=/odom</remapping>
+                </ros>
+            </plugin>
+        </gazebo>
+    </xacro:if>
     
 </robot>

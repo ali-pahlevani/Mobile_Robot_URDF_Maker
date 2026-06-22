@@ -1,92 +1,131 @@
 import os
 import logging
-from PyQt5.QtWidgets import (QWizardPage, QVBoxLayout, QHBoxLayout, QLabel, QWidget)
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (
+    QWizardPage, QVBoxLayout, QHBoxLayout, QLabel, QWidget, QScrollArea, QSizePolicy,
+)
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap
 from ament_index_python.packages import get_package_share_directory
 
-# Future Features Page
+from mobRobURDF_wizard.classes.responsive_widgets import ScaledPixmapLabel
+
+logger = logging.getLogger(__name__)
+
+_CARD_H = 160   # card height
+
+# (title, image_basename, badge_text, badge_color)
+_FEATURES = [
+    ("More Robot Models and Kinematics", "models.png",    "In Progress", "#E67E22"),
+    ("SLAM",                             "slam.png",       "In Progress", "#E67E22"),
+    ("Navigation",                       "navigation.png", "Planned",     "#2980B9"),
+    ("Fleet Management",                 "fleet.png",    "Planned",     "#2980B9"),
+]
+
+
+def _make_item(image_path: str, title_text: str, badge_text: str, badge_color: str) -> QWidget:
+    item = QWidget()
+    item.setObjectName("featureItem")
+    item.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+    item.setFixedHeight(_CARD_H)
+    item.setStyleSheet("""
+        QWidget#featureItem {
+            background-color: #FFFFFF;
+            border: 1px solid #DDE1E4;
+            border-radius: 10px;
+        }
+    """)
+
+    row = QHBoxLayout(item)
+    row.setContentsMargins(0, 0, 28, 0)
+    row.setSpacing(0)
+
+    img = ScaledPixmapLabel(hint=QSize(600, _CARD_H))
+    img.setFixedHeight(_CARD_H)
+    img.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+    img.setStyleSheet("border: none; border-radius: 10px;")
+    if os.path.exists(image_path):
+        img.setSourcePixmap(QPixmap(image_path))
+    else:
+        img.setText("Image not found")
+        img.setStyleSheet(
+            "color: #95A5A6; border: none; background: #F2F3F4; border-radius: 10px;"
+        )
+    row.addWidget(img, 13)   # image: 13 parts ≈ 65 %
+
+    row.addSpacing(24)
+
+    text_col = QVBoxLayout()
+    text_col.setContentsMargins(0, 0, 0, 0)
+    text_col.setSpacing(10)
+    text_col.addStretch()
+
+    title_lbl = QLabel(title_text)
+    title_lbl.setWordWrap(True)
+    title_lbl.setAlignment(Qt.AlignCenter)
+    title_lbl.setStyleSheet(
+        "font-size: 17pt; font-weight: bold; color: #2C3E50; "
+        "background: transparent; border: none;"
+    )
+    text_col.addWidget(title_lbl)
+
+    badge_lbl = QLabel(badge_text)
+    badge_lbl.setFixedHeight(34)
+    badge_lbl.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+    badge_lbl.setAlignment(Qt.AlignCenter)
+    badge_lbl.setStyleSheet(
+        f"font-size: 11pt; font-weight: bold; color: #FFFFFF; "
+        f"background-color: {badge_color}; "
+        f"border-radius: 6px; padding: 0px 20px; border: none;"
+    )
+    text_col.addWidget(badge_lbl, alignment=Qt.AlignHCenter)
+
+    text_col.addStretch()
+    row.addLayout(text_col, 7)   # text: 7 parts ≈ 35 %
+
+    return item
+
+
 class FutureFeaturesPage(QWizardPage):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setTitle("Future Features")
 
-        self.image_dir = os.path.join(get_package_share_directory("mobRobURDF_wizard"), "images", "future_features")
-        #logging.debug(f"Image directory set to: {self.image_dir}")
+        image_dir = os.path.join(
+            get_package_share_directory("mobRobURDF_wizard"),
+            "images", "future_features",
+        )
 
-        features = [
-            #("Gazebo", os.path.join(self.image_dir, "gazebo.png")),
-            #("Control", os.path.join(self.image_dir, "control.png")),
-            ("SLAM", os.path.join(self.image_dir, "slam.png")),
-            ("Navigation", os.path.join(self.image_dir, "navigation.png")),
-            ("Obj. Tracking", os.path.join(self.image_dir, "object_tracking.png")),
-        ]
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(20, 14, 20, 16)
+        outer.setSpacing(12)
 
-        # Main layout: Vertical stack of feature rows
-        main_layout = QVBoxLayout()
-        main_layout.setSpacing(140)  # Space between rows (prev: 40)
+        header = QLabel("What's next for the URDF Maker")
+        header.setAlignment(Qt.AlignCenter)
+        header.setStyleSheet("font-size: 16pt; font-weight: bold; color: #2C3E50;")
+        outer.addWidget(header)
 
-        for feature_name, image_path in features:
-            # Feature name label (centered text)
-            feature_label = QLabel(feature_name)
-            feature_label.setStyleSheet("""
-                font-size: 36pt;
-                font-weight: bold;
-                font-family: "Segoe UI";
-                color: #8B0000;
-                padding: 10px;
-                background-color: #FFFFFF;
-                border: 1px solid #E0E0E0;
-                border-radius: 5px;
-            """)
-            feature_label.setFixedWidth(500) #(prev: 240)
-            feature_label.setAlignment(Qt.AlignCenter)  # Center text horizontally and vertically
+        sub = QLabel(
+            "These capabilities are currently under development or planned for future releases."
+        )
+        sub.setAlignment(Qt.AlignCenter)
+        sub.setStyleSheet("font-size: 10pt; color: #7F8C8D;")
+        outer.addWidget(sub)
 
-            # Image label
-            image_label = QLabel()
-            pixmap = QPixmap(image_path)
-            if not pixmap.isNull():
-                image_label.setPixmap(pixmap.scaled(900, 150)) # Qt.KeepAspectRatio
-                #logging.debug(f"Loaded image for {feature_name}: {image_path}")
-            else:
-                image_label.setText(f"{feature_name} Image Not Found")
-                #logging.warning(f"Failed to load image for {feature_name}: {image_path}")
-            image_label.setStyleSheet("""
-                border: 2px solid #4A90E2;
-                border-radius: 10px;
-                background-color: #F5F5F5;
-                padding: 5px;
-            """)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QScrollArea.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-            # Row layout: Name at start, image centered exactly
-            feature_row = QHBoxLayout()
-            feature_row.addWidget(feature_label)  # Name at the start (left)
-            feature_row.addStretch(2)  # Stretch to push image toward center
-            feature_row.addWidget(image_label, alignment=Qt.AlignCenter)  # Image centered
-            feature_row.addStretch(2)  # Stretch to balance centering
-            feature_row.setSpacing(15)  # Space between name and image
+        inner = QWidget()
+        cards = QVBoxLayout(inner)
+        cards.setContentsMargins(16, 10, 16, 10)
+        cards.setSpacing(16)
 
-            # Wrap row in a widget for styling
-            row_widget = QWidget()
-            row_widget.setLayout(feature_row)
-            row_widget.setStyleSheet("""
-                background-color: #FFFFFF;
-                border: 1px solid #E0E0E0;
-                border-radius: 8px;
-                padding: 10px;
-            """)
-            # Hover effect
-            row_widget.setProperty("class", "feature-row")
-            row_widget.setStyleSheet(row_widget.styleSheet() + """
-                .feature-row:hover {
-                    background-color: #F0F4F8;
-                    border: 1px solid #4A90E2;
-                }
-            """)
+        for title, image_name, badge, color in _FEATURES:
+            path = os.path.join(image_dir, image_name)
+            cards.addWidget(_make_item(path, title, badge, color))
 
-            main_layout.addWidget(row_widget)
+        cards.addStretch()
 
-        main_layout.addStretch()  # Center the rows vertically
-        self.setLayout(main_layout)
-        self.setStyleSheet("background-color: #F0F4F8;")  # Light blue-gray page background
-        #logging.debug("FutureFeaturesPage initialized")
+        scroll.setWidget(inner)
+        outer.addWidget(scroll, 1)

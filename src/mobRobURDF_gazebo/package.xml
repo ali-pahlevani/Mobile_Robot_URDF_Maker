@@ -7,6 +7,13 @@
   <maintainer email="a.pahlevani1998@gmail.com">Ali Pahlevani</maintainer>
   <license>MIT</license>
 
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <!-- Gazebo (Modern) integration -->
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>ros_gz_image</exec_depend>
+
   <!-- Test dependencies if you plan to add tests -->
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
