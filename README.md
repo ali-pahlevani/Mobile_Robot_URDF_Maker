@@ -1,6 +1,6 @@
 # Mobile Robot URDF Maker (V4)
 
-![Mobile Robot URDF Maker Banner](https://github.com/user-attachments/assets/f117642b-6f3c-4057-a417-f05a30a2baa8)
+![Mobile Robot URDF Maker Banner](https://github.com/user-attachments/assets/f71a06c0-73a0-431b-a4ce-6027c849359e)
 
 **Mobile Robot URDF Maker** is a *ROS 2* desktop application that **automates** the creation of a complete, simulation-ready **URDF** for your **mobile robot** — through a guided *PyQt5* wizard, with no hand-written *XML* required. V4 adds **six selectable `ros2_control` controllers**, a **dynamic multi-sensor system**, a **Controller Tuner**, **hardware-interface selection**, and **built-in teleoperation** — so you can pick a chassis, tune the kinematics, add sensors, and **drive the robot live in *Gazebo*, all from one window.**
 
