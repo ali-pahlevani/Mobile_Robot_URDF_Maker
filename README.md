@@ -14,7 +14,7 @@ The app walks you through building a mobile-robot description step by step: pick
 
 ## What's New in V4
 
-* **Six Selectable Controllers**: Differential, mecanum, tricycle, tricycle-steering and Ackermann — each backed by a real `ros2_control` plugin, and only the controllers valid for the chosen chassis are offered.
+* **Six Selectable Controllers**: Differential, skid-steer differential, mecanum, tricycle, tricycle-steering and Ackermann — each backed by a real `ros2_control` plugin, and only the controllers valid for the chosen chassis are offered.
 * **Dynamic Multi-Sensor System**: Add any number of lidars and cameras, each fully configurable, with a live 3D preview and an auto-generated *Gazebo* bridge.
 * **Controller Tuner**: Edit publish/update rates, command timeout, velocity/acceleration and steering limits — or fill them with physics-based **Auto-suggest** values.
 * **Hardware-Interface Selection**: *Gazebo* simulation, mock hardware, or your own custom `ros2_control` plugin, injected directly into the generated *URDF*.
