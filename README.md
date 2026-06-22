@@ -309,7 +309,6 @@ The original wizard for a single **4-wheeled** robot: chassis + 4 wheels + a 2D 
 
 + Questions? Reach out: **a.pahlevani1998@gmail.com**
 + LinkedIn: **https://www.linkedin.com/in/ali-pahlevani/**
-+ Website: **https://www.SLAMbotics.org**
 
 ---
 
