@@ -8,18 +8,21 @@
   <xacro:property name="wheel_width" value="0.12"/>
   <xacro:property name="wheel_mass" value="0.5"/>
   <xacro:property name="wheel_material" value="Dark Gray"/>
-  <xacro:property name="front_x" value="0.6"/>
-  <xacro:property name="front_y" value="0"/>
-  <xacro:property name="front_z" value="-0.15"/>
+  <xacro:property name="fl_x" value="0.4533333333333333"/>
+  <xacro:property name="fl_y" value="0.46"/>
+  <xacro:property name="fl_z" value="-0.15"/>
+  <xacro:property name="fr_x" value="0.4533333333333333"/>
+  <xacro:property name="fr_y" value="-0.46"/>
+  <xacro:property name="fr_z" value="-0.15"/>
   <xacro:property name="rl_x" value="-0.4533333333333333"/>
   <xacro:property name="rl_y" value="0.46"/>
   <xacro:property name="rl_z" value="-0.15"/>
   <xacro:property name="rr_x" value="-0.4533333333333333"/>
   <xacro:property name="rr_y" value="-0.46"/>
   <xacro:property name="rr_z" value="-0.15"/>
-  <xacro:property name="controller_type" value="tricycle"/>
+  <xacro:property name="controller_type" value="diff_4w"/>
   <xacro:property name="hardware_plugin" value="gz_ros2_control/GazeboSimSystem"/>
   <xacro:property name="use_gazebo_sim" value="1"/>
-  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/3_wheeled/mobRob_3w_tricycle.xacro"/>
+  <xacro:include filename="$(find mobRobURDF_description)/urdf/submodules/4_wheeled/mobRob_4w_diff.xacro"/>
   <xacro:include filename="$(find mobRobURDF_description)/urdf/user_sensors.xacro"/>
 </robot>
