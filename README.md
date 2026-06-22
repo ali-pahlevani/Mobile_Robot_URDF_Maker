@@ -104,7 +104,7 @@ Mobile_Robot_URDF_Maker/
 
 The wizard only offers the controllers that are valid for the chosen chassis. The matching controller config lives under `src/mobRobURDF_control/config/` and is regenerated from your parameters every time you click **Apply**.
 
-![Controller List](https://github.com/user-attachments/assets/f71a06c0-73a0-431b-a4ce-6027c849359e)
+![Demo](https://github.com/user-attachments/assets/f71a06c0-73a0-431b-a4ce-6027c849359e)
 
 ## Installation and Usage
 
@@ -235,7 +235,9 @@ Click **Launch Simulation**. The launch file (`mobRobURDF_launch/gazebo_test.lau
 * *RViz2* with a preconfigured view
 * a `cmd_vel_relay` node
 
-![Gazebo Scene](https://github.com/user-attachments/assets/c66fa3c5-59e6-4d80-b096-1d1de728fc7c)
+![Sim and Teleop](https://github.com/user-attachments/assets/c66fa3c5-59e6-4d80-b096-1d1de728fc7c)
+
+![Gazebo Scene](https://github.com/user-attachments/assets/d675217e-e27d-418c-84fd-1b4f2ade13e7)
 
 **Driving the robot.** Different controllers listen on different command topics (`cmd_vel_unstamped`, `cmd_vel`, `reference_unstamped`, …). The built-in `cmd_vel_relay` hides this: it subscribes to a single **`/cmd_vel`** and republishes to whatever the active controller expects. So you can just:
 
