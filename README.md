@@ -104,7 +104,7 @@ Mobile_Robot_URDF_Maker/
 
 The wizard only offers the controllers that are valid for the chosen chassis. The matching controller config lives under `src/mobRobURDF_control/config/` and is regenerated from your parameters every time you click **Apply**.
 
-![Controller List](https://github.com/user-attachments/assets/945a5620-d423-44a1-b807-2aa61d8e1d83)
+![Controller List](https://github.com/user-attachments/assets/161b6c72-ac37-4727-98b4-ce089e223c78)
 
 ## Installation and Usage
 
@@ -183,25 +183,25 @@ The wizard walks you through every step sequentially. Each page can be revisited
 
 A project intro. Click *Next* to begin.
 
-![Welcome Page](PLACEHOLDER_IMAGE_URL)
+![Welcome Page](https://github.com/user-attachments/assets/dbc519d5-a536-45b6-aaac-b4622cc32f55)
 
 ### Step 2: Start Project
 
 Begin a **new project**, or **load a saved session** (`*.mobsession`) to resume exactly where you left off. The detected *ROS 2* environment (`$ROS_DISTRO`) is shown here.
 
-![Start Project](PLACEHOLDER_IMAGE_URL)
+![Start Project](https://github.com/user-attachments/assets/7f4a70c4-9bd8-474e-8cc9-dbed55a854f2)
 
 ### Step 3: Select Robot Type
 
 Choose **4-wheeled**, **3-wheeled (tricycle)**, or **2-wheeled + caster**.
 
-![Select Robot Type](PLACEHOLDER_IMAGE_URL)
+![Select Robot Type](https://github.com/user-attachments/assets/85e3500d-acf3-45f1-a23e-6cffdcbc1158)
 
 ### Step 4: Select Controller
 
 Pick a controller compatible with that chassis — incompatible options are disabled automatically.
 
-![Select Controller](PLACEHOLDER_IMAGE_URL)
+![Select Controller](https://github.com/user-attachments/assets/e6def256-380a-4857-a7dc-8cc0871babb8)
 
 ### Step 5: Configure Parameters
 
@@ -210,19 +210,19 @@ Set chassis size/mass/material and wheel dimensions, add sensors, and watch the 
 * **Add Sensors**: Click **+ Lidar** or **+ Camera** to add as many sensors as you need. Each gets its own card where you set its **pose** (x, y, z, roll, pitch, yaw), **visual/physics** (color, mass, geometry), and type-specific settings — **lidar** (samples, min/max angle, range, update rate) or **camera** (FOV, resolution, clip planes, update rate).
 * Every sensor appears immediately in the 3D preview at its exact pose and color. On build, the wizard writes `user_sensors.xacro` and a generated `gz_bridge_generated.yaml`, so all sensor topics are bridged from *Gazebo* to *ROS 2* automatically.
 
-![Configure Parameters](PLACEHOLDER_IMAGE_URL)
+![Configure Parameters](https://github.com/user-attachments/assets/71a247b8-ce8a-41ab-9591-1473de7ec17e)
 
 ### Step 6: Tune Controller
 
 Review the auto-computed geometry (read-only), pick the **hardware interface** (*Gazebo*, mock hardware, or a custom plugin), and set motion/steering limits — manually or via **Auto-suggest**.
 
-![Tune Controller](PLACEHOLDER_IMAGE_URL)
+![Tune Controller](https://github.com/user-attachments/assets/01ccf15e-2143-4de0-9d2f-ad02f5f6deb8)
 
 ### Step 7: Final Check
 
 Review the generated *URDF* in an editor, make manual edits, copy to clipboard, **Save URDF**, or **Save Session**.
 
-![Final Check](PLACEHOLDER_IMAGE_URL)
+![Final Check](https://github.com/user-attachments/assets/2707b4ae-4a44-47d7-8210-37251cf77dab)
 
 ### Step 8: Simulate & Teleop
 
@@ -235,7 +235,7 @@ Click **Launch Simulation**. The launch file (`mobRobURDF_launch/gazebo_test.lau
 * *RViz2* with a preconfigured view
 * a `cmd_vel_relay` node
 
-![Gazebo Scene](https://github.com/user-attachments/assets/2abbf489-6c52-4d09-b639-26b8e7e7771c)
+![Gazebo Scene](https://github.com/user-attachments/assets/c66fa3c5-59e6-4d80-b096-1d1de728fc7c)
 
 **Driving the robot.** Different controllers listen on different command topics (`cmd_vel_unstamped`, `cmd_vel`, `reference_unstamped`, …). The built-in `cmd_vel_relay` hides this: it subscribes to a single **`/cmd_vel`** and republishes to whatever the active controller expects. So you can just:
 
@@ -249,13 +249,13 @@ For the **mecanum** controller, the **Strafe Mode** toggle remaps left/right to 
 
 > All bundled controllers publish the `odom → base_link` TF and the odometry topic themselves (`enable_odom_tf: true`), so no extra odometry node is required.
 
-![RViz2](https://github.com/user-attachments/assets/e21d173e-c43c-43de-a6be-9f3a55366c62)
+![RViz2](https://github.com/user-attachments/assets/d2c4965e-c791-4a62-bfbb-2ac98521ec14)
 
 ### Step 9: Future Features
 
 A look at what's coming next.
 
-![Future Features](PLACEHOLDER_IMAGE_URL)
+![Future Features](https://github.com/user-attachments/assets/a098dc10-00b9-44cb-b065-6d63ba819e20)
 
 ## Saving Your Work: URDF, Presets and Sessions
 
