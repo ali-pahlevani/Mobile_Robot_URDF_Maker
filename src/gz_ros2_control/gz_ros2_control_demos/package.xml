@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>gz_ros2_control_demos</name>
+  <version>0.7.20</version>
+  <description>gz_ros2_control_demos</description>
+
+  <maintainer email="ahcorde@osrfoundation.org">Alejandro Hernandez</maintainer>
+
+  <license>Apache License 2.0</license>
+
+
+  <url type="website">https://github.com/ros-controls/gz_ros2_control/blob/master/README.md</url>
+  <url type="bugtracker">https://github.com/ros-controls/gz_ros2_control/issues</url>
+  <url type="repository">https://github.com/ros-controls/gz_ros2_control</url>
+
+  <author>Alejandro Hernández</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Harmonic -->
+  <depend condition="$GZ_VERSION == harmonic">gz-sim8</depend>
+  <!-- Fortress (default) -->
+  <depend condition="$GZ_VERSION == '' or $GZ_VERSION == fortress">ignition-gazebo6</depend>
+
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>rclcpp</build_depend>
+  <build_depend>rclcpp_action</build_depend>
+  <build_depend>std_msgs</build_depend>
+
+  <depend>rclcpp_lifecycle</depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>rclcpp</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
+  <!-- ros2_control -->
+  <depend>control_msgs</depend>
+  <depend>control_toolbox</depend>
+  <depend>gz_ros2_control</depend>
+  <depend>hardware_interface</depend>
+  <exec_depend>ackermann_steering_controller</exec_depend>
+  <exec_depend>diff_drive_controller</exec_depend>
+  <exec_depend>force_torque_sensor_broadcaster</exec_depend>
+  <exec_depend>forward_command_controller</exec_depend>
+  <exec_depend>imu_sensor_broadcaster</exec_depend>
+  <exec_depend>joint_state_broadcaster</exec_depend>
+  <exec_depend>joint_trajectory_controller</exec_depend>
+  <exec_depend>mecanum_drive_controller</exec_depend>
+  <exec_depend>ros2controlcli</exec_depend>
+  <exec_depend>tricycle_controller</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
