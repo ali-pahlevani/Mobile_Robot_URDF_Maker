@@ -294,17 +294,6 @@ I'd **love collaborations**! Contribute via pull requests on *GitHub* for bug fi
 
 Please include documentation updates. For major changes, open a *GitHub Issue* first to discuss the approach.
 
-## Version History
-
-### Version 4 (current)
-Six selectable `ros2_control` controllers, *Gazebo Harmonic* simulation, a dynamic multi-sensor system, hardware-interface selection, a Controller Tuner, built-in teleoperation, and full preset/session save & load. Generates both `.urdf` and `.urdf.xacro`, and the 2WC caster now has a 3-DOF free joint.
-
-### Version 2
-Three chassis types to choose from (4-wheeled, tricycle, 2-wheeled + caster), an organised wizard with a navigation bar, automatic *URDF* copy for the test launch file, and a preview of upcoming features.
-
-### Version 1
-The original wizard for a single **4-wheeled** robot: chassis + 4 wheels + a 2D lidar and RGB camera, with a 3D preview (rotate + zoom) and *URDF* export, plus a `urdf_test` launch file (`robot_state_publisher` + `joint_state_publisher_gui` + *RViz2*) for visual and joint checks.
-
 ---
 
 + Questions? Reach out: **a.pahlevani1998@gmail.com**
